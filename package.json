@@ -13,8 +13,10 @@
   },
   "dependencies": {
     "@fontsource/nunito": "^5.2.7",
+    "pako": "^2.1.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "three": "^0.156.1"
   },
   "devDependencies": {
     "vite": "^7.1.0"

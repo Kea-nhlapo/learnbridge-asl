@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import VisionDemo from './VisionDemo.jsx';
+const NiaLab = React.lazy(() => import('./NiaLab.jsx'));
 
 const assets = '/assets/';
 
@@ -25,6 +27,8 @@ const faqs = [
 ];
 
 function App() {
+  if (window.location.pathname === '/vision-demo') return <VisionDemo />;
+  if (window.location.pathname === '/nia-lab') return <React.Suspense fallback={<p>Loading Nia lab…</p>}><NiaLab /></React.Suspense>;
   const [logoOffset, setLogoOffset] = useState(0);
   const [language, setLanguage] = useState('English');
   const [signInOpen, setSignInOpen] = useState(false);
