@@ -63,3 +63,37 @@
 .vision-complete p { color:#536d88; }
 @media(max-width:650px) { .vision-topbar { height:60px; padding:0 16px; } .vision-course { display:none; } .vision-language { margin-left:auto; } .vision-main { padding:16px 16px 110px; } .vision-question { margin-top:14px; } .vision-diagram { margin:12px auto; } .vision-question h1 { margin-bottom:18px; } .vision-option { min-height:52px; font-size:14px!important; } .vision-actions,.vision-feedback { padding:14px 16px; } .vision-feedback { align-items:flex-start; flex-wrap:wrap; gap:8px 12px; } .vision-feedback-action { width:100%; margin:0; } .vision-attempts { display:none; } .vision-check { flex:1; } }
 @media(prefers-reduced-motion:reduce) { .vision-option { transition:none; } }
+
+/* Match the focused full-screen lesson layout from storyboard panels 27, 14 and 15. */
+.vision-main { width:min(100%,1200px); padding:22px 24px 130px; }
+.vision-progress { gap:16px; }
+.vision-progress-track { height:11px; }
+.vision-progress-track span { width:50%; }
+.vision-language { font-size:16px; font-weight:800; }
+.vision-question { max-width:1040px; margin:70px auto 0; }
+.vision-diagram { width:min(100%,1020px); margin:0 auto -16px; }
+.vision-question h1 { font-size:38px; line-height:1.13; margin:0 auto 0; }
+.vision-question.is-feedback { margin-top:240px; }
+.vision-question.is-feedback h1 { font-size:30px; margin-bottom:18px; }
+.vision-options { gap:8px; }
+.vision-option { min-height:68px; font-size:23px!important; }
+.vision-actions { min-height:135px; padding:20px max(24px,calc((100vw - 1150px)/2)); box-shadow:none; }
+.vision-tool-button,.vision-help-button { height:66px; border:2px solid #cbddea; border-bottom-width:4px; border-radius:10px; padding:8px 20px; background:#fff; color:#168af0; font-size:21px!important; font-weight:900!important; }
+.vision-tool-button { width:66px; padding:0; }
+.vision-help-button { min-width:145px; }
+.vision-attempts { margin-left:10px; }
+.vision-check { min-width:240px; height:66px; font-size:20px!important; }
+.vision-feedback { min-height:220px; padding:25px max(24px,calc((100vw - 1120px)/2)); }
+.vision-feedback-symbol { width:75px; height:75px; font-size:45px; }
+.vision-feedback strong { font-size:30px; }
+.vision-feedback p { font-size:18px; max-width:500px; }
+.vision-feedback-action { min-width:270px; min-height:70px; font-size:19px!important; }
+.vision-drawer { width:min(58vw,740px); display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); grid-template-rows:auto auto 1fr auto; gap:18px 22px; align-content:start; }
+.vision-drawer-heading { grid-column:1/-1; }
+.vision-drawer-heading h2 { font-size:30px; }
+.vision-drawer-media { grid-column:1; grid-row:2; aspect-ratio:4/3; }
+.vision-preview-notice { grid-column:1; grid-row:3; margin:0; font-size:14px; align-self:start; }
+.vision-drawer-copy { grid-column:2; grid-row:2/4; font-size:17px; }
+.vision-drawer-copy p { font-size:17px; }
+.vision-drawer-footer { grid-column:1/-1; grid-row:4; }
+@media(max-width:760px) { .vision-main { padding:15px 15px 110px; } .vision-progress { gap:8px; } .vision-language { font-size:11px; } .vision-question,.vision-question.is-feedback { margin:25px auto 0; } .vision-diagram { width:100%; } .vision-question h1,.vision-question.is-feedback h1 { font-size:clamp(20px,5vw,28px); margin-bottom:18px; } .vision-option { min-height:55px; font-size:15px!important; } .vision-actions { min-height:82px; padding:12px 15px; } .vision-tool-button,.vision-help-button { height:50px; font-size:15px!important; padding:7px 10px; } .vision-tool-button { width:50px; } .vision-help-button { min-width:80px; } .vision-check { min-width:95px; height:50px; font-size:15px!important; } .vision-feedback { min-height:130px; padding:14px 16px; } .vision-feedback-symbol { width:40px; height:40px; font-size:25px; } .vision-feedback strong { font-size:19px; } .vision-feedback p { font-size:13px; } .vision-feedback-action { min-width:0; min-height:45px; font-size:14px!important; } .vision-drawer { width:min(100%,440px); display:flex; gap:16px; } .vision-drawer-heading h2 { font-size:25px; } .vision-drawer-copy p { font-size:15px; } }

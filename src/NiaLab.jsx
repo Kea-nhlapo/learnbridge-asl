@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Performs } from './vendor/performs.nogui.module.js';
+import Brand from './Brand.jsx';
 import './nia-lab.css';
 
 // Technical proof of Nia + one real upstream NGT sign. It is not question 27's explanation.
@@ -63,5 +64,5 @@ export default function NiaLab() {
     setTimeout(() => { if (recorder.state === 'recording') recorder.stop(); }, 6000);
   }
 
-  return <main className="nia-lab"><div className="nia-lab-head"><a href="/vision-demo">← Question 27</a><h1>Nia technical test</h1><p>This tests the avatar and a real upstream NGT sign for “eye.” It is not a signed explanation of astigmatism.</p></div><div ref={mount} className="nia-lab-stage" aria-label="Nia avatar stage"/><div className="nia-lab-controls"><p role="status">{status}</p><button type="button" disabled={!ready || recording} onClick={play}>Play NGT sign</button><button type="button" disabled={!ready || recording} onClick={record}>Record motion sample</button></div></main>;
+  return <main className="nia-lab"><div className="nia-lab-head"><Brand href="/"/><a className="nia-lab-back" href="/vision-demo">← Question 27</a><h1>Nia technical test</h1><p>This tests the avatar and a real upstream NGT sign for “eye.” It is not a signed explanation of astigmatism.</p></div><div ref={mount} className="nia-lab-stage" aria-label="Nia avatar stage"/><div className="nia-lab-controls"><p role="status">{status}</p><button type="button" disabled={!ready || recording} onClick={play}>Play NGT sign</button><button type="button" disabled={!ready || recording} onClick={record}>Record motion sample</button></div></main>;
 }
