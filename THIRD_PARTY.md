@@ -6,6 +6,11 @@ LearnBridge's application code and sample lesson illustrations were authored for
 - Tesseract.js, Naptha and contributors — Apache License 2.0. https://github.com/naptha/tesseract.js — loaded from https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/ . Upstream license: https://github.com/naptha/tesseract.js/blob/master/LICENSE.md . OCR language data and WASM assets use their upstream terms.
 - pose-viewer, sign-language-processing contributors — MIT. https://www.npmjs.com/package/pose-viewer — loaded from https://cdn.jsdelivr.net/npm/pose-viewer@1.2.0/ . Used to display actual pose data; no claim of authorship or linguistic accuracy.
 - Sign Translate / Rylo, Amit Moryossef and contributors — external public research service and web application. https://github.com/sign/translate . The prototype calls its existing public motion endpoint and links to its translator. No source or model weights from this project are bundled. No partnership or endorsement is implied. Availability is controlled by its maintainers.
+- Free hosted model demos on Hugging Face Spaces, called through `worker/index.js` (no model weights are bundled; availability and capacity are controlled by their maintainers):
+  - Whisper large-v3, OpenAI — MIT — https://huggingface.co/spaces/hf-audio/whisper-large-v3 (English transcription)
+  - W2V-BERT 2.0 isiZulu ASR, badrex — CC BY 4.0 — https://huggingface.co/spaces/badrex/Zulu-ASR (isiZulu transcription)
+  - NLLB-200, Meta — CC BY-NC 4.0 (non-commercial) — https://huggingface.co/spaces/UNESCO/nllb (translation)
+  - OmniVoice, k2-fsa — code Apache-2.0, weights non-commercial — https://huggingface.co/spaces/k2-fsa/OmniVoice (isiZulu, Sepedi and English voices)
 - DM Sans and Manrope — Google Fonts distribution, SIL Open Font License. Font files are remotely served, with local sans-serif fallbacks.
 
 No third-party human signing footage is included. A teacher may attach a video they have permission to use.
