@@ -70,8 +70,8 @@
 .vision-progress-track { height:11px; }
 .vision-progress-track span { width:50%; }
 .vision-language { font-size:16px; font-weight:800; }
-.vision-question { max-width:1040px; margin:70px auto 0; }
-.vision-diagram { width:min(100%,1020px); height:auto; margin:0 auto 18px; image-rendering:auto; }
+.vision-question { max-width:1040px; margin:35px auto 0; }
+.vision-diagram { width:min(100%,1020px); height:250px; object-fit:contain; margin:0 auto 18px; image-rendering:auto; }
 .vision-question h1 { font-size:38px; line-height:1.13; margin:0 auto 0; }
 .vision-question.is-feedback { margin-top:240px; }
 .vision-question.is-feedback h1 { font-size:30px; margin-bottom:18px; }
@@ -96,4 +96,4 @@
 .vision-drawer-copy { grid-column:2; grid-row:2/4; font-size:17px; }
 .vision-drawer-copy p { font-size:17px; }
 .vision-drawer-footer { grid-column:1/-1; grid-row:4; }
-@media(max-width:760px) { .vision-main { padding:15px 15px 110px; } .vision-progress { gap:8px; } .vision-language { font-size:11px; } .vision-question,.vision-question.is-feedback { margin:25px auto 0; } .vision-diagram { width:100%; } .vision-question h1,.vision-question.is-feedback h1 { font-size:clamp(20px,5vw,28px); margin-bottom:18px; } .vision-option { min-height:55px; font-size:15px!important; } .vision-actions { min-height:82px; padding:12px 15px; } .vision-tool-button,.vision-help-button { height:50px; font-size:15px!important; padding:7px 10px; } .vision-tool-button { width:50px; } .vision-help-button { min-width:80px; } .vision-check { min-width:95px; height:50px; font-size:15px!important; } .vision-feedback { min-height:130px; padding:14px 16px; } .vision-feedback-symbol { width:40px; height:40px; font-size:25px; } .vision-feedback strong { font-size:19px; } .vision-feedback p { font-size:13px; } .vision-feedback-action { min-width:0; min-height:45px; font-size:14px!important; } .vision-drawer { width:min(100%,440px); display:flex; gap:16px; } .vision-drawer-heading h2 { font-size:25px; } .vision-drawer-copy p { font-size:15px; } }
+@media(max-width:760px) { .vision-main { padding:15px 15px 110px; } .vision-progress { gap:8px; } .vision-language { font-size:11px; } .vision-question,.vision-question.is-feedback { margin:25px auto 0; } .vision-diagram { width:100%; height:auto; } .vision-question h1,.vision-question.is-feedback h1 { font-size:clamp(20px,5vw,28px); margin-bottom:18px; } .vision-option { min-height:55px; font-size:15px!important; } .vision-actions { min-height:82px; padding:12px 15px; } .vision-tool-button,.vision-help-button { height:50px; font-size:15px!important; padding:7px 10px; } .vision-tool-button { width:50px; } .vision-help-button { min-width:80px; } .vision-check { min-width:95px; height:50px; font-size:15px!important; } .vision-feedback { min-height:130px; padding:14px 16px; } .vision-feedback-symbol { width:40px; height:40px; font-size:25px; } .vision-feedback strong { font-size:19px; } .vision-feedback p { font-size:13px; } .vision-feedback-action { min-width:0; min-height:45px; font-size:14px!important; } .vision-drawer { width:min(100%,440px); display:flex; gap:16px; } .vision-drawer-heading h2 { font-size:25px; } .vision-drawer-copy p { font-size:15px; } }

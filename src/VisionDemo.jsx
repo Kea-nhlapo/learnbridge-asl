@@ -89,7 +89,7 @@ export default function VisionDemo() {
     <main className="vision-main">
       <div className="vision-progress"><button type="button" className="vision-exit" aria-label="Exit lesson" onClick={() => { window.location.href = '/'; }}>×</button><div className="vision-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow={completed ? 1 : 0} aria-label="Lesson progress"><span /></div><span className="vision-language">Language: English⌄</span></div>
       <section className={`vision-question ${result ? 'is-feedback' : ''}`} aria-labelledby="vision-question-title">
-        {!result && <img className="vision-diagram" src="/assets/astigmatism-reference.png" alt="Normal eye rays focus at one point; astigmatism rays focus at several points" />}
+        {!result && <img className="vision-diagram" src="/assets/astigmatism-reference-4k.png" alt="Normal eye rays focus at one point; astigmatism rays focus at several points" />}
         <h1 id="vision-question-title">What causes blurred vision in astigmatism?</h1>
         <div className="vision-options" role="group" aria-label="Choose an answer">{options.map(option => <button key={option.id} type="button" className={`vision-option ${selectedId === option.id ? 'selected' : ''} ${selectedId === option.id && result ? result : ''}`} aria-pressed={selectedId === option.id} onClick={() => select(option.id)}><span>{option.label}</span>{selectedId === option.id && result && <span aria-hidden="true" className="vision-option-icon">{result === 'correct' ? '✓' : '×'}</span>}</button>)}</div>
       </section>
