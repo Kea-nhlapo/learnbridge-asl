@@ -1,1 +1,12 @@
-{"name":"learnbridge-asl-prototype","version":"0.1.0","private":true,"type":"module","scripts":{"dev":"node scripts/build.mjs && node scripts/dev.mjs","build":"node scripts/build.mjs","check":"node --check web/app.js && node scripts/validate-artifact.mjs","test":"node --test tests/worker.test.mjs"}}
+{
+  "name": "learnbridge-asl-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/build.mjs && node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "check": "node --check web/app.js && node scripts/validate-artifact.mjs",
+    "test": "node --test tests/*.test.mjs"
+  }
+}

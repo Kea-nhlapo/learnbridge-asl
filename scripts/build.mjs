@@ -1,7 +1,7 @@
 import {readFile,mkdir,writeFile,rm} from 'node:fs/promises';
 const root=new URL('../',import.meta.url);
 const assets={};
-for(const [name,type] of [['index.html','text/html; charset=utf-8'],['style.css','text/css; charset=utf-8'],['app.js','text/javascript; charset=utf-8']])assets['/'+name]={body:await readFile(new URL('web/'+name,root),'utf8'),type};
+for(const [name,type] of [['index.html','text/html; charset=utf-8'],['style.css','text/css; charset=utf-8'],['app.js','text/javascript; charset=utf-8'],['asl-text.js','text/javascript; charset=utf-8']])assets['/'+name]={body:await readFile(new URL('web/'+name,root),'utf8'),type};
 const worker=await readFile(new URL('worker/index.js',root),'utf8');
 await rm(new URL('dist/',root),{recursive:true,force:true});
 await mkdir(new URL('dist/server/',root),{recursive:true});await mkdir(new URL('dist/.openai/',root),{recursive:true});
