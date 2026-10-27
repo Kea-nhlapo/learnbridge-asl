@@ -101,3 +101,12 @@ test('honest failures: too few grounded questions, busy model fallback, missing 
   assert.equal((await call(noKey, 'GET', '/api/lessons/lesson-missing')).status, 404);
   assert.equal((await call(noKey, 'GET', '/api/other')).status, 'next');
 });
+
+test('inline mode (serverless): the POST waits for the job and returns the lesson with it', async () => {
+  const jobs = createLessonJobs({ apiKey: 'k', fetchImpl: fakeGemini([GEMINI_QUESTIONS]), inline: true });
+  const created = await call(jobs, 'POST', '/api/lesson-jobs/script', { text: SOURCE });
+  assert.equal(created.status, 202);
+  assert.equal(created.body.status, 'ready');
+  assert.doesNotThrow(() => validateLesson(created.body.lesson));
+  assert.equal(created.body.lesson.questions.length, 3);
+});

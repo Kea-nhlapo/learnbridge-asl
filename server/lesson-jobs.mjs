@@ -110,7 +110,9 @@ SOURCE:
 ${text.slice(0, MAX_SOURCE_CHARS)}`;
 }
 
-export function createLessonJobs({ apiKey, fetchImpl = fetch, newId = () => crypto.randomUUID().slice(0, 8) } = {}) {
+// inline: finish the job within the POST request and return the lesson with it. Serverless hosts (Vercel)
+// cannot keep jobs in memory between requests, so polling another instance would not find the job.
+export function createLessonJobs({ apiKey, fetchImpl = fetch, newId = () => crypto.randomUUID().slice(0, 8), inline = false } = {}) {
   const jobs = new Map();
   const lessons = new Map();
 
@@ -156,7 +158,8 @@ export function createLessonJobs({ apiKey, fetchImpl = fetch, newId = () => cryp
   }
 
   const send = (res, status, body) => { res.statusCode = status; res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.setHeader('Cache-Control', 'no-store'); res.end(JSON.stringify(body)); };
-  const publicJob = ({ done, ...job }) => job;
+  const publicJob = ({ done, ...job }) => (inline && job.lessonId ? { ...job, lesson: lessons.get(job.lessonId) } : job);
+  const started = async job => { if (inline) await job.done; return publicJob(job); };
   async function readBody(req, limit) {
     const chunks = []; let size = 0;
     for await (const chunk of req) { size += chunk.length; if (size > limit) throw new UserError('The upload is too large.'); chunks.push(chunk); }
@@ -171,13 +174,13 @@ export function createLessonJobs({ apiKey, fetchImpl = fetch, newId = () => cryp
       if (req.method === 'POST' && path === '/api/lesson-jobs/script') {
         const body = JSON.parse((await readBody(req, 200000)).toString() || '{}');
         if (typeof body.text !== 'string' || normalise(body.text).split(' ').length < 30) return send(res, 400, { message: 'Paste at least a paragraph of lesson text (30 words or more).' });
-        return send(res, 202, publicJob(start('script', { text: body.text, metadata: metadataFrom(body.metadata) })));
+        return send(res, 202, await started(start('script', { text: body.text, metadata: metadataFrom(body.metadata) })));
       }
       if (req.method === 'POST' && path === '/api/lesson-jobs/youtube') {
         const body = JSON.parse((await readBody(req, 300000)).toString() || '{}');
         if (!/^[A-Za-z0-9_-]{11}$/.test(body.videoId || '')) return send(res, 400, { message: 'A YouTube video ID is required.' });
         if (typeof body.transcript !== 'string' || normalise(body.transcript).split(' ').length < 30) return send(res, 400, { message: 'The transcript is too short to build a lesson.' });
-        return send(res, 202, publicJob(start('youtube', { text: body.transcript, videoId: body.videoId, metadata: metadataFrom(body.metadata) })));
+        return send(res, 202, await started(start('youtube', { text: body.transcript, videoId: body.videoId, metadata: metadataFrom(body.metadata) })));
       }
       if (req.method === 'POST' && path === '/api/lesson-jobs/pdf') {
         const raw = await readBody(req, MAX_PDF_BYTES + 100000);
@@ -187,7 +190,7 @@ export function createLessonJobs({ apiKey, fetchImpl = fetch, newId = () => cryp
         const pdf = Buffer.from(await file.arrayBuffer());
         if (pdf.subarray(0, 5).toString() !== '%PDF-') return send(res, 400, { message: 'That file is not a PDF.' });
         if (pdf.length > MAX_PDF_BYTES) return send(res, 413, { message: 'Choose a PDF under 15 MB.' });
-        return send(res, 202, publicJob(start('pdf', { pdf, metadata: metadataFrom(form.get('metadata')) })));
+        return send(res, 202, await started(start('pdf', { pdf, metadata: metadataFrom(form.get('metadata')) })));
       }
       const jobMatch = path.match(/^\/api\/lesson-jobs\/([\w-]+)$/);
       if (req.method === 'GET' && jobMatch) {

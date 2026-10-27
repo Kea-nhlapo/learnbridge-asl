@@ -3,6 +3,7 @@
 // opens the explanation with Nia signing it. Without an upload, the storyboard screens are unchanged.
 import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createLessonApi } from '../lesson-integration/api.js';
+import { validateLesson } from '../lesson-integration/contract.js';
 import { useQuestionLanguage, LanguageSelect, ListenButton, TranslationNote } from './QuestionLanguage.jsx';
 import { NiaSigner } from './NiaSign.jsx';
 import './live-lesson.css';
@@ -15,7 +16,9 @@ const useLive = () => useSyncExternalStore(l => { listeners.add(l); return () =>
 
 export const liveLesson = () => live.lesson;
 // The journey's 1.2 s auto-advance must wait while a real job is running.
-export const liveJobRunning = () => !!live.job && !['ready', 'failed'].includes(live.job.status);
+// True from the moment a real source is submitted (including when the lesson came back at once, or failed),
+// so the journey shows the live generating screen instead of the storyboard's.
+export const liveJobRunning = () => !!live.job;
 
 const youtubeVideoId = url => String(url).match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/)?.[1] || null;
 const SOURCES = [['pdf', 'PDF document'], ['youtube', 'YouTube video'], ['text', 'Paste text']];
@@ -76,7 +79,12 @@ const STEPS = [['extracting', 'Reading your document...'], ['generating_question
 export function LiveGenerating({ setId, ui: { Brand, Ic } }) {
   const state = useLive();
   useEffect(() => {
-    if (!state.job || ['ready', 'failed'].includes(state.job.status)) return;
+    if (!state.job || state.job.status === 'failed') return;
+    if (state.job.status === 'ready') {
+      // Serverless hosts return the finished lesson with the job (see server/lesson-jobs.mjs, inline mode).
+      if (state.job.lesson && !state.lesson) { try { update({ lesson: validateLesson(state.job.lesson) }); setId('review-loading'); } catch (error) { update({ job: { ...state.job, status: 'failed' }, error: error.message }); } }
+      return;
+    }
     let stopped = false;
     const poll = async () => {
       try {

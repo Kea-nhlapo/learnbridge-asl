@@ -15,7 +15,8 @@ export default defineConfig(({ mode }) => {
   // full reload would tear down MediaPipe and lose the participant's capture.
   // Keep the demo stable; restart/refresh manually when changing source.
   // Lesson preparation (src/lesson-integration contract): Gemini writes questions checked against the source.
-  const lessonJobs = createLessonJobs({ apiKey: env.GEMINI_API_KEY || process.env.GEMINI_API_KEY });
+  // LESSON_JOBS_INLINE=1 reproduces the Vercel behaviour (lesson returned within the POST) locally.
+  const lessonJobs = createLessonJobs({ apiKey: env.GEMINI_API_KEY || process.env.GEMINI_API_KEY, inline: process.env.LESSON_JOBS_INLINE === '1' });
   const lessonApi = { name: 'lesson-jobs-api', configureServer(server) { server.middlewares.use(lessonJobs.handle); }, configurePreviewServer(server) { server.middlewares.use(lessonJobs.handle); } };
   // Any sign from Nia's NGT dictionary, for /nia-sign.
   const ngtSigns = ngtSignsMiddleware(new URL('./public', import.meta.url).pathname);

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "functions": {
+    "api/[...path].js": { "maxDuration": 120 }
+  },
+  "rewrites": [
+    {
+      "source": "/data/dictionaries/NGT/Glosses/:file",
+      "destination": "https://cdn.jsdelivr.net/gh/upf-gti/performs@dfe48af8bc0213df0dae73929b0d69538e54b785/data/dictionaries/NGT/Glosses/:file"
+    },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}
