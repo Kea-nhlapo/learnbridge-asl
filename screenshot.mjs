@@ -45,13 +45,11 @@ try {
     await page.screenshot({ path: path.join(output, 'desktop.png'), fullPage: true });
     console.log(JSON.stringify({ desktop: path.join(output, 'desktop.png'), height: await page.evaluate(() => document.documentElement.scrollHeight) }));
     assert.equal(await page.locator('img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)), true, 'All landing-page images load');
-    await page.getByRole('button', { name: 'Next logos' }).click();
-    assert.equal(await page.locator('.logo-item img').first().getAttribute('alt'), 'Department of Basic Education');
+    assert.equal(await page.locator('.logo-track .logo-item').count(), 10, 'Carousel duplicates logos for a continuous loop');
     await page.getByRole('button', { name: 'Can I edit generated lessons?' }).click();
     assert.equal(await page.getByText('Yes. You can review and edit a lesson before assigning it to a class.').isVisible(), true);
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
-    assert.equal(await page.getByRole('dialog').isVisible(), true);
-    await page.getByRole('button', { name: 'Close' }).click();
+    await page.waitForURL(/\/vision-demo\?screen=login/);
     console.log('Desktop interactions passed');
     await page.setViewportSize({ width: 390, height: 844 });
     await page.reload({ waitUntil: 'networkidle' });

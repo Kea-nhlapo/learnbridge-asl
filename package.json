@@ -8,11 +8,14 @@
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1 --port 8765",
     "screenshot": "node screenshot.mjs",
+    "screenshot:demo": "node qa-screenshots.mjs",
     "verify": "node verify.mjs",
     "test:integration": "node --test src/lesson-integration/*.test.js"
   },
   "dependencies": {
     "@fontsource/nunito": "^5.2.7",
+    "@mediapipe/tasks-vision": "0.10.17",
+    "onnxruntime-web": "1.20.1",
     "pako": "^2.1.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

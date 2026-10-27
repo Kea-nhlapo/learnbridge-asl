@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import VisionDemo from './VisionDemo.jsx';
+import React, { useLayoutEffect, useRef, useState } from 'react';
+import VisionDemo from './DemoJourney.jsx';
 import Brand from './Brand.jsx';
 const NiaLab = React.lazy(() => import('./NiaLab.jsx'));
+const SignIntroduction = React.lazy(() => import('./SignConversation.jsx'));
+const SignCalibration = React.lazy(() => import('./SignCalibration.jsx'));
 
 const assets = '/assets/';
 
@@ -21,15 +23,18 @@ const faqs = [
 ];
 
 function App() {
-  if (window.location.pathname === '/vision-demo') return <VisionDemo />;
+  // `/app` is the product experience reached from the public homepage.
+  // Keep the original prototype URL working for existing bookmarks and demos.
+  if (['/app', '/vision-demo'].includes(window.location.pathname)) return <VisionDemo />;
   if (window.location.pathname === '/nia-lab') return <React.Suspense fallback={<p>Loading Nia lab…</p>}><NiaLab /></React.Suspense>;
-  const [logoOffset, setLogoOffset] = useState(0);
+  if (window.location.pathname === '/sign-introduction') return <React.Suspense fallback={<p>Loading sign introduction…</p>}><SignIntroduction /></React.Suspense>;
+  if (window.location.pathname === '/sign-calibration') return <React.Suspense fallback={<p>Loading calibration…</p>}><SignCalibration /></React.Suspense>;
   const [language, setLanguage] = useState('English');
   const [signInOpen, setSignInOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
-  const orderedLogos = [...logos.slice(logoOffset), ...logos.slice(0, logoOffset)];
-  const start = () => setSignInOpen(true);
+  const start = () => { window.location.href = '/app?screen=login'; };
+  const signIn = () => { window.location.href = '/app?screen=login'; };
 
   return <>
     <a className="skip-link" href="#main">Skip to content</a>
@@ -39,7 +44,7 @@ function App() {
         <div className="header-actions">
           <label className="language-control"><svg className="globe" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true"><circle cx="16" cy="16" r="12"/><path d="M4 16h24M16 4c-4 4-6 8-6 12s2 8 6 12M16 4c4 4 6 8 6 12s-2 8-6 12"/></svg><span>Language: </span><select aria-label="Language" value={language} onChange={event => setLanguage(event.target.value)}><option>English</option><option>isiZulu</option><option>Sesotho</option><option>Afrikaans</option></select></label>
           <span className="header-rule" aria-hidden="true" />
-          <button className="sign-in" onClick={() => setSignInOpen(true)}>Sign in</button>
+          <button className="sign-in" onClick={signIn}>Sign in</button>
         </div>
       </div>
     </header>
@@ -49,21 +54,14 @@ function App() {
         <div className="hero-inner">
           <div className="hero-copy">
             <h1 id="hero-title">Quality education<br/>for a brighter<br/>South Africa.</h1>
-            <p>Create engaging lessons from the<br className="desktop-break"/> material you already have.</p>
-            <div className="hero-buttons"><button className="button button-primary" onClick={start}>Get started</button><button className="button button-outline" onClick={() => setSignInOpen(true)}>I already have an account</button></div>
+            <p>Create, share and deliver engaging<br className="desktop-break"/> lesson plans for every classroom.</p>
+            <div className="hero-buttons"><button className="button button-primary" onClick={start}>Get started</button><button className="button button-outline" onClick={signIn}>I already have an account</button></div>
           </div>
           <img className="hero-illustration" src={`${assets}hero-educator.png`} alt="Educator holding a lesson plan and tablet" />
         </div>
       </section>
 
-      <section className="collaborators" aria-labelledby="collaborators-title">
-        <h2 id="collaborators-title">Potential public-sector collaborators</h2>
-        <div className="logo-carousel">
-          <button className="carousel-arrow" onClick={() => setLogoOffset((logoOffset + logos.length - 1) % logos.length)} aria-label="Previous logos">‹</button>
-          <div className="logo-list" aria-live="polite">{orderedLogos.map(item => <div className="logo-item" key={item.src}><img src={`${assets}${item.src}`} alt={item.alt}/></div>)}</div>
-          <button className="carousel-arrow" onClick={() => setLogoOffset((logoOffset + 1) % logos.length)} aria-label="Next logos">›</button>
-        </div>
-      </section>
+      <section className="collaborators" aria-label="Public-sector organisation logos"><LogoCarousel /></section>
 
       <section className="how-section" aria-labelledby="how-title">
         <div className="section-heading"><span className="spark-left" aria-hidden="true">⌁</span><h2 id="how-title">From a PDF to a lesson learners love.</h2><span className="spark-right" aria-hidden="true">⌁</span><p>Turn your existing materials into engaging, accessible lessons in just a few steps.</p></div>
@@ -77,7 +75,7 @@ function App() {
       </section>
 
       <section className="dashboard-section" aria-labelledby="dashboard-title">
-        <div className="dashboard-copy"><h2 id="dashboard-title">Everything you need<br/>to keep lessons moving.</h2><p>Organise your materials, create engaging lessons, assign to classes, and see real progress — all in one simple workspace.</p>
+        <div className="dashboard-copy"><h2 id="dashboard-title">Everything you need<br/>to keep lessons moving.</h2><p>Organise your materials, create engaging lessons, assign to classes, and see real progress, all in one simple workspace.</p>
           <Feature icon="book" title="All your materials in one place">Upload PDFs, videos, images and more.</Feature>
           <Feature icon="lesson" title="Interactive, accessible lessons">Turn content into activities, quizzes and summaries.</Feature>
           <Feature icon="chart" title="Track learner progress">See completion, understanding and class insights.</Feature>
@@ -110,6 +108,54 @@ function App() {
     {signInOpen && <div className="dialog-backdrop" onMouseDown={() => setSignInOpen(false)}><div className="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" onMouseDown={event => event.stopPropagation()}><button className="dialog-close" onClick={() => setSignInOpen(false)} aria-label="Close">×</button><Brand/><h2 id="dialog-title">Welcome back</h2><p>Sign in to your educator account</p><form onSubmit={event => {event.preventDefault(); setSignInOpen(false);}}><label>Email address<input type="email" required autoFocus/></label><label>Password<input type="password" required/></label><button className="button button-primary" type="submit">Sign in</button></form></div></div>}
     {contactOpen && <div className="dialog-backdrop" onMouseDown={() => setContactOpen(false)}><div className="dialog" role="dialog" aria-modal="true" aria-labelledby="contact-title" onMouseDown={event => event.stopPropagation()}><button className="dialog-close" onClick={() => setContactOpen(false)} aria-label="Close">×</button><Brand/><h2 id="contact-title">Contact SA Educate</h2><p>Contact details will be added when the platform launches.</p></div></div>}
   </>;
+}
+
+function LogoCarousel() {
+  const viewportRef = useRef(null);
+  const pauseUntilRef = useRef(0);
+  const hoveringRef = useRef(false);
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return undefined;
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const firstSet = viewport.querySelector('.logo-set');
+    const setWidth = () => firstSet.getBoundingClientRect().width;
+    const resetPosition = () => { viewport.scrollLeft = setWidth(); };
+    resetPosition();
+    const observer = new ResizeObserver(resetPosition);
+    observer.observe(viewport);
+    let frame;
+    let previous = performance.now();
+    const tick = now => {
+      const elapsed = Math.min(now - previous, 50);
+      previous = now;
+      if (!media.matches && !document.hidden && !hoveringRef.current && now >= pauseUntilRef.current) viewport.scrollLeft += elapsed * 0.035;
+      const width = setWidth();
+      if (width > 0) {
+        if (viewport.scrollLeft >= width * 2) viewport.scrollLeft -= width;
+        if (viewport.scrollLeft < width) viewport.scrollLeft += width;
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); };
+  }, []);
+  const move = direction => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const items = viewport.querySelectorAll('.logo-item');
+    const step = items[1].getBoundingClientRect().left - items[0].getBoundingClientRect().left;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    pauseUntilRef.current = performance.now() + (reducedMotion ? 0 : 850);
+    viewport.scrollBy({ left: direction * step, behavior: reducedMotion ? 'auto' : 'smooth' });
+  };
+  return <div className="logo-carousel" onMouseEnter={() => { hoveringRef.current = true; }} onMouseLeave={() => { hoveringRef.current = false; }} onFocus={() => { hoveringRef.current = true; }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) hoveringRef.current = false; }}>
+    <button className="carousel-arrow" onClick={() => move(-1)} aria-label="Previous logos">‹</button>
+    <div className="logo-viewport" ref={viewportRef} role="img" aria-label={logos.map(item => item.alt).join(', ')}>
+      <div className="logo-track">{[0, 1, 2].map(copy => <div className="logo-set" aria-hidden="true" key={copy}>{logos.map(item => <div className="logo-item" key={`${copy}-${item.src}`}><img src={`${assets}${item.src}`} alt="" /></div>)}</div>)}</div>
+    </div>
+    <button className="carousel-arrow" onClick={() => move(1)} aria-label="Next logos">›</button>
+  </div>;
 }
 
 function Icon({ name }) {
