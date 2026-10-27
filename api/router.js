@@ -1,4 +1,5 @@
-// Vercel function for every /api/* route. It reuses the same server modules as the Vite dev server:
+// Vercel function for every /api/* route (vercel.json rewrites /api/<path> to /api/router?__path=<path>,
+// because Vercel's file routing would not reach nested paths such as /api/lesson-jobs/script). It reuses the same server modules as the Vite dev server:
 // LearnBridge's gateway (translation, voices, transcription, YouTube, ASL), lesson preparation and
 // Signchat sentence reconstruction. Keys come from the Vercel project's environment variables.
 import { Readable } from 'node:stream';
@@ -31,7 +32,19 @@ function runMiddleware(middleware, request) {
   });
 }
 
-async function handle(request) {
+// Rebuilds the original request URL (/api/<path>?…) from the rewrite's __path parameter.
+function originalRequest(request) {
+  const url = new URL(request.url);
+  const routed = url.searchParams.get('__path');
+  if (routed === null) return request;
+  url.searchParams.delete('__path');
+  url.pathname = '/api/' + routed.replace(/^\/+/, '');
+  const hasBody = !['GET', 'HEAD'].includes(request.method);
+  return new Request(url, { method: request.method, headers: request.headers, ...(hasBody ? { body: request.body, duplex: 'half' } : {}) });
+}
+
+async function handle(incoming) {
+  const request = originalRequest(incoming);
   const path = new URL(request.url).pathname;
   if (GATEWAY_ROUTES.has(path)) return gateway.fetch(request, { HF_TOKEN: process.env.HF_TOKEN, GEMINI_API_KEY: process.env.GEMINI_API_KEY });
   if (path.startsWith('/api/lesson-jobs') || path.startsWith('/api/lessons/')) return runMiddleware(lessons.handle, request);
