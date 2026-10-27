@@ -1,0 +1,10 @@
+{
+  "questionId": "vision-q27",
+  "status": "prototype",
+  "language": "NGT",
+  "videoUrl": "/nia/nia-question-27-ngt-prototype.webm",
+  "glosses": ["OOG", "VORM", "ANDERS", "BREKEN", "VERSCHILLEND", "PUNT", "SCHERP", "SLECHT"],
+  "hasNarration": true,
+  "caption": "Astigmatism can blur vision because the eye bends incoming light unevenly, so it does not focus at a single point.",
+  "reviewStatus": "needs_fluent_review"
+}

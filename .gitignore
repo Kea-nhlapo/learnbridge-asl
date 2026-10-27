@@ -1,3 +1,6 @@
-/node_modules/
-/qa/
-*.tar.gz
+node_modules/
+dist/
+qa/
+.vite/
+.env.local
+public/nia/nia-ngt-oog-motion-test.webm

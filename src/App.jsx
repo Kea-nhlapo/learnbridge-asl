@@ -1,13 +1,11 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
+import VisionDemo from './DemoJourney.jsx';
+import Brand from './Brand.jsx';
+const NiaLab = React.lazy(() => import('./NiaLab.jsx'));
+const SignIntroduction = React.lazy(() => import('./SignConversation.jsx'));
+const SignCalibration = React.lazy(() => import('./SignCalibration.jsx'));
 
 const assets = '/assets/';
-
-function Brand({ light = false }) {
-  return <a className={`brand ${light ? 'brand-light' : ''}`} href="#top" aria-label="SA Educate home">
-    <svg viewBox="0 0 50 50" aria-hidden="true"><circle cx="25" cy="7" r="5" fill="currentColor"/><path d="M25 17c-7-7-17-7-22-4v26c8-1 16 1 22 7V17Zm0 0c7-7 17-7 22-4v26c-8-1-16 1-22 7V17Z" fill="currentColor"/><path d="M25 18v27" stroke={light ? '#fff' : '#fff'} strokeWidth="2"/></svg>
-    <span>SA Educate</span>
-  </a>;
-}
 
 const logos = [
   { src: 'logo-egov.png', alt: 'Gauteng Province e-Government' },
@@ -25,11 +23,18 @@ const faqs = [
 ];
 
 function App() {
+  // `/app` is the product experience reached from the public homepage.
+  // Keep the original prototype URL working for existing bookmarks and demos.
+  if (['/app', '/vision-demo'].includes(window.location.pathname)) return <VisionDemo />;
+  if (window.location.pathname === '/nia-lab') return <React.Suspense fallback={<p>Loading Nia lab…</p>}><NiaLab /></React.Suspense>;
+  if (window.location.pathname === '/sign-introduction') return <React.Suspense fallback={<p>Loading sign introduction…</p>}><SignIntroduction /></React.Suspense>;
+  if (window.location.pathname === '/sign-calibration') return <React.Suspense fallback={<p>Loading calibration…</p>}><SignCalibration /></React.Suspense>;
   const [language, setLanguage] = useState('English');
   const [signInOpen, setSignInOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
-  const start = () => setSignInOpen(true);
+  const start = () => { window.location.href = '/app?screen=login'; };
+  const signIn = () => { window.location.href = '/app?screen=login'; };
 
   return <>
     <a className="skip-link" href="#main">Skip to content</a>
@@ -39,7 +44,7 @@ function App() {
         <div className="header-actions">
           <label className="language-control"><svg className="globe" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true"><circle cx="16" cy="16" r="12"/><path d="M4 16h24M16 4c-4 4-6 8-6 12s2 8 6 12M16 4c4 4 6 8 6 12s-2 8-6 12"/></svg><span>Language: </span><select aria-label="Language" value={language} onChange={event => setLanguage(event.target.value)}><option>English</option><option>isiZulu</option><option>Sesotho</option><option>Afrikaans</option></select></label>
           <span className="header-rule" aria-hidden="true" />
-          <button className="sign-in" onClick={() => setSignInOpen(true)}>Sign in</button>
+          <button className="sign-in" onClick={signIn}>Sign in</button>
         </div>
       </div>
     </header>
@@ -49,16 +54,14 @@ function App() {
         <div className="hero-inner">
           <div className="hero-copy">
             <h1 id="hero-title">Quality education<br/>for a brighter<br/>South Africa.</h1>
-            <p>Create engaging lessons from the<br className="desktop-break"/> material you already have.</p>
-            <div className="hero-buttons"><button className="button button-primary" onClick={start}>Get started</button><button className="button button-outline" onClick={() => setSignInOpen(true)}>I already have an account</button></div>
+            <p>Create, share and deliver engaging<br className="desktop-break"/> lesson plans for every classroom.</p>
+            <div className="hero-buttons"><button className="button button-primary" onClick={start}>Get started</button><button className="button button-outline" onClick={signIn}>I already have an account</button></div>
           </div>
           <img className="hero-illustration" src={`${assets}hero-educator.png`} alt="Educator holding a lesson plan and tablet" />
         </div>
       </section>
 
-      <section className="collaborators" aria-label="Public-sector organisation logos">
-        <LogoCarousel />
-      </section>
+      <section className="collaborators" aria-label="Public-sector organisation logos"><LogoCarousel /></section>
 
       <section className="how-section" aria-labelledby="how-title">
         <div className="section-heading"><span className="spark-left" aria-hidden="true">⌁</span><h2 id="how-title">From a PDF to a lesson learners love.</h2><span className="spark-right" aria-hidden="true">⌁</span><p>Turn your existing materials into engaging, accessible lessons in just a few steps.</p></div>
@@ -72,17 +75,17 @@ function App() {
       </section>
 
       <section className="dashboard-section" aria-labelledby="dashboard-title">
-        <div className="dashboard-copy"><h2 id="dashboard-title">Everything you need<br/> to keep lessons moving.</h2><p>Create lessons, assign them to classes and track progress in one place.</p>
-          <Feature icon="book" title="All your materials together">Keep PDFs, videos and images in one place.</Feature>
-          <Feature icon="lesson" title="Accessible, interactive lessons">Create activities, quizzes and summaries.</Feature>
-          <Feature icon="chart" title="Clear progress insights">See completion and class progress.</Feature>
+        <div className="dashboard-copy"><h2 id="dashboard-title">Everything you need<br/>to keep lessons moving.</h2><p>Organise your materials, create engaging lessons, assign to classes, and see real progress, all in one simple workspace.</p>
+          <Feature icon="book" title="All your materials in one place">Upload PDFs, videos, images and more.</Feature>
+          <Feature icon="lesson" title="Interactive, accessible lessons">Turn content into activities, quizzes and summaries.</Feature>
+          <Feature icon="chart" title="Track learner progress">See completion, understanding and class insights.</Feature>
         </div>
         <img className="dashboard-preview" src={`${assets}dashboard-preview.png`} alt="Educator dashboard preview showing classes, lesson plans, and a lesson path"/>
       </section>
 
       <section className="accessibility-section" aria-labelledby="access-title">
         <img className="access-preview" src={`${assets}accessibility-preview.png`} alt="Lesson question with text, audio and sign-language explanation options" />
-        <div className="access-copy"><h2 id="access-title">One lesson.<br/> More ways to<br/> understand.</h2><p>Read it, hear it, or watch the explanation in sign language.</p>
+        <div className="access-copy"><h2 id="access-title">One lesson.<br/>More ways to<br/>understand.</h2><p>Read it, hear it, or watch the explanation in sign language.</p>
           <Feature icon="document" title="Read">Clear, simple explanations.</Feature>
           <Feature icon="volume" title="Listen">Hear the question and explanation.</Feature>
           <Feature icon="hand" title="Watch">See the explanation in sign language.</Feature>
@@ -90,7 +93,7 @@ function App() {
       </section>
 
       <section className="progress-section" aria-labelledby="progress-title">
-        <div className="progress-copy"><h2 id="progress-title">Every step feels<br/> like progress.</h2><p>Short, focused lessons help you<br/> build your skills with confidence.</p></div>
+        <div className="progress-copy"><h2 id="progress-title">Every step feels<br/>like progress.</h2><p>Short, focused lessons help you<br/>build your skills with confidence.</p></div>
         <img src={`${assets}progress-preview.png`} alt="Water Cycle lesson path alongside correct and incorrect feedback"/>
       </section>
 
@@ -111,10 +114,9 @@ function LogoCarousel() {
   const viewportRef = useRef(null);
   const pauseUntilRef = useRef(0);
   const hoveringRef = useRef(false);
-
   useLayoutEffect(() => {
     const viewport = viewportRef.current;
-    if (!viewport) return;
+    if (!viewport) return undefined;
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
     const firstSet = viewport.querySelector('.logo-set');
     const setWidth = () => firstSet.getBoundingClientRect().width;
@@ -127,9 +129,7 @@ function LogoCarousel() {
     const tick = now => {
       const elapsed = Math.min(now - previous, 50);
       previous = now;
-      if (!media.matches && !document.hidden && !hoveringRef.current && now >= pauseUntilRef.current) {
-        viewport.scrollLeft += elapsed * 0.035;
-      }
+      if (!media.matches && !document.hidden && !hoveringRef.current && now >= pauseUntilRef.current) viewport.scrollLeft += elapsed * 0.035;
       const width = setWidth();
       if (width > 0) {
         if (viewport.scrollLeft >= width * 2) viewport.scrollLeft -= width;
@@ -140,7 +140,6 @@ function LogoCarousel() {
     frame = requestAnimationFrame(tick);
     return () => { cancelAnimationFrame(frame); observer.disconnect(); };
   }, []);
-
   const move = direction => {
     const viewport = viewportRef.current;
     if (!viewport) return;
@@ -150,7 +149,6 @@ function LogoCarousel() {
     pauseUntilRef.current = performance.now() + (reducedMotion ? 0 : 850);
     viewport.scrollBy({ left: direction * step, behavior: reducedMotion ? 'auto' : 'smooth' });
   };
-
   return <div className="logo-carousel" onMouseEnter={() => { hoveringRef.current = true; }} onMouseLeave={() => { hoveringRef.current = false; }} onFocus={() => { hoveringRef.current = true; }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) hoveringRef.current = false; }}>
     <button className="carousel-arrow" onClick={() => move(-1)} aria-label="Previous logos">‹</button>
     <div className="logo-viewport" ref={viewportRef} role="img" aria-label={logos.map(item => item.alt).join(', ')}>
