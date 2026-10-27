@@ -37,7 +37,7 @@ export function NiaSigner({ text, language = 'en', autoSign = false }) {
   async function sign() {
     const app = performs.current;
     if (!app || !text.trim() || state.busy) return;
-    setState(s => ({ ...s, busy: true, status: 'Translating into Dutch (NLLB)…' }));
+    setState(s => ({ ...s, busy: true, status: 'Preparing the signing…' }));
     try {
       const [index, translated] = await Promise.all([loadIndex(), fetch('/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text.slice(0, 2000), from: language, to: 'nl' }) }).then(async r => { const d = await r.json(); if (!r.ok) throw Error(d.error || 'Translation failed.'); return d.text; })]);
       const glosses = dutchToGlosses(translated, index);
@@ -62,11 +62,7 @@ export function NiaSigner({ text, language = 'en', autoSign = false }) {
       <button type="button" disabled={!ready || state.busy || !text.trim()} onClick={sign}>{state.glosses.length ? 'Sign again' : 'Sign with Nia'}</button>
       {state.duration > 0 && <button type="button" className="secondary" disabled={state.busy} onClick={() => performs.current?.changePlayState(true)}>Replay</button>}
     </div>
-    {state.glosses.length > 0 && <div className="nia-sign-glosses">
-      <p><b>Dutch:</b> {state.dutch}</p>
-      <p><b>Signs:</b> {state.glosses.map((g, i) => <span key={i} className={g.file ? 'sign' : 'missing'} title={g.file ? undefined : 'No sign in the dictionary yet'}>{g.file ? signName(g.file) : g.word}</span>)}</p>
-    </div>}
-    <p className="nia-sign-note">Prototype: Nia signs word by word from her Dutch Sign Language (NGT) dictionary, after machine translation into Dutch. Crossed-out words have no sign yet. A South African Sign Language version, reviewed by Deaf signers, is the next step.</p>
+    <p className="nia-sign-note">Prototype: Nia signs the text word by word. Words without a sign yet are skipped.</p>
   </div>;
 }
 
@@ -74,7 +70,7 @@ export default function NiaSign() {
   const [text, setText] = useState('When the droplets become heavy enough, water falls from the clouds as rain.');
   const [language, setLanguage] = useState('en');
   return <main className="nia-lab nia-sign">
-    <div className="nia-lab-head"><Brand href="/" /><h1>Nia signs any text</h1><p>Type or paste a sentence, then press <b>Sign with Nia</b>.</p></div>
+    <div className="nia-lab-head"><Brand href="/" /><h1>Nia signs any text</h1><p>Type or paste a sentence in English, isiZulu or Sepedi, then press <b>Sign with Nia</b> to see it in sign language.</p></div>
     <label className="nia-sign-field">Text<textarea rows={3} value={text} onChange={e => setText(e.target.value)} /></label>
     <label className="nia-sign-field">Written in<select value={language} onChange={e => setLanguage(e.target.value)}>{Object.entries(SOURCE_LANGUAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
     <NiaSigner text={text} language={language} />
