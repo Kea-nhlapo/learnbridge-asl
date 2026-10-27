@@ -19,3 +19,6 @@
 .lb-source-field span { font-weight: 400; font-size: .9rem; color: #5c6f87; }
 /* Hidden but still rendering, so Nia is loaded and ready before the drawer opens. */
 .lb-help-overlay.preloading { visibility: hidden; pointer-events: none; }
+.lb-generating-tip { margin-top: 22px; max-width: 520px; font-size: .95rem; color: #40536d; min-height: 2.6em; }
+/* Keep the progress bar from being squeezed to 0 px when the generating screen's content is tall. */
+.dj-generating .dj-progress { flex-shrink: 0; }

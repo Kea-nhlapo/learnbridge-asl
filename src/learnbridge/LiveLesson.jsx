@@ -31,8 +31,7 @@ const MAX_TEXT_CHARS = 60000;
 let pdfjsModule = null;
 // Starts downloading the PDF reader early (when the upload screen opens), so reading a file starts at once.
 const loadPdfjs = () => pdfjsModule ??= import(/* @vite-ignore */ `${PDFJS}pdf.min.mjs`).catch(error => { pdfjsModule = null; throw error; });
-async function pdfText(file, progress) {
-  progress('Reading your PDF…');
+async function pdfText(file, progress = () => {}) {
   const pdfjs = await loadPdfjs();
   pdfjs.GlobalWorkerOptions.workerSrc = `${PDFJS}pdf.worker.min.mjs`;
   const pdf = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()), isEvalSupported: false }).promise;
@@ -56,39 +55,45 @@ export function LiveUpload({ next, ui: { AppShell, Btn, Ic, UploadCloudIcon, Pdf
   const [file, setFile] = useState(null);
   const [url, setUrl] = useState('');
   const [text, setText] = useState('');
-  const [busy, setBusy] = useState('');
   const [dragging, setDragging] = useState(false);
   useEffect(() => { loadPdfjs().catch(() => {}); }, []);
   const choose = f => { if (!f) return; if (f.type !== 'application/pdf' && !/\.pdf$/i.test(f.name)) { update({ error: 'Choose a PDF file.' }); return; } update({ error: '' }); setFile(f); };
-  const begin = (fileName, job) => { update({ fileName, lesson: null, results: [], error: '', job }); next(); };
-  const start = async () => {
-    if (busy) return;
+  // Show the generating screen straight away and do the work behind it; `work` reports its stage as it goes.
+  const begin = (fileName, work) => {
+    update({ fileName, lesson: null, results: [], error: '', job: { id: 'pending', status: 'extracting', pending: true, startedAt: Date.now() } });
+    next();
+    const stage = status => update({ job: { ...live.job, status, stageAt: Date.now() } });
+    work(stage).then(job => update({ job, ...(job.status === 'failed' ? { error: job.error || 'The lesson could not be prepared.' } : {}) }))
+      .catch(error => update({ job: { id: 'pending', status: 'failed' }, error: error.message }));
+  };
+  const start = () => {
     update({ error: '' });
-    try {
-      if (mode === 'pdf') {
-        if (!file) { input.current?.click(); return; }
+    // Problems the teacher can fix right away stay on this screen.
+    if (mode === 'pdf') {
+      if (!file) { input.current?.click(); return; }
+      begin(file.name, async stage => {
         // Read the text on this device and send only the text: no file upload, and one Gemini request
         // instead of two. Scanned PDFs (no text) under 4 MB are sent to Gemini to read instead.
         let text = null;
-        try { text = await pdfText(file, setBusy); } catch (error) { if (file.size > DIRECT_PDF_LIMIT || error.name !== 'NoTextError') throw error; }
-        setBusy(text ? 'Starting the lesson…' : 'Uploading…');
-        begin(file.name, await (text ? api.createFromScript(text, { title: '' }) : api.uploadPdf(file, { title: '' })));
-      } else if (mode === 'youtube') {
-        const videoId = youtubeVideoId(url);
-        if (!videoId) throw Error('Paste a YouTube video link.');
-        setBusy('Getting the video’s transcript…');
+        try { text = await pdfText(file); } catch (error) { if (file.size > DIRECT_PDF_LIMIT || error.name !== 'NoTextError') throw error; }
+        if (text) stage('generating_questions');
+        return text ? api.createFromScript(text, { title: '' }) : api.uploadPdf(file, { title: '' });
+      });
+    } else if (mode === 'youtube') {
+      const videoId = youtubeVideoId(url);
+      if (!videoId) { update({ error: 'Paste a YouTube video link.' }); return; }
+      begin('your YouTube video', async stage => {
         const response = await fetch('/api/youtube', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url, language: 'en' }) });
         const found = await response.json();
         if (!response.ok) throw Error(found.error || 'The video’s transcript could not be found.');
-        setBusy('Starting the lesson…');
-        begin(found.title || 'YouTube video', await api.createFromYoutube(videoId, found.text, { title: '' }));
-      } else {
-        if (text.trim().split(/\s+/).length < 30) throw Error('Paste at least a paragraph (30 words or more).');
-        setBusy('Starting the lesson…');
-        begin('your text', await api.createFromScript(text, { title: '' }));
-      }
-    } catch (error) { update({ error: error.message }); }
-    finally { setBusy(''); }
+        if (found.title) update({ fileName: found.title });
+        stage('generating_questions');
+        return api.createFromYoutube(videoId, found.text, { title: '' });
+      });
+    } else {
+      if (text.trim().split(/\s+/).length < 30) { update({ error: 'Paste at least a paragraph (30 words or more).' }); return; }
+      begin('your text', async stage => { stage('generating_questions'); return api.createFromScript(text, { title: '' }); });
+    }
   };
   const ready = mode === 'pdf' ? !!file : mode === 'youtube' ? !!youtubeVideoId(url) : text.trim().length > 0;
   return <AppShell active="Create"><main className="dj-content narrow"><h1>Add your learning material</h1><p>Upload a CAPS document or past paper, use a YouTube video, or paste your own lesson text.</p>
@@ -103,14 +108,25 @@ export function LiveUpload({ next, ui: { AppShell, Btn, Ic, UploadCloudIcon, Pdf
     {mode === 'youtube' && <label className="lb-source-field">YouTube link<input type="url" value={url} onChange={e => setUrl(e.target.value)} placeholder="https://www.youtube.com/watch?v=…" /><span>We use the video’s captions, or transcribe it when it has none.</span></label>}
     {mode === 'text' && <label className="lb-source-field">Lesson text<textarea rows={8} value={text} onChange={e => setText(e.target.value)} placeholder="Paste your lesson, notes or a transcript…" /></label>}
     {state.error && <div className="dj-upload-error"><b>We could not use that.</b><span>{state.error}</span></div>}
-    <Btn className="next" disabled={!!busy} onClick={start}>{busy || (ready ? 'Continue' : mode === 'pdf' ? 'Choose a PDF' : 'Continue')}</Btn></main></AppShell>;
+    <Btn className="next" onClick={start}>{ready ? 'Continue' : mode === 'pdf' ? 'Choose a PDF' : 'Continue'}</Btn></main></AppShell>;
 }
 
 const STEPS = [['extracting', 'Reading your document...'], ['generating_questions', 'Writing practice questions from it...'], ['ready', 'Checking every question against the document...']];
+// Progress range for each stage; the bar eases towards the top of its range while the stage runs.
+const PROGRESS = { extracting: [6, 38], generating_questions: [38, 92], ready: [100, 100] };
+const TIPS = [
+  'Every question quotes the sentence it comes from, and is checked against your document.',
+  'Learners can switch questions to isiZulu or Sepedi and have them read aloud.',
+  'A wrong answer opens the explanation, signed by Nia.',
+  'Questions point to the page of your document they come from.',
+  'You can also start a lesson from a YouTube video or your own notes.',
+];
 export function LiveGenerating({ setId, ui: { Brand, Ic } }) {
   const state = useLive();
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 400); return () => clearInterval(timer); }, []);
   useEffect(() => {
-    if (!state.job || state.job.status === 'failed') return;
+    if (!state.job || state.job.pending || state.job.status === 'failed') return;
     if (state.job.status === 'ready') {
       // Serverless hosts return the finished lesson with the job (see server/lesson-jobs.mjs, inline mode).
       if (state.job.lesson && !state.lesson) { try { update({ lesson: validateLesson(state.job.lesson) }); setId('review'); } catch (error) { update({ job: { ...state.job, status: 'failed' }, error: error.message }); } }
@@ -128,13 +144,18 @@ export function LiveGenerating({ setId, ui: { Brand, Ic } }) {
     };
     const timer = setTimeout(poll, 800);
     return () => { stopped = true; clearTimeout(timer); };
-  }, [state.job?.id]);
+  }, [state.job?.id, state.job?.pending, state.job?.status]);
   const status = state.job?.status || 'extracting';
   const at = Math.max(0, STEPS.findIndex(([s]) => s === status));
-  if (status === 'failed') return <div className="dj-generating"><Brand /><Ic>!</Ic><h1>We could not prepare this lesson</h1><p>{state.error}</p><button type="button" className="dj-btn" onClick={() => setId('upload')}>Try another PDF</button></div>;
+  if (status === 'failed') return <div className="dj-generating"><Brand /><Ic>!</Ic><h1>We could not prepare this lesson</h1><p>{state.error}</p><button type="button" className="dj-btn" onClick={() => setId('upload')}>Try again</button></div>;
+  const [from, to] = PROGRESS[status] || PROGRESS.extracting;
+  const elapsed = (now - (state.job?.stageAt || state.job?.startedAt || now)) / 1000;
+  const width = from + (to - from) * (1 - Math.exp(-elapsed / 3));
+  const tip = TIPS[Math.floor((now - (state.job?.startedAt || now)) / 4000) % TIPS.length];
   return <div className="dj-generating"><Brand /><Ic>▣</Ic><h1>{at ? 'Generating your questions...' : 'Generating your lesson...'}</h1><p>Using <b>{state.fileName}</b> to shape the lesson.</p>
-    <div className="dj-progress"><span style={{ width: `${[30, 70, 100][at]}%` }} /></div>
-    {STEPS.map(([s, label], i) => <div className="dj-gen" key={s}><i className={i < at ? 'done' : ''}>{i < at ? '✓' : '○'}</i>{label}</div>)}</div>;
+    <div className="dj-progress"><span style={{ width: `${width.toFixed(1)}%`, transition: 'width .4s linear' }} /></div>
+    {STEPS.map(([s, label], i) => <div className="dj-gen" key={s}><i className={i < at ? 'done' : ''}>{i < at ? '✓' : '○'}</i>{label}</div>)}
+    <p className="lb-generating-tip" aria-live="polite">💡 {tip}</p></div>;
 }
 
 export function LiveReview({ next, ui: { AppShell, Btn, Ic } }) {
