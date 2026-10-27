@@ -28,9 +28,12 @@ const SOURCES = [['pdf', 'PDF document'], ['youtube', 'YouTube video'], ['text',
 const DIRECT_PDF_LIMIT = 4 * 1024 * 1024;
 const PDFJS = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/';
 const MAX_TEXT_CHARS = 60000;
+let pdfjsModule = null;
+// Starts downloading the PDF reader early (when the upload screen opens), so reading a file starts at once.
+const loadPdfjs = () => pdfjsModule ??= import(/* @vite-ignore */ `${PDFJS}pdf.min.mjs`).catch(error => { pdfjsModule = null; throw error; });
 async function pdfText(file, progress) {
   progress('Reading your PDF…');
-  const pdfjs = await import(/* @vite-ignore */ `${PDFJS}pdf.min.mjs`);
+  const pdfjs = await loadPdfjs();
   pdfjs.GlobalWorkerOptions.workerSrc = `${PDFJS}pdf.worker.min.mjs`;
   const pdf = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()), isEvalSupported: false }).promise;
   let text = '';
@@ -42,7 +45,7 @@ async function pdfText(file, progress) {
       if (pageText) text += `[Page ${n}]\n${pageText}\n\n`;
     }
   } finally { await pdf.destroy(); }
-  if (text.replace(/\[Page \d+\]/g, '').trim().split(/\s+/).length < 30) throw Error('This PDF has no readable text (it may be scanned). Use a PDF under 4 MB, or paste the text instead.');
+  if (text.replace(/\[Page \d+\]/g, '').trim().split(/\s+/).length < 30) throw Object.assign(Error('This PDF has no readable text (it may be scanned). Use a PDF under 4 MB, or paste the text instead.'), { name: 'NoTextError' });
   return text.slice(0, MAX_TEXT_CHARS);
 }
 
@@ -55,6 +58,7 @@ export function LiveUpload({ next, ui: { AppShell, Btn, Ic, UploadCloudIcon, Pdf
   const [text, setText] = useState('');
   const [busy, setBusy] = useState('');
   const [dragging, setDragging] = useState(false);
+  useEffect(() => { loadPdfjs().catch(() => {}); }, []);
   const choose = f => { if (!f) return; if (f.type !== 'application/pdf' && !/\.pdf$/i.test(f.name)) { update({ error: 'Choose a PDF file.' }); return; } update({ error: '' }); setFile(f); };
   const begin = (fileName, job) => { update({ fileName, lesson: null, results: [], error: '', job }); next(); };
   const start = async () => {
@@ -63,15 +67,12 @@ export function LiveUpload({ next, ui: { AppShell, Btn, Ic, UploadCloudIcon, Pdf
     try {
       if (mode === 'pdf') {
         if (!file) { input.current?.click(); return; }
-        if (file.size > DIRECT_PDF_LIMIT) {
-          // Too big to upload in one request on Vercel: read the text here and send only the text.
-          const text = await pdfText(file, setBusy);
-          setBusy('Starting the lesson…');
-          begin(file.name, await api.createFromScript(text, { title: '' }));
-        } else {
-          setBusy('Uploading…');
-          begin(file.name, await api.uploadPdf(file, { title: '' }));
-        }
+        // Read the text on this device and send only the text: no file upload, and one Gemini request
+        // instead of two. Scanned PDFs (no text) under 4 MB are sent to Gemini to read instead.
+        let text = null;
+        try { text = await pdfText(file, setBusy); } catch (error) { if (file.size > DIRECT_PDF_LIMIT || error.name !== 'NoTextError') throw error; }
+        setBusy(text ? 'Starting the lesson…' : 'Uploading…');
+        begin(file.name, await (text ? api.createFromScript(text, { title: '' }) : api.uploadPdf(file, { title: '' })));
       } else if (mode === 'youtube') {
         const videoId = youtubeVideoId(url);
         if (!videoId) throw Error('Paste a YouTube video link.');
