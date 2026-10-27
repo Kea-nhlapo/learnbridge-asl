@@ -1,0 +1,16 @@
+.lb-library-view { max-width: 980px; }
+.lb-library-view h1 { margin: 6px 0 4px; }
+.lb-back { display: block; font: inherit; font-weight: 800; color: #0c5bd0; background: none; border: 0; padding: 0; cursor: pointer; margin-bottom: 14px; }
+.lb-library-source { color: #5c6f87; margin: 0 0 22px; }
+.lb-lesson-list { display: grid; gap: 14px; margin: 8px 0 24px; }
+.lb-lesson-card { text-align: left; font: inherit; color: #072857; cursor: pointer; display: grid; gap: 6px; padding: 18px 22px; border: 2px solid #bce4fc; border-radius: 16px; background: linear-gradient(115deg, #e8f7ff, #ecf9ff); }
+.lb-lesson-card:hover, .lb-lesson-card:focus-visible { border-color: #078ff0; }
+.lb-lesson-card b { font-size: 1.2rem; }
+.lb-lesson-meta { font-size: .85rem; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; color: #078ff0; }
+.lb-lesson-excerpt { color: #40536d; line-height: 1.5; }
+.lb-reader-page { background: #fff; border: 1px solid #dbe6f1; border-radius: 16px; padding: 28px 34px; margin: 18px 0 12px; box-shadow: 0 6px 22px #07192c0d; }
+.lb-reader-page p { font-size: 1.08rem; line-height: 1.75; color: #1f2f45; margin: 0 0 16px; }
+.lb-reader-page p:last-child { margin-bottom: 0; }
+.lb-library-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+.lb-library-results h2 { font-size: 1.15rem; margin: 26px 0 4px; color: #072857; }
+@media (max-width: 700px) { .lb-reader-page { padding: 20px; } }

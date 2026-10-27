@@ -4,7 +4,9 @@
 // Signed explanations cannot be rendered yet, so each question's help is "text_only": the drawer shows the
 // written explanation and says a signed explanation is not available yet.
 
-const MODELS = ['gemini-3.5-flash-lite', 'gemini-2.5-flash', 'gemini-flash-lite-latest'];
+const MODELS = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-flash-lite-latest'];
+// Busy, rate-limited or retired models fall through to the next one.
+const tryNextModel = (status, detail) => [0, 429, 500, 503].includes(status) || ([400, 404].includes(status) && /no longer available|not found|not supported/i.test(detail));
 const MAX_PDF_BYTES = 15 * 1024 * 1024;
 const MAX_SOURCE_CHARS = 60000;
 const MIN_QUESTIONS = 3;
@@ -57,8 +59,8 @@ async function gemini(apiKey, parts, schema, fetchImpl) {
     }
     const detail = (await response.json().catch(() => ({})))?.error?.message || `HTTP ${response.status}`;
     lastError = `Gemini (${model}): ${detail}`;
-    // Busy or rate-limited models fall through to the next one; other errors (bad key, bad request) stop here.
-    if (![0, 429, 500, 503].includes(response.status)) break;
+    // Other errors (bad key, bad request) stop here.
+    if (!tryNextModel(response.status, detail)) break;
   }
   throw new Error(lastError);
 }

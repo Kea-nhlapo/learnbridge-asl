@@ -73,11 +73,11 @@ async function youtube(request,env){
 }
 const GEMINI_TRANSCRIPT_SCHEMA={type:'object',properties:{language:{type:'string',enum:['en','zu','nso','other']},text:{type:'string'}},required:['language','text']};
 async function geminiYouTube(id,apiKey){
-  for(const model of ['gemini-3.5-flash-lite','gemini-2.5-flash']){
+  for(const model of ['gemini-3.5-flash-lite','gemini-3.5-flash','gemini-flash-lite-latest']){
     const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{method:'POST',headers:{'x-goog-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({
       contents:[{role:'user',parts:[{fileData:{fileUri:`https://www.youtube.com/watch?v=${id}`},videoMetadata:{endOffset:'900s'}},{text:'Transcribe the speech in this video word for word, in the language it is spoken in. No timestamps or speaker labels. language: en for English, zu for isiZulu, nso for Sepedi, other for anything else.'}]}],
       generationConfig:{responseMimeType:'application/json',responseJsonSchema:GEMINI_TRANSCRIPT_SCHEMA}}),signal:AbortSignal.timeout(180000)});
-    if(!response.ok){if([429,500,503].includes(response.status))continue;return null}
+    if(!response.ok){const detail=await response.text().catch(()=>'');if([429,500,503].includes(response.status)||([400,404].includes(response.status)&&/no longer available|not found|not supported/i.test(detail)))continue;return null}
     const parsed=JSON.parse((await response.json())?.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('')||'{}');
     const text=String(parsed.text||'').replace(/\s+/g,' ').trim();
     if(text.split(' ').length<5)return null;
@@ -146,7 +146,7 @@ async function geminiSpeech(text,lang,apiKey){
     const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{method:'POST',headers:{'x-goog-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({
       contents:[{parts:[{text:`Read this aloud clearly, as a native ${GEMINI_SPEAKERS[lang]} speaker: ${text}`}]}],
       generationConfig:{responseModalities:['AUDIO'],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:'Kore'}}}}}),signal:AbortSignal.timeout(60000)});
-    if(!response.ok){if([429,500,503].includes(response.status))continue;return null}
+    if(!response.ok){const detail=await response.text().catch(()=>'');if([429,500,503].includes(response.status)||([400,404].includes(response.status)&&/no longer available|not found|not supported/i.test(detail)))continue;return null}
     const part=(await response.json())?.candidates?.[0]?.content?.parts?.find(p=>p.inlineData?.data);
     if(!part)continue;
     const pcm=Uint8Array.from(atob(part.inlineData.data),c=>c.charCodeAt(0));

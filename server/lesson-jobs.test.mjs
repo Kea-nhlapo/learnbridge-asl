@@ -117,3 +117,12 @@ test('text read from a PDF in the browser keeps its page references', async () =
   const created = await call(jobs, 'POST', '/api/lesson-jobs/script', { text });
   assert.deepEqual(created.body.lesson.questions.map(q => q.sourceRefs[0].page), [1, 2, 2]);
 });
+
+test('a retired fallback model is skipped, not treated as a failure', async () => {
+  const calls = [];
+  const retired = Response.json({ error: { message: 'This model models/x is no longer available to new users.' } }, { status: 404 });
+  const jobs = createLessonJobs({ apiKey: 'k', fetchImpl: fakeGemini([Response.json({ error: { message: 'high demand' } }, { status: 503 }), retired, GEMINI_QUESTIONS], calls), inline: true });
+  const created = await call(jobs, 'POST', '/api/lesson-jobs/script', { text: SOURCE });
+  assert.equal(created.body.status, 'ready');
+  assert.equal(calls.length, 3);
+});

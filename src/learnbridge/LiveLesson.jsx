@@ -20,6 +20,15 @@ export const liveLesson = () => live.lesson;
 // so the journey shows the live generating screen instead of the storyboard's.
 export const liveJobRunning = () => !!live.job;
 
+// Library lessons: send the lesson's text to the generator and follow it on the generating screen.
+export function startLessonFromText({ title, text, subject, grade }, setId) {
+  update({ fileName: title, lesson: null, results: [], error: '', job: { id: 'pending', status: 'generating_questions', pending: true, startedAt: Date.now(), stageAt: Date.now() } });
+  setId('generating-lesson');
+  api.createFromScript(text, { title, subject, grade: grade ? String(grade) : undefined })
+    .then(job => update({ job, ...(job.status === 'failed' ? { error: job.error || 'The lesson could not be prepared.' } : {}) }))
+    .catch(error => update({ job: { id: 'pending', status: 'failed' }, error: error.message }));
+}
+
 const youtubeVideoId = url => String(url).match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/)?.[1] || null;
 const SOURCES = [['pdf', 'PDF document'], ['youtube', 'YouTube video'], ['text', 'Paste text']];
 
