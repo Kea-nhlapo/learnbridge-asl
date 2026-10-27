@@ -14,6 +14,8 @@ export function validateLesson(lesson) {
     if (!optionIds.includes(question.correctOptionId)) throw new Error(`Question ${question.id} has no matching correct option`);
     if (!nonEmpty(question.explanation)) throw new Error(`Question ${question.id} has no explanation`);
     if (!question.help || !nonEmpty(question.help.id) || !nonEmpty(question.help.language)) throw new Error(`Question ${question.id} has no signed-help reference`);
+    // 'text_only': no signed video exists yet; the drawer shows the written explanation and says so.
+    if (question.help.status === 'text_only') continue;
     if (question.help.status !== 'ready' || !nonEmpty(question.help.videoUrl)) throw new Error(`Question ${question.id} signed help is not ready`);
   }
   return lesson;
