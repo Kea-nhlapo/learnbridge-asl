@@ -108,6 +108,11 @@ try {
       assert.deepEqual(badResponses, [], `${viewport.name}: ${screen} requests`);
       const filename = `${String(index + 1).padStart(2, '0')}-${screen}.png`;
       await page.screenshot({ path: path.join(viewport.output, filename) });
+      if (screen === 'library') {
+        assert.equal(await page.locator('.dj-subject-icon').count(), 6, `${viewport.name}: six reference subject illustrations`);
+        await page.locator('.dj-teacher-menu summary').click();
+        assert.equal(await page.locator('.dj-teacher-dropdown a').isVisible(), true, `${viewport.name}: Teacher menu exposes Profile`);
+      }
     }
     await page.close();
     console.log(`${viewport.name}: ${selectedScreens.length} screen${selectedScreens.length === 1 ? '' : 's'} verified`);
