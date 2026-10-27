@@ -1,0 +1,202 @@
+{
+ "maths-fractions": {
+  "zu": [
+   "Ama-fraction nama-fraction alinganayo",
+   "Ingxenyana ichaza ingxenye ephelele eye yahlukaniswa yaba izingxenye ezilinganayo. Engxenyeni engu-3/4, inombolo engezansi ibizwa ngokuthi isihlonzi futhi inombolo ephezulu ibizwa ngokuthi umbali. Umqambi usitshela ukuthi ingqikithi ihlukaniswe yaba izingxenye ezingaki ezilinganayo. Isibali sisitshela ukuthi zingaki zalezi zingxenye esikhuluma ngazo.",
+   "Izingxenyana ezimbili ziyalingana uma zichaza inani elifanayo. Ngokwesibonelo, u - 1/2, u - 2/4 no - 4/8 ziyizingxenyana ezilinganayo. Ukuze wenze isiqephu esilinganayo, phindaphinda noma uhlukanise isihlonzi nesibalo ngenombolo efanayo. Ukuphindaphinda izingxenye zombili ze-2/3 ngo-5 kunikeza u-10/15, okuyinani elifanayo.",
+   "I-fraction isesimweni sayo esilula lapho umshicileli nomqambi bengenaso isici esivamile ngaphandle kuka-1. Ukuze silulaze u-12/18, masihlukanise izinombolo zombili ngesici sazo esivamile esiphezulu, esingu-6. Lokhu kunikeza 2/3.",
+   "Ukuze uqhathanise izinhlayiya ezinamagama ahlukene, ziqale zibhalwe ngegama elivamile. Ukuze uqhathanise u-3/5 no-2/3, bhala u-9/15 no-10/15. Ngoba u-10/15 mkhulu, u-2/3 mkhulu kuno-3/5."
+  ],
+  "nso": [
+   "Dikarolwana le dikarolwana tša go lekana",
+   "Karolwana e hlaloša karolo ya selo se feletsego seo se kgaogantšwego ka dikarolo tša go lekana. Mo karolwaneng ya 3/4, nomoro ya ka tlase e bitšwa sekhutšwisi mme nomoro ya ka godimo e bitšwa mohlalo. Sekhutšwisi se re botša gore selo se feletsego se kgaogantšwe ka dikarolo tše kae tša go lekana. Mohlalo o re botša ka dikarolo tše kae tša tšeo re bolelang ka tšona.",
+   "Dikarolwana tše pedi di lekana ge di hlaloša bogolo bo bannyane bja go swana. Ka mohlala, 1/2, 2/4 le 4/8 ke dikarolwana tše di lekanang. Go dira karolwana ya go lekana, ata goba kgaoganya mohlalo le sekhutšwisi ka nomoro ya go swana. Go ata dikarolo tše pedi tša 2/3 ka 5 go neela 10/15, yeo e lego bogolo bja go swana.",
+   "Karolwana e mo sebopegong sa yona sa bonolo ge mohlalo le sekhutšwisi di se na seka-hlathe sa go swana ntle le 1. Go dira gore 12/18 e be bonolo, kgaoganya dinomoro tše ka bobedi ka seka-hlathe sa godimo kudu sa tšona, e lego 6. Se se neela 2/3.",
+   "Go bapetša dikarolwana tše di nago le dikhutšwisi tša go fapana, thoma ka go di ngwala ka sekhutšwisi sa go swana. Go bapetša 3/5 le 2/3, di ngwale bjalo ka 9/15 le 10/15. Ka ge 10/15 e le kgolo kudu, 2/3 e kgolo go feta 3/5."
+  ]
+ },
+ "maths-linear-equations": {
+  "zu": [
+   "Ukuxazulula izixazululo ze-linear equation",
+   "I-equation isitatimende sezibalo sokuthi izinkulumo ezimbili ziyalingana. I-linear equation iqukethe into eguquguqukayo, efana no-x, engaphakanyiswanga kunoma yiliphi izinga eliphakeme kunelinye. Ukuxazulula i-equation kusho ukuthola inani lokuguquguqukayo okwenza isitatimende sibe yiqiniso.",
+   "Umthetho wegolide wama-equation uthi noma yini oyenzayo kolunye uhlangothi, kumelwe futhi uyenze kolunye. Lokhu kugcina isilinganiso silinganiselwe, njengesikali.",
+   "Ukuze uxazulule x + 7 = 12, susa u-7 ezinhlangothini zombili. Lokhu kushiya u-x = 5. Ukuze sixazulule u-3x = 21, sihlukanisa izinhlangothi zombili ngo-3, okunikeza u-x = 7. Izilinganiso eziningi zidinga izinyathelo ezingaphezu kweyodwa. Ukuxazulula u-2x + 5 = 17, okokuqala susa u-5 kuzo zombili izinhlangothi ukuze uthole u-2x = 12, bese uhlukanisa izinhlangothi zombili ngo-2 ukuze uthole u-x = 6.",
+   "Njalo hlola impendulo yakho ngokuyibuyisela esilinganisweni sokuqala. Uma u-x = 6, khona-ke u-2 (6) + 5 = 17, ngakho-ke ikhambi lilungile.",
+   "Izilinganiso eziqondile zisisiza ukuba sixazulule izinkinga zansuku zonke. Uma uhambo ngetekisi lubiza amaRandi angu-15 kanye namaRandi angu-8 ngekhilomitha, futhi izindleko zizonke zazingamaRandi angu-55, i-equation 15 + 8k = 55 ibonisa ukuthi lolu hambo lwalungamakhilomitha angu-5 ubude."
+  ],
+  "nso": [
+   "Go rarolla di-linear equations",
+   "Tekanyetšo ke polelo ya dipalo yeo e bontšhago gore dipolelo tše pedi di a lekana. Tekanyetšo ya go theoga e na le phapano, e bjalo ka x, yeo e sa godišetšwego go matla le ge e le afe ao a fetago e tee. Go rarolla tekanyetšo go bolela go hwetša mohola wa selo seo se fetogago seo se dirago gore polelwana e be therešo.",
+   "Molao wa gauta wa tekanyetšo ke gore selo le ge e le sefe seo o se dirago ka lehlakoreng le lengwe, o swanetše go se dira le ka go le lengwe. Se se boloka tekanyetšo e leka-lekane, bjalo ka sekala.",
+   "Go rarolla x + 7 = 12, ntšha 7 mahlakoreng ka bobedi. Se se tlogela x e lekana le 5. Go rarolla 3x = 21, arola mahlakore ka bobedi ka 3, yeo e neago x = 7. Ditekanyo tše dintši di nyaka megato e fetago e tee. Go rarolla 2x + 5 = 17, thoma ka go ntšha 5 mahlakoreng ka bobedi go hwetša 2x = 12, ke moka o arole mahlakore ka bobedi ka 2 go hwetša x = 6.",
+   "Ka mehla hlahloba karabo ya gago ka go e bušetša ka gare ga polelwana ya mathomo. Ge e ba x e lekana le 6, gona 2 (6) + 5 e lekana le 17, ka gona tharollo e nepagetše.",
+   "Di-equation tša go theoga di re thuša go rarolla mathata a letšatši le letšatši. Ge e ba leeto la thekisi le bitša R15 le R8 ka khilomithara, gomme palomoka ya ditshenyagalelo e be e le R55, gona tekanyetšo ya 15 + 8k = 55 e bontšha gore leeto le be le le botelele bja dikhilomithara tše 5."
+  ]
+ },
+ "phys-states-of-matter": {
+  "zu": [
+   "Izimo zendaba nethiyori yamangqamuzana yokunyakaza",
+   "Indaba yinto enesisindo futhi ethatha isikhala. Emhlabeni, indaba ivame ukutholakala ngezimo ezintathu: uqinile, uketshezi kanye negesi.",
+   "Ithiyori yamangqamuzana yokunyakaza ichaza indlela indaba ezenza ngayo. Ichaza ukuthi yonke indaba yenziwe ngamangqamuzana amancane ahlale enyakaza, nokuthi kukhona amandla okudonsela phakathi kwalawa mangqamuzana. Lapho amangqamuzana enyakaza ngokushesha, abe namandla enyakazo amaningi, futhi izinga lokushisa linyuke.",
+   "Kutoqina, amangqamuzana ahlangene eduze ngendlela emisiwe. Ayazamazama endaweni yawo kodwa awakwazi ukudlula komunye nomunye, ngakho uqinile unezimo ezimisiwe kanye nevolumu emisiwe. Kuketshezi, amangqamuzana aseseduze kodwa angakwazi ukushelela komunye nomunye. Uketshezi lunezimo ezimisiwe kodwa luthatha isimo sesitsha saso. Kwegesi, amangqamuzana akude kakhulu futhi anyakaza ngokukhululeka kuzo zonke izinhlangothi. Igesi ayinesimo esiqinile noma ivolumu futhi igcwalisa noma yisiphi isitsha.",
+   "Uma into ishisa, amangqamuzana ayo athola amandla. Ukunyibilika kuwushintsho kusuka ekuqineni kuya oketshezini, futhi ukubila kuwushintsho kusuka oketshezini kuya kwi-gesi. Uma igesi ipholile, iyancipha ibe uketshezi, futhi uma uketshezi lupholile ngokwanele, luba uqine ngokuqhwa."
+  ],
+  "nso": [
+   "Maemo a tlhago le thuto-tlase ya kinetic molecular",
+   "Taba ke selo se sengwe le se sengwe seo se nago le boima le go tšea sekoba. Mo Lefaseng, taba e hwetšwa gantši ka maemo a mararo: e tiile, metsi le gase.",
+   "Thuto-tlase ya kinetic molecular e hlaloša maitshwaro a taba. E hlaloša gore taba yohle e dirilwe ka dikarolwana tše dinyenyane tše di sepela ka mehla, le gore go na le maatla a go gapa magareng ga dikarolwana tše. Ge dikarolwana di sepela ka lebelo, di na le maatla a kinetic a mantši, gomme mogote o phagame.",
+   "Go se tiile, dikarolwana di phuthetšwe kgauswi le tše dingwe ka sebopego se tiilego. Di thothomela felong ga tšona eupša di ka se kgone go ralala, ka gona selo se tiilego se na le sebopego se tiilego le molamo o tiilego. Go metsi, dikarolwana di sa dutše di le kgauswi eupša di kaunula magareng ga tše dingwe. Metsi a na le molamo o tiilego eupša a tšea sebopego sa sejana sa ona. Go gase, dikarolwana di kgolagane di le kgole le go sepela ka tokologo ditseleng tšohle. Gase ga e na sebopego se tiilego goba molamo mme e tlaletsa sejana se sengwe le se sengwe.",
+   "Ge sediriswa se fišwa, dikarolwana tša sona di hwetša maatla. Go qhibiliha ke phetogo go tloga go se tiile go ya go metsi, le go bela ke phetogo go tloga go metsi go ya go gase. Ge gase e tonyela, e fetoga metsi, mme ge metsi a tonyela ka mo go lekanego, a thaba go ba se tiile."
+  ]
+ },
+ "phys-electric-circuits": {
+  "zu": [
+   "Amasekhethi kagesi",
+   "Isekhethi kagesi yindlela evaliwe lapho ukugeleza kwamandla kagesi kungahamba khona. Isekhethi elula idinga umthombo wamandla, njengeseli noma ibhethri, izintambo eziqhuba ugesi, kanye nento esebenzisa amandla, njengebhalbhu yokukhanya. Ushintshi ungavula noma uvale isekhethi.",
+   "Ukugeleza kwamandla kagesi kuyizinga lokugeleza kweshaji ngomqhubi. Kukalwa ngama-amperes (A) kusetshenziswa i-ammeter, exhunywe ngokulandelana. Ukwehlukana kwamandla, okubizwa nangokuthi i-voltage, kungamandla adluliselwe ngeyunithi ngayinye yeshaji. Kukalwa ngama-volts (V) kusetshenziswa i-voltmeter, exhunywe ngokuhambisanayo esigabeni.",
+   "Ukumelana kuyaphikisa ukugeleza kwamandla futhi kukalwa ngama-ohms. Intambo encane ende inokumelana okukhulu kunesikhathi sentambo efinqiwe eqinile eyenziwe ngento efanayo.",
+   "Esisekelweni sokulandelana, izingxenye zixhunywe ngokulandelana, ngakho-ke ukugeleza kwamandla okufanayo kuhamba ngakunye kwazo. Uma ibhalbhu eyodwa esisekelweni sokulandelana iphuka, sonke isekhethi siyayeka ukusebenza. Esisekelweni esihambisanayo, izingxenye zixhunywe ezihlahleni ezihlukene. Uma ibhalbhu eyodwa iphuka, amabhalbhu kwezinye izihlahla ayaqhubeka nokusebenza. Yingakho izibani ezisendlini zixhunywe ngokuhambisanayo."
+  ],
+  "nso": [
+   "Disekete tša mohlagase",
+   "Sekete sa mohlagase ke tsela ye e tswalwago yeo go yona mohlagase o kgonago go ela. Sekete se bonolo se hloka mohlodi wa maatla, bjalo ka sele goba betiri, megala ya go swara mohlagase, le karolo ye e šomišago maatla, bjalo ka lebone. Switšho e ka bula goba ya tswala sekete.",
+   "Mohlagase o elago ke lebelo leo ka lona phetisetšo e elago ka gare ga mola. O elwa ka ampere (A) o šomiša amimiitha, ye e golagantšwego ka molokoloko. Phapano ya maatla, ye e bitšwago gape le matla a mohlagase, ke maatla ao a fetšetšwago ka karolo nngwe le nngwe ya phetisetšo. E elwa ka volte (V) o šomiša voltimiitha, ye e golagantšwego ka mapheko godimo ga karolo.",
+   "Kganetšo e ganetša go ela ga mohlagase gomme e elwa ka ohm. Mola o mosesane wo motelele o na le kganetšo ye kgolo go feta mola o mofudio wo mokgutshwane wo dirilwego ka sedirišo se se swanago.",
+   "Ka seketeng sa molokoloko, dikarolo di golagantšwe e le tše di latelago tše dingwe, ka baka leo mohlagase o swanago o ela ka go tšona ka moka. Ge e le gore lebone le le tee ka seketeng sa molokoloko le robega, sekete ka moka se lesetsa go šoma. Ka seketeng sa mapheko, dikarolo di golagantšwe ka makala a arokanego. Ge e le gore lebone le le tee le robega, mabone a makala a mangwe a tšwela pele ka go šoma. Se ke lebaka la ge mabone a ka gae a golagantšwe ka mapheko."
+  ]
+ },
+ "bus-environments": {
+  "zu": [
+   "Izindawo ezintathu zebhizinisi",
+   "Wonke amabhizinisi asebenza esimweni esithinta indlela asebenza ngayo. Izifundo Zezamabhizinisi zihlukanisa lokhu kube yizindawo ezintathu: indawo encane, indawo yemakethe nendawo enkulu.",
+   "Imvelo encane iyibhizinisi ngokwalo. Kuhlanganisa umbono webhizinisi, umsebenzi, ukuphathwa, abasebenzi, izinsiza kanye nemisebenzi yebhizinisi eyisishiyagalombili, njengokuthenga, ukumaketha kanye nemisebenzi yezezimali. Ibhizinisi lilawula ngokuphelele indawo yalo encane.",
+   "Isimo semakethe sitholakala ngokuqondile ngaphandle kwebhizinisi. Kuhlanganisa abathengi, abahlinzeki, izimbangi nabaxhumanisi njengabathengisi abakhulu nabathengisi abancane. Ibhizinisi linamandla athile kuphela okulawula le ndawo. Ngokwesibonelo, ingase izame ukuzuza amakhasimende ngamanani nezinsizakalo ezinhle, kodwa ayikwazi ukulawula lokho okwenziwa izimbangi.",
+   "Imvelo enkulu ihlanganisa amandla amakhulu athinta wonke amabhizinisi. Lezi zihlanganisa ezomnotho, ezomthetho nezombusazwe, ezobuchwepheshe, ezenhlalo nezemvelo. Ibhizinisi alinawo amandla okulawula isimo salo esikhulu. Ngokwesibonelo, uma izinga lenzalo likhuphuka noma kuphasiswa umthetho omusha, ibhizinisi kumelwe livumelane nezimo.",
+   "Amabhizinisi atadisha zonke lezi zindawo ezintathu ukuze akwazi ukuthola amathuba, anciphise izinsongo futhi ahlele ikusasa."
+  ],
+  "nso": [
+   "Tikologo tše tharo tša kgwebo",
+   "Kgwebo ye nngwe le ye nngwe e šoma ka gare ga tikologo ye e huetšago tsela ye e dirago ka yona. Thuto ya Dikgwebo e aba se ka tikologo tše tharo: tikologo ya ka gare, tikologo ya mmaraka le tikologo ya ka ntle.",
+   "Tikologo ya ka gare ke kgwebo ka boyona. E akaretša pono, maikemišetšo, bolaodi, bašomi, dihlfula le ditiro tše seswai tša kgwebo, tša bjalo ka tiro ya go reka, ya mmaraka le ya tšhelete. Kgwebo e na le taolo ka botlalo godimo ga tikologo ya yona ya ka gare.",
+   "Tikologo ya mmaraka e fithelwa ka ntle ga kgwebo ka go lebanya. E akaretša bareki, barekiši, badiisani le magareng a bjalo ka baabi ba ka godimo le barekiši ba ka tlase. Kgwebo e na le taolo feela ka tekanyo eithuti godimo ga tikologo ye. Ka mohlala, e ka leka go thopa bareki ka ditheko tše botse le tirelo, eupša e ka se kgone go laola seo badiisani ba se dirago.",
+   "Tikologo ya ka ntle e akaretša maatla a magolo ao a huetšago dikgwebo ka moka. A akaretša tša ekonomi, melao le dipolitiki,ethekinoloji, setšhaba le tikologo ya tlhago. Kgwebo ga e na taolo le gatee godimo ga tikologo ya yona ya ka ntle. Ka mohlala, ge tswala ya tšhelete e nyakela godimo goba mohlala o mofsa o fetiswa, kgwebo e swanetše go ikamahanya le maemo.",
+   "Dikgwebo di ithuta tikologo ka moka tše tharo gore di tle di kgone go hwetša sebaka, go fokotša matšhafo le go loga maano a tšhomiso ya nako e tlaago."
+  ]
+ },
+ "bus-entrepreneurship": {
+  "zu": [
+   "Ukwamabhizinisi",
+   "Usomabhizinisi ngumuntu obona ithuba lebhizinisi futhi ozimisele ukuthatha ingozi ukuliguqula libe ibhizinisi. Osomabhizinisi bahlanganisa izici zokukhiqiza, okungukuthi imithombo yemvelo, abasebenzi kanye nenhloko-mali, ukuze bakhiqize izimpahla noma amasevisi adingwa ngabantu.",
+   "Osomabhizinisi abaphumelelayo bavamise ukuba nezici ezithile ezifanayo. Banobuciko futhi bayakwazi ukuza nemibono emisha. Bazimisele ukuthatha izingozi ezibaliwe, futhi bayaphikelela uma izinto zingahambi ngendlela ehlelwe ngayo. Banelusizo oluhle ekuhleleni nasekuphatheni isikhathi sabo kanye nemali yabo.",
+   "Ukwamabhizinisi kubalulekile umnotho waseningizimu Afrika. Amabhizinisi amasha adala imisebenzi, okusiza ekwehliseni ukungasebenzi. Aphinde alethe imikhiqizo emisha namasevisi emiphakathini futhi akhokhe intela uhulumeni angayisebenzisa ukunikeza amasevisi.",
+   "Ngaphambi kokuqala ibhizinisi, usomabhizinisi kufanele abhale uhlelo lwebhizinisi. Uhlelo lwebhizinisi luchaza umkhiqizo noma isevisi, imakethe eqondiswe kuyo, izimbangi, ukuthi ibhizinisi lizothengiswa kanjani nokuthi malini edingekayo ukuluqala. Uhlelo lwebhizinisi oluhle lusiza usomabhizinisi ukuba acabisise ngombono futhi lungasetshenziselwa ukucela imali mboleko."
+  ],
+  "nso": [
+   "Kgwebano",
+   "Mošomi wa kgwebo ke motho yo a lemogago sebaka sa kgwebo gomme a ikemišetše go tšea kotsi go se fetolela go ba kgwebo. Borakgwebo ba kopanya dintlha tša tšweletšo, e lego methopo ya tlhago, bašomi le tšhelete, go tšweletša dithoto goba ditirelo tše di hlokwago ke batho.",
+   "Borakgwebo bao ba atlegago gantši ba na le makgabane a swanago. Ba bopa dilo mme ba kgona go tla ka dikgopolo tše mpsha. Ba ikemišetše go tšea dikotsi tše di hlahlobišitšwego, mme ba tiile ge dilo di sa sepele ka moo go hlophilwego ka gona. Gape ba na le bokgoni bja go beakanya le go laola nako le tšhelete ya bona.",
+   "Kgwebo ke ya bohlokwa kudu go ekonomi ya Afrika Borwa. Dikgwebo tše mpsha di hlola mešomo, tše di thušago go fokotša tlhoka-mešomo. Gape di tlisago dithoto le ditirelo tše mpsha setšhabeng mme di lefa mohlophiso woo mmušo o ka o šomišago go aba ditirelo.",
+   "Pele ga ge o thoma kgwebo, morakgwebo o swanetše go ngwala leano la kgwebo. Leano la kgwebo le hlalosa sehlahiswa goba tirelo, mmaraka wo o lebeletšwago, bahaisani, ka moo kgwebo e tlago go bapatšwa ka gona le gore go nyakega tšhelete e kae go e thoma. Leano la kgwebo le le botse le thuša morakgwebo go nagana ka kelokelo ka ga kgopolo mme le ka šomišwa go kgopela kadimo."
+  ]
+ },
+ "geo-water-cycle": {
+  "zu": [
+   "Umjikelezo wamanzi",
+   "Amanzi ahlala ehamba phakathi komhlaba, ulwandle kanye nomkhathi. Lokhu kuhamba okungapheli kubizwa ngokuthi umjikelezo wamanzi, noma umjikelezo we-hydrological. Amandla aqhuba umjikelezo wamanzi avela elangeni.",
+   "Ilanga lishisa amanzi aselwandle, emifuleni nasemadamu. Ezinye zalezi zinhlayiya zamanzi ziphenduka umhwamuko wamanzi zenyukele emoyeni. Lolu hlelo lubizwa ngokuthi ukuwagwaqa. Izitshalo nazo zikhipha umhwamuko wamanzi ngamaqabunga azo, okubizwa ngokuthi ukuhogela kwezitshalo.",
+   "Njengoba umhwamuko wamanzi unyuka, uyaphola. Umhwamuko opholile uphinde uphenduke amaconsi amancane kakhulu amanzi enza amafu. Lolu hlelo lubizwa ngokuthi ukujiya.",
+   "Uma amaconsi asefu ehlangana ndawonye abe nzima, awehla phansi emhlabeni ngendlela yemvula, isichotho noma iqhwa. Lokhu kubizwa ngokuthi imvula noma ukuwa kwamanzi. Iningi laseNingizimu Afrika lithola imvula yalo ehlobo, kodwa iNtshonalanga Kapa ithola imvula yayo eningi ebusika.",
+   "Ezinye zamanzi ezifinyelela phansi emhlabeni zigeleza phezu komhlaba zingena ezibungwini nasemifuleni. Lokhu kubizwa ngokuthi ukuhamba kwamanzi angaphezulu. Ezinye zamanzi ziyamiliza zingene enhlabathini zibe wamanzi angaphansi komhlaba. Ekugcineni amanzi abuyela olwandle, bese umjikelezo uqala futhi."
+  ],
+  "nso": [
+   "Moloro wa meetse",
+   "Meetse a sepela ka mehla magareng ga lefase, mawatle le moya. Sepelo se sa khwiti se bitšwa moloro wa meetse, goba moloro wa hydrologic. Matla ao a tšweletšago moloro wa meetse a tšwa letšatšing.",
+   "Letšatši le fiša meetse ka mawatleng, dinokeng le matamong. A mang a meetse a fetoga mouwane wa meetse gomme a rotogela moyeng. Mokgwa wo o bitšwa gofufetša (evaporation). Dimela le tšona di ntšha mouwane wa meetse ka matlakala a tšona, wo o bitšwago transpiration.",
+   "Ge mouwane wa meetse o dutše o rotogela godimo, o tonywa. Mouwane wo o foditšwego o boela o fetoga marothodi a manyenyane a meetse ao a bopago maru. Mokgwa wo o bitšwa condensation.",
+   "Ge marothodi ka lerung akopana gomme a ba boima, a wela fase e le pula, sefako goba kapoko. Se se bitšwa precipitation. Bontši bja Afrika Borwa bo amogela pula ya bona ka lehlabula, efela Kapa Bodikela e amogela bontši bja pula ya yona ka marega.",
+   "Meetse a mang ao a fihlago fase a elela godimo ga lefase a tsena melaseng le dinokeng. Se se bitšwa run-off. A mang a meetse a nwela mobung gomme a ba meetse a ka tlase ga lefase. Mafelelong meetse a boela mawatleng, gomme moloro wa thoma gape."
+  ]
+ },
+ "geo-weather-climate": {
+  "zu": [
+   "Isimo sezulu nomoya wesimo sezulu",
+   "Isimo sezulu nomoya wesimo sezulu bachaza umkhathi, kodwa akufani. Isimo sezulu yisimo somkhathi endaweni ethile nangesikhathi esithile. Singashintsha kusuka ngehora kuya ngehora. Umoya wesimo sezulu uwisimo sezulu esivamile sendawo, esilinganiswa esikhathini eside esivamise ukuba iminyaka engamashumi amathathu noma ngaphezulu.",
+   "Izinto eziyinhloko zesimo sezulu ukushisa, imvula, umoya, umswakama kanye nomfutho womoya. Ukushisa kulinganiswa ngesilinganiso sokushisa, imvula ngesilinganiso semvula, kanye nesivinini somoya ngesilinganiso somoya. Umfutho womoya ulinganiswa nge-barometer.",
+   "Izici eziningi zithinta umoya wesimo sezulu sendawo. Izindawo eziseduze ne-equator zivame ukuba zifudumele kunezinye eziseduze nezigxobo. Izindawo ezisezingeni eliphakeme ziba namakhaza kunezinye ezisezingeni lolwandle, yingakho iJohannesburg, eseHighveld, inobusuku obubandayo kuneDurban esogwini. Imisinga yolwandle nayo iqhaza iqhaza. Umasinga ofudumele i-Agulhas wenza ugu olusempumalanga yeNingizimu Afrika lube lufudumele futhi lunomswakama, kanti umasinga obandayo i-Benguela wenza ugu olusentshonalanga lupholile futhi lomile.",
+   "Ukuqonda isimo sezulu nomoya wesimo sezulu kusiza abalimi ukuthi bahlele ukutshala kwabo futhi kusiza imiphakathi ukuba izilungiselele isomiso nezikhukhula."
+  ],
+  "nso": [
+   "Boemo bja leratadima le klaemete",
+   "Boemo bja leratadima le klaemete ka bobedi di hlalosa mowa, eupša ga di swane. Boemo bja leratadima ke seemo sa mowa lefelong le leswa le ka nako ye e riyeng. Bo ka fetoga go tloga iri le iri. Klaemete ke palogare ya boemo bja leratadima bja lefelo, bjo bo elwago ka nako ye telele ya go tlwaelega ya mengwaga ye masome a tharo go ya godimo.",
+   "Dikarolo tše dikgolo tša boemo bja leratadima ke phišo, pula, phefo, mongobo le kgatelelo ya mowa. Phišo e elwa ka therometara, pula ka sekala sa pula, gomme lebelo la phefo ka anemometara. Kgatelelo ya mowa e elwa ka barometer.",
+   "Dintho tše mmalwa di huetša klaemete ya lefelo. Malefelo ao a lego kgauswi le ekhwatara gantši afiša go feta malefelo ao a lego kgauswi le dipole. Malefelo a godimo a tonya go feta malefelo ao a lego maemong a lewatle, e lego lebaka leo ka lona Johannesburg, Highveld, e nago le bošego bjo bo tonya go feta Durban lebopong. Mesela ya lewatle le yona e bapala karolo. Motlakase wa lewatle wa Agulhas wo o fišago o dira gore lebepo la bodikela la Afrika Borwa le fiše gape le be le mongobo, mola Motlakase wa lewatle wa Benguela wo o tonyago o dira gore lebopo la bodikela le tonyego gape le ome.",
+   "Go kwešiša boemo bja leratadima le klaemete go thuša balemi go rulaganya bjala bja bona le go thuša setšhaba go ba malala-a-laotsweng bakeng sa komoro le merwalela."
+  ]
+ },
+ "life-human-eye": {
+  "zu": [
+   "Iso lomuntu",
+   "Iso litho lemizwa elisivumela ukuba sibone. Lithola ukukhanya likuguqule kube yimiyalezo yezinzwa ethunyelwa ebuchosheni.",
+   "Ukukhanya kuqala kudlula oponjeni, okuyingxenye engaphambili ecwebezelayo yeso. Uponjeni uyaphambukisa, noma ugoba, ukukhanya. Emva kwalokho ukukhanya kudlula ophupheni, okuyimbobo esesiswini se-iris. I-iris yingxenye yeso enemibala, futhi imisipha yayo ilawula ubukhulu bophuphe. Ekukhanyeni okukhanyayo uphuphelwa lube luncane, ukuze kungena ukukhanya okuncane esweni. Ekukhanyeni okufiphalazi uphuphelwa lube lukhulu.",
+   "Emva kophupho kukhona ilensi. Ilensi ishintsha ukuma kwayo ukuze igxilise ukukhanya ku-retina ngemuva kweso. Lolu hlelo lubizwa ngokuthi ukuzivumelanisa. I-retina iqukethe amangqamuzana azwela ukukhanya abizwa ngokuthi ama-rods nama-cones. Ama-rods asivumela ukuba sibone ekukhanyeni okufiphalisayo, kuyilapho ama-cones asivumela ukuba sibone umbala. Uzinzwa lwe-optic luphatha imiyalezo evela ku-retina iye ebuchosheni.",
+   "Ukukhubazeka okuningi kungathinta ukubona. Ukubona kude nokufushane kwenzeka uma ibhola leso lide kakhulu futhi lilungiswa ngamalensi anciphayo. Ukubona kude kwenzeka uma ibhola leso lincane kakhulu futhi lilungiswa ngamalensi akhukhumele. I-Astigmatism ibangwa ukungalingani kokuqina kowu-cornea noma kwelensi, okwenza umfanekiso ube mfitshane."
+  ],
+  "nso": [
+   "Leihlo la motho",
+   "Leihlo ke setho sa kutlo seo se re dumelelago go bona. Le lemoga lesedi gomme la le fetolela go ba dikgokagano tša methapo tša di romelwago bokong.",
+   "Lesedi le feta pele ka lenaka la leihlo (cornea), karolo ya pele e pepeneneng ya leihlo. Lenaka la leihlo le kobatša lesedi. Ka morago lesedi le feta ka sekaenyana (pupil), e lego lesoba leo le lego magareng ga iris. Iris ke karolo ya leihlo e nago le mmala, gomme mesifa ya yona e laola bogolo bja sekaenyana. Leseding le legolo sekaenyana se nyenyefala gore go tsene lesedi le lenyenyane ka leihlong. Leseding le le nnyane sekaenyana se gološa.",
+   "Ka morago ga sekaenyana go na le lensi. Lensi e fetola sebopego sa yona go lebisa lesedi godimo ga retina ka morago ga leihlo. Tshepetšo ye e bitšwa tlwaetšo (accommodation). Retina e na le disele tše di sepelelago le lesedi tše di bitšwago dirodi le dikono. Dirodi di re dumelela go bona leseding le le nnyane, mola dikono di re dumelela go bona mmala. Methapo ya pono e rwala dikgokagano go tloga go retina go ya bokong.",
+   "Ditšhila tše di fapafapanego di ka ama pono. Go sa bone gabolele go direga ge leihlo le le telele kudu gomme go lokiswa ka dilense tša concave. Go sa bone kgole go direga ge leihlo le le kopana kudu gomme go lokiswa ka dilense tša convex. Astigmatism e bakwa ke go se lekane ga boemo bja lenaka la leihlo goba lensi, tše di dirago gore seswantšho se se bonale gabotse."
+  ]
+ },
+ "life-photosynthesis": {
+  "zu": [
+   "I-photosynthesis",
+   "I-photosynthesis inqubo lapho izitshalo eziluhlaza zenza khona ukudla kwazo. Izitshalo zisebenzisa amandla okukhanya avela elangeni ukuze zishintshe isikhutha namanzi zibe ushukela nomoya-mpilo.",
+   "I-photosynthesis yenzeka ikakhulukazi emaqabungeni, ngaphakathi kwezakhiwo ezibizwa ngokuthi ama-chloroplast. Ama - chloroplast anombala oluhlaza obizwa ngokuthi i - chlorophyll, omunca amandla okukhanya. Yingakho amaqabunga eluhlaza.",
+   "Izitshalo zithatha i - carbon dioxide emoyeni ngezikhala ezincane emaqabungeni azo ezibizwa ngokuthi ama - stomata. Amanzi amuncwa izimpande emhlabathini abese enyukela emaqabungeni nge - xylem. I-glucose ekhiqizwayo isetshenziswa isitshalo ukuze sithole amandla nokukhula, noma igcinwe njengesitashi. Umoya-mpilo udedelwa emoyeni nge-stomata.",
+   "Izinga le-photosynthesis lincike ezicini eziningana. Uyanda lapho kunokukhanya okwengeziwe, isikhutha esengeziwe noma izinga lokushisa elifanele. Uma esinye salezi zici singatholakali ngokwanele, sinciphisa ijubane i-photosynthesis engenzeka ngalo.",
+   "I-photosynthesis ibalulekile kukho konke ukuphila eMhlabeni. Inikeza umoya-mpilo ophefumulwa izilwane nabantu, futhi ukudla okukhiqizayo kuyisiqalo cishe sawo wonke amaketanga okudla."
+  ],
+  "nso": [
+   "Tshepedišo ya photosynthesis",
+   "Photosynthesis ke tshepedišo yeo ka yona dimela tše tala di itirelago dijo tša tšona. Dimela di diriša matla a seetša go tšwa letšatšing go fetoša carbon dioxide le meetse go ba glukose le oksitšene.",
+   "Tiro ya photosynthesis e direga kudu matlakaleng, ka gare ga dibopego tšeo di bitšwago di-chloroplast. Di-chloroplast di na le mmala o motala wo o bitšwago chlorophyll, woo o monyago matla a seetša. Ke ka baka leo matlakala e lego a matala.",
+   "Dimela di monya carbon dioxide moyeng ka mašoba a manyenyane matlakaleng a tšona ao a bitšwago stomata. Meetse a monwa mmung ke medu gomme a išwa matlakaleng ka xylem. Glucose yeo e tšweletšwago e dirišwa ke sebjalo bakeng sa matla le kgolo, goba e bolokwa e le setatšhe. Oksitšene e ntšhetšwa moyeng ka stomata.",
+   "Tekanyo ya photosynthesis e ithekgile ka mabaka a mmalwa. E a oketšega ge go e-na le seetša se se oketšegilego, carbon dioxide e oketšegilego goba thempheretšha e swanetšego. Ge e ba le lengwe la mabaka a le hlaela, le lekanyetša lebelo leo photosynthesis e ka diregago ka lona.",
+   "Tshepedišo ya photosynthesis e bohlokwa bakeng sa bophelo ka moka mo lefaseng. E nea oksitšene yeo diphoofolo le batho ba e hemago, gomme dijo tšeo e di tšweletšago ke mathomo a mo e nyakilego go ba ketane e nngwe le e nngwe ya dijo."
+  ]
+ },
+ "art-elements": {
+  "zu": [
+   "Izakhi zobuciko",
+   "Izakhi zobuciko yizona zisekelo eziyisisekelo ezisetshenziswa abaculi ukudala umsebenzi wobuciko. Izakhi eziyisikhombisa umugqa, isimo, ifomu, isikhala, umbala, inani kanye nendlela okwakheke ngayo.",
+   "Umugqa uwuphawu oluxhumanisa amaphuzu amabili. Imigqa ingaba qondile noma egobile, ibe mncane noma ibe mkhulu, futhi ingahola amehlo ombukeli nxazonke zobuciko. Isimo siyingxesha eyisicaba evaliwe enobukhulu obubili, njのではないでしょうか isiyingi noma isikwele. Ifomu linobukhulu obuthathu futhi linobude, ububanzi kanye nokujula, njengesithombe esiqoshiwe noma umdwebo wekhubhu elicwebezelisiwe ukuze libukeke liqinile.",
+   "Isikhala yindawo ezungeze kanye naphakathi kwezinto emsebenzini wobuciko. Abaculi benza inkohliso yokujula ngokwenza izinto ezikude zibe zincane futhi bazibeke phezulu ephepheni. Inani lichaza ukuthi umbala ukhanya noma umnyama kangakanani. Umehluko oqinile enanini udala ukungqubuzana kanye nomdlalo.",
+   "Umbala unezici ezintathu: i-hue, okuw igama lombala; inani; kanye nokuqina, okuwukuthi umbala ukhanya noma ubuthuntu kangakanani. Indlela okwakheke ngayo yindlela indawo ezwakala ngayo, noma ebika ngayo ukuthi ingezwakala kanjani. Indlela yokuzwakala yangempela ingathintwa, kuyilapho indlela yokuzwakala ebonakalayo idalwa umculi ukuthi ibukeke imahhadla noma ibushelelezi."
+  ],
+  "nso": [
+   "Dikarolo tša bokgoni",
+   "Dikarolo tša bokgoni ke metheo ya motheo yeo baratudi ba e dirišago go hlama modiro wa bokgoni. Dikarolo tše šupa ke mela, sebopego, sebopego se se feletšego, sekgoba, mmala, boleng le bophara bja mmele.",
+   "Mela ke leswao leo le kopanyago dintlha tše pedi. Mela e ka ba ye e otlolohilego goba ye e kobegilego, ye e nwanago goba ye e sesane, gomme e ka eta mahlo a mohlokomedi go dikologa modiro wa bokgoni. Sebopego ke lefelo la go lekana leo le tswaletšwego la bogolo bjo bedi, bjalo ka sediko goba sekwere. Sebopego se se feletšego se na le bogolo bjo tharo gomme se na le bolelele, bophara le botebo, bjalo ka seswanwa goba thalo ya khubu ye e shaetšwego gore e bonale e tiile.",
+   "Sekgoba ke lefelo le le dikologago le le gare ga dilo ka mo modirong wa bokgoni. Baratudi ba hlama ponalo ya botebo ka go dira gore dilo tše di lego kgole di be nnyane le go di bea godimo mo letlakaleng. Boleng bo hlaloša kamoo mmala o lego morotho goba o leswiswi ka gona. Phapano ya matla ka boleng e hlama phapano le tšhitišo.",
+   "Mmala o na le dintlha tše tharo: hue, ye e lego leina la mmala; boleng; le maatla, ye e lego kamoo mmala o phadimago goba o se nago phadimiso ka gona. Bophara bja mmele ke tsela yeo bokagodimo bo ikwašago ka yona, goba bjo bo bonalago ka bjana eka bo tla ikwaša ka gona. Bophara bja mmele bja nnete bo ka kgwathwa, mola bophara bja mmele bjo bo akanywago bo hlotšwe ke motaratudi gore bo bonale bo le marhaba goba bo le boreledi."
+  ]
+ },
+ "art-colour-theory": {
+  "zu": [
+   "Ithiyori yemibala",
+   "Ithiyori yemibala isiza abaculi ukuba baqonde ukuthi imibala isebenza kanjani ndawonye. Isondo lemibala lihlela imibala endilingeni ukuze libonise ubudlelwano phakathi kwayo.",
+   "Imibala eyinhloko iwubomvu, ophuzi kanye oluhlaza okwesibhakabhaka. Ayikwazi ukwenziwa ngokuxuba eminye imibala. Uma imibala emibili eyinhloko ixubene, yenza umbala wesibili. Ubomvu n ophuzi kwenza owolintshi, ophuzi n ohlaza okwesibhakabhaka kwenza ohlaza okotshani, kanti ohlaza okwesibhakabhaka n owobomvu kwenza olemabalabala/nsomi. Ukuxuba umbala oyinhloko nombala wesibili oseduze kwawo kwenza umbala wesithathu, onjengoluhlaza okwesibhakabhaka-oluhlaza okotshani.",
+   "Imibala ehambisanayo itholakala ngaphesheya kwenye esondweni lemibala, enjengobomvu nohlaza okotshani, noma ohlaza okwesibhakabhaka nowolintshi. Uma zibekwe eduze kwenye, zenza enye ibukeke ikhanya kakhulu, okwakha umehluko oqinile. Imibala efanayo ihlala eduze kwenye esondweni lemibala, enjengophuzi, ophuzi-owolintshi nowolintshi. Yakha umuzwa ozolile nowobumbano.",
+   "Imibala ingabuye ichazwe njengefudumele noma epholile. Imibala efudumele enjengobomvu, owolintshi nophuzi ibonakala iza phambili emdweweni futhi iphakamisa amandla nokushisa. Imibala epholile enjengoluhlaza okwesibhakabhaka, ohlaza okotshani nonokusomi ibonakala ihlehla emuva futhi iphakamisa ukuzola nebanga."
+  ],
+  "nso": [
+   "Thuto ya mebala",
+   "Thuto ya mebala e thuša bašomi ba bokgabo go kwešiša ka moo mebala e šomago gotee ka gona. Sekgethelana sa mebala se beakanya mebala ka sediko go bontšha dikamano tše di lego magareng ga yona.",
+   "Mebala ya motheo ke e khubedu, serolwane le botala bja legodimo. Di ka se dirwe ka goakatanya mebala e mengwe. Ge mebala ye mebedi ya motheo e kopantšwe, e dira mmala wa bobedi. Mmala wo o khubedu le o serolwane di dira lamunu, serolwane le botala bja legodimo di dira botala bja mahareng, gomme botala bja legodimo le o khubedu di dira mmala wa namune. Go kopanya mmala wa motheo le mmala wa bobedi wo o lego kgauswi le wona go dira mmala wa boraro, bjalo ka botala bja legodimo-botala.",
+   "Mebala ya tlatšano e hwetšwa e lebane le e mengwe sekgethelaneng sa mebala, bjalo ka e khubedu le botala, goba botala bja legodimo le lamunu. Ge di beilwe kgauswi le tše dingwe, di dira gore e mengwe e bonale e phadima kudu, e lego se se hlolago phapano e maatla. Mebala ya go swana e dula kgauswi le e mengwe sekgethelaneng sa mebala, bjalo ka serolwane, serolwane-lamunu le lamunu. Di hlola maikutlo a khutšo le a tumelano.",
+   "Mebala e ka hlalošwa gape bjalo ka e fišago goba e tonya. Mebala e fišago bjalo ka e khubedu, lamunu le serolwane e bonagala e tla pele ka pentheng gomme e šupa maatla le phišo. Mebala e tonya bjalo ka botala bja legodimo, botala le mmala wa namune e bonagala e bušetša morago gomme e šupa khutšo le bokgole."
+  ]
+ }
+}

@@ -2,6 +2,9 @@
 // "Make practice questions" button sends the lesson to the real lesson generator.
 import React from 'react';
 import { SAMPLE_LESSONS, TEXTBOOK, allSampleLessons } from './sample-lessons.js';
+import { useQuestionLanguage, LanguageSelect, ListenButton, TranslationNote } from './QuestionLanguage.jsx';
+import { speechPieces } from './speech-pieces.js';
+import TRANSLATIONS from './sample-lessons-translations.json';
 import './lesson-library-views.css';
 
 export const lessonCount = subject => SAMPLE_LESSONS[subject]?.length || 0;
@@ -34,11 +37,17 @@ export function SubjectLessons({ subject, onOpen, onBack, onCreate, Btn }) {
 }
 
 export function LessonReader({ lesson, onBack, onPractice, Btn }) {
+  const paragraphs = lesson.text.split('\n\n');
+  // Title first, then each paragraph: translated together into isiZulu or Sepedi when chosen.
+  const lang = useQuestionLanguage([lesson.title, ...paragraphs], TRANSLATIONS[lesson.id]);
+  const [title, ...shown] = lang.texts;
   return <main className="dj-content lb-library-view lb-reader">
     <button type="button" className="lb-back" onClick={onBack}>← {lesson.subject}</button>
     <span className="lb-lesson-meta">{lesson.subject} · Grade {lesson.grade} · Chapter {lesson.chapter}</span>
-    <h1>{lesson.title}</h1>
-    <article className="lb-reader-page">{lesson.text.split('\n\n').map((paragraph, i) => <p key={i}>{paragraph}</p>)}</article>
+    <h1>{title}</h1>
+    <div className="lb-reader-tools"><LanguageSelect translating={lang.translating} /><ListenButton lines={speechPieces([title, ...shown])} language={lang.language} /></div>
+    <TranslationNote translated={lang.translated} error={lang.error} />
+    <article className={'lb-reader-page' + (lang.translating ? ' is-translating' : '')}>{shown.map((paragraph, i) => <p key={i}>{paragraph}</p>)}</article>
     <p className="lb-library-source">From the {TEXTBOOK}.</p>
     <div className="lb-library-actions"><Btn onClick={onPractice}>Make practice questions</Btn><Btn className="outline" onClick={onBack}>Back to {lesson.subject}</Btn></div>
   </main>;

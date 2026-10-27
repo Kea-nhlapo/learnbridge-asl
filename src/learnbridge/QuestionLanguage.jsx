@@ -42,18 +42,21 @@ async function translateTexts(texts, to) {
 }
 
 // texts: English strings (question first, then answers, then anything else on the screen).
-export function useQuestionLanguage(texts) {
+// presets: ready-made translations ({ zu: [...], nso: [...] }, same order as texts), used instead of a request.
+export function useQuestionLanguage(texts, presets = null) {
   const language = useQuestionLanguageCode();
   const joined = texts.join('\u0001');
+  const preset = language !== 'en' && presets?.[language]?.length === texts.length ? presets[language] : null;
   const [state, setState] = useState({ key: '', texts, error: '' });
   useEffect(() => {
-    if (language === 'en') return;
+    if (language === 'en' || preset) return;
     let live = true;
     setState(previous => ({ ...previous, error: '' }));
     translateAll(texts, language).then(result => live && setState({ key: `${language}\u0000${joined}`, texts: result, error: '' }))
       .catch(error => live && setState({ key: '', texts, error: error.message }));
     return () => { live = false; };
-  }, [language, joined]);
+  }, [language, joined, preset]);
+  if (preset) return { language, texts: preset, translating: false, translated: true, error: '' };
   const ready = language === 'en' || state.key === `${language}\u0000${joined}`;
   return { language, texts: ready && language !== 'en' ? state.texts : texts, translating: !ready && !state.error, translated: ready && language !== 'en', error: state.error };
 }

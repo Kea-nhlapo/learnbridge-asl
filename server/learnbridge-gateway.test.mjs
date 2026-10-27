@@ -53,3 +53,18 @@ test('read aloud uses Gemini speech first, as a WAV file', async () => {
     assert.ok(seen.every(s => !s.url.includes('omnivoice')));
   });
 });
+
+test('translation falls back to Gemini when NLLB is busy, keeping paragraphs', async () => {
+  const seen = [];
+  await withFetch(async (url, init = {}) => {
+    url = String(url); seen.push(url);
+    if (url.includes('unesco-nllb')) return url.endsWith('/call/translate') ? Response.json({ event_id: 'e' }) : new Response('event: error\ndata: null\n\n');
+    if (url.includes('generativelanguage')) return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify({ paragraphs: ['Sawubona.', 'Amanzi.'] }) }] } }] });
+    return new Response('?', { status: 404 });
+  }, async () => {
+    const r = await gateway.fetch(new Request('http://x/api/translate', { method: 'POST', body: JSON.stringify({ text: 'Hello.\n\nWater.', from: 'en', to: 'zu' }) }), { GEMINI_API_KEY: 'k' });
+    assert.equal(r.status, 200);
+    assert.deepEqual(await r.json(), { text: 'Sawubona.\n\nAmanzi.', translatedBy: 'gemini' });
+    assert.ok(seen.some(u => u.includes('generativelanguage')));
+  });
+});

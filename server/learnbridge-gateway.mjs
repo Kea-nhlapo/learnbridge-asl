@@ -119,20 +119,39 @@ async function transcribe(request,url,env){
   try{const [text]=await gradioCall(space,space.data,env,{bytes,name:'section.wav',type:'audio/wav'});return Response.json({text:String(text||'').trim()},{headers:{...baseHeaders,'cache-control':'no-store'}})}
   catch(error){return jsonError(error.message===BUSY?BUSY:'The transcription service could not be reached.',502)}
 }
+// NLLB first; when its free GPU allowance is used up (or it fails) and GEMINI_API_KEY is set, Gemini
+// translates instead, keeping the paragraphs in the same order. The response says which was used.
+const GEMINI_LANGUAGES={en:'English',zu:'isiZulu (Zulu)',nso:'Sepedi (Northern Sotho, Sesotho sa Leboa)',nl:'Dutch'};
+async function geminiTranslate(paragraphs,from,to,apiKey){
+  const schema={type:'object',properties:{paragraphs:{type:'array',items:{type:'string'}}},required:['paragraphs']};
+  const prompt=`Translate each paragraph from ${GEMINI_LANGUAGES[from]} into ${GEMINI_LANGUAGES[to]} for South African school learners. Keep the meaning exact, keep numbers and technical terms accurate, and return exactly ${paragraphs.length} paragraphs in the same order.\n\n${JSON.stringify(paragraphs)}`;
+  for(const model of ['gemini-3.5-flash-lite','gemini-3.5-flash','gemini-flash-lite-latest']){
+    const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{method:'POST',headers:{'x-goog-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json',responseJsonSchema:schema,temperature:0.2}}),signal:AbortSignal.timeout(60000)});
+    if(!response.ok){const detail=await response.text().catch(()=>'');if([429,500,503].includes(response.status)||([400,404].includes(response.status)&&/no longer available|not found|not supported/i.test(detail)))continue;return null}
+    let parsed;try{parsed=JSON.parse((await response.json())?.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('')||'{}')}catch{continue}
+    if(Array.isArray(parsed.paragraphs)&&parsed.paragraphs.length===paragraphs.length&&parsed.paragraphs.every(p=>typeof p==='string'&&p.trim()))return parsed.paragraphs.map(p=>p.trim());
+  }
+  return null;
+}
 async function translate(request,env){
   const data=await readJSON(request,30000);
   if(!data||typeof data.text!=='string'||!data.text.trim()||data.text.length>20000)return jsonError('Provide up to 20,000 characters of text.',400);
   if(!NLLB_NAMES[data.from]||!NLLB_NAMES[data.to]||data.from===data.to)return jsonError('Choose two different languages: English, isiZulu or Sepedi.',400);
+  const paragraphs=data.text.split(/\n{2,}/);
+  const reply=(text,by)=>Response.json({text,translatedBy:by},{headers:{...baseHeaders,'cache-control':'no-store'}});
   try{
     const out=[];
     // Paragraphs are kept; each is translated in short pieces, a few at a time.
-    for(const paragraph of data.text.split(/\n{2,}/)){
+    for(const paragraph of paragraphs){
       const pieces=chunkText(paragraph);const translated=[];
       for(let i=0;i<pieces.length;i+=3)translated.push(...await Promise.all(pieces.slice(i,i+3).map(async piece=>(await gradioCall(SPACES.translate,[piece,NLLB_NAMES[data.from],NLLB_NAMES[data.to]],env))[0])));
       out.push(translated.join(' '));
     }
-    return Response.json({text:out.join('\n\n')},{headers:{...baseHeaders,'cache-control':'no-store'}});
-  }catch(error){return jsonError(error.message===BUSY?BUSY:'The translation service could not be reached.',502)}
+    return reply(out.join('\n\n'),'nllb');
+  }catch(error){
+    if(env?.GEMINI_API_KEY){const gemini=await geminiTranslate(paragraphs,data.from,data.to,env.GEMINI_API_KEY).catch(()=>null);if(gemini)return reply(gemini.join('\n\n'),'gemini')}
+    return jsonError(error.message===BUSY?BUSY:'The translation service could not be reached.',502);
+  }
 }
 // Gemini text-to-speech first when GEMINI_API_KEY is set (its own free allowance), else OmniVoice.
 const GEMINI_SPEAKERS={en:'South African English',zu:'isiZulu',nso:'Sepedi (Northern Sotho)'};

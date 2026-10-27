@@ -11,3 +11,12 @@ test('every library subject has sample lessons long enough to make a quiz', () =
   }
   assert.equal(new Set(allSampleLessons().map(l => l.id)).size, allSampleLessons().length);
 });
+
+test('every sample lesson has a complete isiZulu and Sepedi translation', async () => {
+  const { readFileSync } = await import('node:fs');
+  const translations = JSON.parse(readFileSync(new URL('./sample-lessons-translations.json', import.meta.url)));
+  for (const lesson of allSampleLessons()) {
+    const count = 1 + lesson.text.split('\n\n').length;
+    for (const lang of ['zu', 'nso']) assert.equal(translations[lesson.id]?.[lang]?.length, count, `${lesson.id} ${lang}`);
+  }
+});

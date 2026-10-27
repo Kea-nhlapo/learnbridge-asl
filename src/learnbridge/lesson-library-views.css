@@ -14,3 +14,6 @@
 .lb-library-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
 .lb-library-results h2 { font-size: 1.15rem; margin: 26px 0 4px; color: #072857; }
 @media (max-width: 700px) { .lb-reader-page { padding: 20px; } }
+.lb-reader-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 10px 0 2px; }
+.lb-reader-tools .lb-listen { margin: 0; }
+.lb-reader-page.is-translating { opacity: .55; transition: opacity .2s; }
