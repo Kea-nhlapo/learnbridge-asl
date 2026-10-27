@@ -15,12 +15,9 @@ let glossIndex = null;
 const loadIndex = async () => glossIndex ??= fetch('/nia/ngt-glosses.json').then(r => r.json()).then(d => buildGlossIndex(d.files));
 
 // Reusable: <NiaSigner text="…" language="en" /> loads Nia once and signs the text when asked.
-// preload: get the signs ready in the background as soon as Nia is loaded.
-// play: when it turns true, Nia starts signing straight away (using the prepared signs).
-export function NiaSigner({ text, language = 'en', autoSign = false, preload = false, play = false }) {
+export function NiaSigner({ text, language = 'en', autoSign = false }) {
   const mount = useRef(null);
   const performs = useRef(null);
-  const prepared = useRef({ key: '', promise: null });
   const [ready, setReady] = useState(false);
   const [state, setState] = useState({ status: 'Loading Nia…', dutch: '', glosses: [], busy: false, duration: 0 });
 
@@ -37,40 +34,26 @@ export function NiaSigner({ text, language = 'en', autoSign = false, preload = f
     return () => { performs.current = null; };
   }, []);
 
-  // Translation, sign lookup and sign files for the current text, fetched once and reused.
-  function prepare() {
-    const app = performs.current;
-    const key = `${language}\u0000${text}`;
-    if (prepared.current.key === key && prepared.current.promise) return prepared.current.promise;
-    const promise = (async () => {
-      const [index, translated] = await Promise.all([loadIndex(), fetch('/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text.slice(0, 2000), from: language, to: 'nl' }) }).then(async r => { const d = await r.json(); if (!r.ok) throw Error(d.error || 'Translation failed.'); return d.text; })]);
-      const glosses = dutchToGlosses(translated, index);
-      const signed = glosses.filter(g => g.file);
-      if (!signed.length) throw Error('Nia cannot sign this text yet.');
-      const blocks = await app.scriptApp.processMessageFiles(signed.map(g => ({ name: SIGNS + encodeURIComponent(g.file) })));
-      if (blocks.some(b => !b?.data || !String(b.data).includes('<'))) throw Error('Some signs could not be loaded.');
-      return { translated, glosses, signed, blocks };
-    })();
-    prepared.current = { key, promise };
-    promise.catch(() => { if (prepared.current.promise === promise) prepared.current = { key: '', promise: null }; });
-    return promise;
-  }
-
   async function sign() {
     const app = performs.current;
     if (!app || !text.trim() || state.busy) return;
     setState(s => ({ ...s, busy: true, status: 'Preparing the signing…' }));
     try {
-      const { translated, glosses, signed, blocks } = await prepare();
+      const [index, translated] = await Promise.all([loadIndex(), fetch('/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text.slice(0, 2000), from: language, to: 'nl' }) }).then(async r => { const d = await r.json(); if (!r.ok) throw Error(d.error || 'Translation failed.'); return d.text; })]);
+      const glosses = dutchToGlosses(translated, index);
+      const signed = glosses.filter(g => g.file);
+      if (!signed.length) throw Error('None of these words are in Nia’s sign dictionary yet.');
+      setState(s => ({ ...s, dutch: translated, glosses, status: `Loading ${signed.length} signs…` }));
+      const blocks = await app.scriptApp.processMessageFiles(signed.map(g => ({ name: SIGNS + encodeURIComponent(g.file) })));
+      if (blocks.some(b => !b?.data || !String(b.data).includes('<'))) throw Error('Some signs could not be loaded.');
       const result = await new Promise(resolve => app.scriptApp.onMessage(blocks, resolve));
       window.niaSign = { signed: signed.map(g => signName(g.file)), duration: result?.duration }; // read by automated checks
-      setState(s => ({ ...s, busy: false, dutch: translated, glosses, duration: result?.duration || 0, status: 'Nia is signing.' }));
+      setState(s => ({ ...s, busy: false, duration: result?.duration || 0, status: `Signing ${signed.length} of ${glosses.length} words.` }));
     } catch (error) {
       setState(s => ({ ...s, busy: false, status: error.message }));
     }
   }
-  useEffect(() => { if (preload && ready && text.trim()) prepare().catch(() => {}); }, [preload, ready, text, language]);
-  useEffect(() => { if ((autoSign || play) && ready) sign(); }, [autoSign, play, ready, text]);
+  useEffect(() => { if (autoSign && ready) sign(); }, [autoSign, ready, text]);
 
   return <div className="nia-sign-player">
     <div ref={mount} className="nia-sign-stage" aria-label="Nia signing avatar" />
@@ -79,7 +62,7 @@ export function NiaSigner({ text, language = 'en', autoSign = false, preload = f
       <button type="button" disabled={!ready || state.busy || !text.trim()} onClick={sign}>{state.glosses.length ? 'Sign again' : 'Sign with Nia'}</button>
       {state.duration > 0 && <button type="button" className="secondary" disabled={state.busy} onClick={() => performs.current?.changePlayState(true)}>Replay</button>}
     </div>
-    <p className="nia-sign-note">Prototype signing avatar.</p>
+    <p className="nia-sign-note">Prototype: Nia signs the text word by word. Words without a sign yet are skipped.</p>
   </div>;
 }
 
