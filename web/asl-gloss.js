@@ -88,3 +88,7 @@ export const formatGloss=words=>words.map(w=>w.toUpperCase()).join(' ');
 export function textToGlossSections(text){
   return splitSentences(text).flatMap(english=>splitASLText(formatGloss(sentenceToGloss(english))).map((gloss,i)=>({english:i?'':english,gloss})));
 }
+// Hand-corrected gloss (one signing section per line) -> sections, still kept short for the signing service.
+export function parseGlossLines(text){
+  return String(text).split('\n').map(line=>line.trim().replace(/\s+/g,' ').toUpperCase()).filter(line=>/[\p{L}\p{N}]/u.test(line)).flatMap(line=>splitASLText(line).map(gloss=>({english:'',gloss})));
+}
