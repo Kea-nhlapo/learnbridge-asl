@@ -1,0 +1,13 @@
+.lb-dropzone { cursor: pointer; }
+.lb-dropzone.dragging { outline: 3px dashed #1d63c9; outline-offset: 4px; }
+.lb-review-questions { padding-left: 22px; }
+.lb-review-questions li { margin: 0 0 12px; }
+.lb-review-questions li span { display: block; color: #40536d; font-size: .95rem; }
+.lb-live-question main > small { display: block; margin-top: 18px; }
+.lb-live-question .dj-feedback .dj-btn + .dj-btn { margin-left: 10px; }
+.lb-help-overlay { position: fixed; inset: 0; background: rgba(7, 25, 44, .45); z-index: 50; display: flex; justify-content: flex-end; }
+.lb-help-overlay aside { position: relative; width: min(760px, 100%); height: 100%; overflow: auto; background: #fff; padding: 36px 40px; box-shadow: 0 18px 46px #07192c45; }
+.lb-help-overlay aside h1 { font-size: 28px; margin: 0 0 16px; }
+.lb-help-overlay aside .dj-close { position: absolute; top: 18px; right: 22px; font-size: 26px; background: none; border: 0; cursor: pointer; }
+.lb-help-overlay .nia-sign-stage { height: 360px; }
+.lb-help-overlay aside > p { font-size: 17px; line-height: 1.7; color: #40536d; }
