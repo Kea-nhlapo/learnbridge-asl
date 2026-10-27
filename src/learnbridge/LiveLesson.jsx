@@ -20,7 +20,7 @@ export const liveJobRunning = () => !!live.job && !['ready', 'failed'].includes(
 const youtubeVideoId = url => String(url).match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/)?.[1] || null;
 const SOURCES = [['pdf', 'PDF document'], ['youtube', 'YouTube video'], ['text', 'Paste text']];
 
-export function LiveUpload({ next, ui: { AppShell, Btn, Ic } }) {
+export function LiveUpload({ next, ui: { AppShell, Btn, Ic, UploadCloudIcon, PdfIcon, CheckCircleIcon } }) {
   const state = useLive();
   const input = useRef(null);
   const [mode, setMode] = useState('pdf');
@@ -61,10 +61,10 @@ export function LiveUpload({ next, ui: { AppShell, Btn, Ic } }) {
     <div className="lb-source-tabs" role="tablist">{SOURCES.map(([key, label]) => <button key={key} type="button" role="tab" aria-selected={mode === key} className={mode === key ? 'on' : ''} onClick={() => { setMode(key); update({ error: '' }); }}>{label}</button>)}</div>
     {mode === 'pdf' && <>
       <section className={'dj-upload lb-dropzone' + (dragging ? ' dragging' : '')} onClick={() => input.current?.click()} onDragOver={e => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={e => { e.preventDefault(); setDragging(false); choose(e.dataTransfer.files[0]); }}>
-        <Ic>⇧</Ic><b>Drag and drop your PDF here</b><span>or</span><Btn className="outline" type="button">Choose a file</Btn>
+        {UploadCloudIcon ? <UploadCloudIcon /> : <Ic>⇧</Ic>}<b>Drag and drop your PDF here</b><span>or</span><Btn className="outline" type="button">Choose a file</Btn>
         <input ref={input} type="file" accept="application/pdf,.pdf" hidden onChange={e => choose(e.target.files[0])} />
       </section>
-      {file && !state.error && <div className="dj-file"><Ic>PDF</Ic><div><b>{file.name}</b><span>{(file.size / 1e6).toFixed(1)} MB</span></div><strong>✓</strong></div>}
+      {file && !state.error && <div className="dj-file">{PdfIcon ? <PdfIcon /> : <Ic>PDF</Ic>}<div><b>{file.name}</b><span>{(file.size / 1e6).toFixed(1)} MB</span></div>{CheckCircleIcon ? <CheckCircleIcon /> : <strong>✓</strong>}</div>}
     </>}
     {mode === 'youtube' && <label className="lb-source-field">YouTube link<input type="url" value={url} onChange={e => setUrl(e.target.value)} placeholder="https://www.youtube.com/watch?v=…" /><span>We use the video’s captions, or transcribe it when it has none.</span></label>}
     {mode === 'text' && <label className="lb-source-field">Lesson text<textarea rows={8} value={text} onChange={e => setText(e.target.value)} placeholder="Paste your lesson, notes or a transcript…" /></label>}
