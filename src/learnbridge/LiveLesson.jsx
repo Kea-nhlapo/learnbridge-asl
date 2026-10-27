@@ -136,13 +136,14 @@ export function LiveQuiz({ setId, ui: { Btn } }) {
     {!result && <footer><span /><span /><Btn disabled={!selected} onClick={check}>Check</Btn></footer>}
     {result === 'correct' && <section className="dj-feedback"><i>✓</i><div><h2>Correct!</h2><p>{tExplanation}</p></div><Btn onClick={next}>Continue</Btn></section>}
     {result === 'incorrect' && <section className="dj-feedback bad"><i>×</i><div><h2>Not quite</h2><p>Watch the explanation, then try again.</p></div><Btn className="outline" onClick={() => setHelpOpen(true)}>✋ Watch signed explanation</Btn><Btn onClick={tryAgain}>Try again</Btn></section>}
-    {helpOpen && <div className="lb-help-overlay" role="dialog" aria-label="Signed explanation"><aside>
+    {/* Always mounted so Nia and this explanation's signs load while the question is answered. */}
+    <div className={'lb-help-overlay' + (helpOpen ? '' : ' preloading')} role="dialog" aria-label="Signed explanation" aria-hidden={!helpOpen}><aside>
       <button type="button" className="dj-close" aria-label="Close" onClick={() => setHelpOpen(false)}>×</button>
       <h1>Why this is the answer</h1>
-      <NiaSigner text={q.explanation} language="en" autoSign />
+      <NiaSigner text={q.explanation} language="en" preload play={helpOpen} />
       <h3>Explanation</h3><p>{tExplanation}</p>
       <Btn onClick={tryAgain}>Try again</Btn>
-    </aside></div>}
+    </aside></div>
   </div>;
 }
 
