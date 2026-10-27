@@ -1,0 +1,7 @@
+.lb-language { display: inline-flex; align-items: center; gap: 6px; font: inherit; color: inherit; }
+.lb-language select { font: inherit; font-weight: 700; color: inherit; background: transparent; border: 1px solid currentColor; border-radius: 8px; padding: 2px 6px; cursor: pointer; }
+.lb-language-busy { font-size: .85em; opacity: .75; }
+.lb-listen { font: inherit; font-weight: 700; border: 1.5px solid currentColor; background: transparent; color: inherit; border-radius: 999px; padding: 6px 14px; cursor: pointer; margin: 4px 0 12px; }
+.lb-listen[aria-pressed="true"] { background: rgba(0, 0, 0, .06); }
+.lb-translation-note { font-size: .85rem; opacity: .75; margin: 0 0 8px; }
+.lb-translation-note.error { opacity: 1; color: #b3261e; }
