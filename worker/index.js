@@ -48,6 +48,42 @@ export function chunkText(text,max=400){
   return parts.filter(Boolean);
 }
 
+// YouTube captions, the same way youtube-transcript-api does it: read the watch page's API key, ask the
+// player API (Android client) for caption tracks, then download the chosen track. Prefer human captions.
+const YT_LANGS={en:['en','en-GB','en-US','en-ZA'],zu:['zu'],nso:['nso']};
+export function youtubeId(value){const match=String(value).match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/);return match?match[1]:null}
+const decodeEntities=s=>s.replace(/&(?:#(\d+)|#x([0-9a-f]+)|(amp|lt|gt|quot|apos|#39));/gi,(m,d,h,n)=>d?String.fromCodePoint(+d):h?String.fromCodePoint(parseInt(h,16)):{amp:'&',lt:'<',gt:'>',quot:'"',apos:"'",'#39':"'"}[n.toLowerCase()]);
+export function captionsToText(xml){
+  return [...String(xml).matchAll(/<text[^>]*>([\s\S]*?)<\/text>/g)].map(([,t])=>decodeEntities(decodeEntities(t)).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim()).filter(Boolean).join(' ').replace(/\s+/g,' ').trim();
+}
+const YT_BLOCKED='YouTube did not share captions for this video right now. Paste the transcript instead.';
+async function youtube(request,env){
+  const data=await readJSON(request,2000);
+  const id=data&&youtubeId(data.url);
+  if(!id)return jsonError('That is not a YouTube video link.',400);
+  const language=YT_LANGS[data.language]?data.language:'en';
+  try{
+    const headers={'Accept-Language':'en-US,en;q=0.9','User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36'};
+    let html=await (await fetch(`https://www.youtube.com/watch?v=${id}`,{headers,signal:AbortSignal.timeout(20000)})).text();
+    if(html.includes('action="https://consent.youtube.com/s"')){const v=html.match(/name="v" value="(.*?)"/);if(v)html=await (await fetch(`https://www.youtube.com/watch?v=${id}`,{headers:{...headers,Cookie:`CONSENT=YES+${v[1]}`},signal:AbortSignal.timeout(20000)})).text()}
+    const key=html.match(/"INNERTUBE_API_KEY":\s*"([a-zA-Z0-9_-]+)"/)?.[1];
+    if(!key)throw Error(YT_BLOCKED);
+    const player=await (await fetch(`https://www.youtube.com/youtubei/v1/player?key=${key}`,{method:'POST',headers:{...headers,'content-type':'application/json'},body:JSON.stringify({context:{client:{clientName:'ANDROID',clientVersion:'20.10.38'}},videoId:id}),signal:AbortSignal.timeout(20000)})).json();
+    const tracks=player?.captions?.playerCaptionsTracklistRenderer?.captionTracks||[];
+    if(player?.playabilityStatus?.status&&player.playabilityStatus.status!=='OK'&&!tracks.length)throw Error(YT_BLOCKED);
+    if(!tracks.length)return jsonError('This video has no captions. Paste or dictate a transcript instead.',404);
+    const wanted=[...YT_LANGS[language],...(language==='en'?[]:YT_LANGS.en)];
+    const rank=t=>{const i=wanted.findIndex(code=>t.languageCode===code||t.languageCode.startsWith(code+'-'));return (i<0?100:i)*2+(t.kind==='asr'?1:0)};
+    const track=[...tracks].sort((a,b)=>rank(a)-rank(b))[0];
+    if(rank(track)>=200)return jsonError(`This video has captions only in ${tracks.map(t=>t.name?.runs?.[0]?.text||t.languageCode).join(', ')}. Paste an English, isiZulu or Sepedi transcript instead.`,404);
+    const xml=await (await fetch(track.baseUrl.replace('&fmt=srv3',''),{headers,signal:AbortSignal.timeout(20000)})).text();
+    const text=captionsToText(xml);
+    if(!text)throw Error(YT_BLOCKED);
+    const captionLanguage=Object.entries(YT_LANGS).find(([,codes])=>codes.some(code=>track.languageCode===code||track.languageCode.startsWith(code+'-')))?.[0]||'en';
+    let title=null;try{title=(await (await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`,{signal:AbortSignal.timeout(10000)})).json()).title||null}catch{}
+    return Response.json({text,language:captionLanguage,automatic:track.kind==='asr',title},{headers:{...baseHeaders,'cache-control':'no-store'}});
+  }catch(error){return jsonError(error.message===YT_BLOCKED?YT_BLOCKED:'YouTube could not be reached. Paste the transcript instead.',502)}
+}
 async function transcribe(request,url,env){
   const lang=url.searchParams.get('lang');
   if(lang==='nso')return jsonError('Automatic Sepedi transcription is not connected yet: no free hosted Sepedi speech model is available. Type or paste the Sepedi transcript instead.',501);
@@ -90,12 +126,13 @@ async function speak(request,env){
 export default {
   async fetch(request, env={}) {
     const url = new URL(request.url);
-    if (['/api/transcribe','/api/translate','/api/speak'].includes(url.pathname)) {
+    if (['/api/transcribe','/api/translate','/api/speak','/api/youtube'].includes(url.pathname)) {
       if (request.method !== 'POST') return jsonError('Use POST.',405);
       const origin=request.headers.get('origin');
       if(origin && origin!==url.origin)return jsonError('Request must come from this learning workspace.',403);
       if(url.pathname==='/api/transcribe')return transcribe(request,url,env);
       if(url.pathname==='/api/translate')return translate(request,env);
+      if(url.pathname==='/api/youtube')return youtube(request,env);
       return speak(request,env);
     }
     if (url.pathname === '/api/asl') {
