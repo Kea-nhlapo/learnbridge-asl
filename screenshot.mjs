@@ -45,20 +45,60 @@ try {
     await page.screenshot({ path: path.join(output, 'desktop.png'), fullPage: true });
     console.log(JSON.stringify({ desktop: path.join(output, 'desktop.png'), height: await page.evaluate(() => document.documentElement.scrollHeight) }));
     assert.equal(await page.locator('img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)), true, 'All landing-page images load');
+    const carousel = page.locator('.logo-viewport');
+    assert.equal(await page.locator('.collaborators').evaluate(element => Math.round(element.getBoundingClientRect().height)), 171);
+    const movingFrom = await carousel.evaluate(element => element.scrollLeft);
+    await page.waitForTimeout(400);
+    const movingTo = await carousel.evaluate(element => element.scrollLeft);
+    assert.ok(movingTo > movingFrom, 'Carousel moves continuously');
     await page.getByRole('button', { name: 'Next logos' }).click();
-    assert.equal(await page.locator('.logo-item img').first().getAttribute('alt'), 'Department of Basic Education');
+    await page.waitForTimeout(600);
+    const afterNext = await carousel.evaluate(element => element.scrollLeft);
+    assert.ok(afterNext > movingTo + 50, 'Next arrow advances the carousel');
+    await carousel.evaluate(element => {
+      const width = element.querySelector('.logo-set').getBoundingClientRect().width;
+      element.scrollLeft = width * 2 + 5;
+    });
+    await page.waitForTimeout(80);
+    assert.equal(await carousel.evaluate(element => {
+      const width = element.querySelector('.logo-set').getBoundingClientRect().width;
+      return element.scrollLeft >= width && element.scrollLeft < width * 2;
+    }), true, 'Carousel wraps without reaching an end');
+    const beforePrevious = await carousel.evaluate(element => {
+      const width = element.querySelector('.logo-set').getBoundingClientRect().width;
+      const item = element.querySelector('.logo-item').getBoundingClientRect().width;
+      element.scrollLeft = width + item * 2;
+      return element.scrollLeft;
+    });
+    await page.getByRole('button', { name: 'Previous logos' }).click();
+    await page.waitForTimeout(600);
+    assert.ok(await carousel.evaluate(element => element.scrollLeft) < beforePrevious - 50, 'Previous arrow moves backwards');
     await page.getByRole('button', { name: 'Can I edit generated lessons?' }).click();
     assert.equal(await page.getByText('Yes. You can review and edit a lesson before assigning it to a class.').isVisible(), true);
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
     assert.equal(await page.getByRole('dialog').isVisible(), true);
     await page.getByRole('button', { name: 'Close' }).click();
     console.log('Desktop interactions passed');
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.reload({ waitUntil: 'networkidle' });
-    await page.screenshot({ path: path.join(output, 'mobile.png'), fullPage: true });
-    console.log(JSON.stringify({ mobile: path.join(output, 'mobile.png'), height: await page.evaluate(() => document.documentElement.scrollHeight) }));
-    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, 'No mobile horizontal overflow');
-    console.log('Mobile layout passed');
+    const responsiveWidths = [1440, 1024, 768, 390, 320];
+    for (const width of responsiveWidths) {
+      await page.setViewportSize({ width, height: width <= 390 ? 844 : 900 });
+      await page.reload({ waitUntil: 'networkidle' });
+      const filename = width === 390 ? 'mobile.png' : `responsive-${width}.png`;
+      await page.screenshot({ path: path.join(output, filename), fullPage: true });
+      const layout = await page.evaluate(() => ({
+        viewport: window.innerWidth,
+        scrollWidth: document.documentElement.scrollWidth,
+        height: document.documentElement.scrollHeight,
+        sections: [...document.querySelectorAll('main > section')].every(section => {
+          const rect = section.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0;
+        }),
+      }));
+      assert.ok(layout.scrollWidth <= layout.viewport, `No horizontal overflow at ${width}px`);
+      assert.equal(layout.sections, true, `All sections have visible dimensions at ${width}px`);
+      console.log(JSON.stringify({ width, screenshot: path.join(output, filename), height: layout.height }));
+    }
+    console.log('Responsive layout passed at 1440, 1024, 768, 390 and 320 pixels');
   }
 } finally {
   await browser?.close();

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 
 const assets = '/assets/';
 
@@ -25,12 +25,10 @@ const faqs = [
 ];
 
 function App() {
-  const [logoOffset, setLogoOffset] = useState(0);
   const [language, setLanguage] = useState('English');
   const [signInOpen, setSignInOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
-  const orderedLogos = [...logos.slice(logoOffset), ...logos.slice(0, logoOffset)];
   const start = () => setSignInOpen(true);
 
   return <>
@@ -58,13 +56,8 @@ function App() {
         </div>
       </section>
 
-      <section className="collaborators" aria-labelledby="collaborators-title">
-        <h2 id="collaborators-title">Potential public-sector collaborators</h2>
-        <div className="logo-carousel">
-          <button className="carousel-arrow" onClick={() => setLogoOffset((logoOffset + logos.length - 1) % logos.length)} aria-label="Previous logos">‹</button>
-          <div className="logo-list" aria-live="polite">{orderedLogos.map(item => <div className="logo-item" key={item.src}><img src={`${assets}${item.src}`} alt={item.alt}/></div>)}</div>
-          <button className="carousel-arrow" onClick={() => setLogoOffset((logoOffset + 1) % logos.length)} aria-label="Next logos">›</button>
-        </div>
+      <section className="collaborators" aria-label="Public-sector organisation logos">
+        <LogoCarousel />
       </section>
 
       <section className="how-section" aria-labelledby="how-title">
@@ -79,17 +72,17 @@ function App() {
       </section>
 
       <section className="dashboard-section" aria-labelledby="dashboard-title">
-        <div className="dashboard-copy"><h2 id="dashboard-title">Everything you need<br/>to keep lessons moving.</h2><p>Organise your materials, create engaging lessons, assign to classes, and see real progress — all in one simple workspace.</p>
-          <Feature icon="book" title="All your materials in one place">Upload PDFs, videos, images and more.</Feature>
-          <Feature icon="lesson" title="Interactive, accessible lessons">Turn content into activities, quizzes and summaries.</Feature>
-          <Feature icon="chart" title="Track learner progress">See completion, understanding and class insights.</Feature>
+        <div className="dashboard-copy"><h2 id="dashboard-title">Everything you need<br/> to keep lessons moving.</h2><p>Create lessons, assign them to classes and track progress in one place.</p>
+          <Feature icon="book" title="All your materials together">Keep PDFs, videos and images in one place.</Feature>
+          <Feature icon="lesson" title="Accessible, interactive lessons">Create activities, quizzes and summaries.</Feature>
+          <Feature icon="chart" title="Clear progress insights">See completion and class progress.</Feature>
         </div>
         <img className="dashboard-preview" src={`${assets}dashboard-preview.png`} alt="Educator dashboard preview showing classes, lesson plans, and a lesson path"/>
       </section>
 
       <section className="accessibility-section" aria-labelledby="access-title">
         <img className="access-preview" src={`${assets}accessibility-preview.png`} alt="Lesson question with text, audio and sign-language explanation options" />
-        <div className="access-copy"><h2 id="access-title">One lesson.<br/>More ways to<br/>understand.</h2><p>Read it, hear it, or watch the explanation in sign language.</p>
+        <div className="access-copy"><h2 id="access-title">One lesson.<br/> More ways to<br/> understand.</h2><p>Read it, hear it, or watch the explanation in sign language.</p>
           <Feature icon="document" title="Read">Clear, simple explanations.</Feature>
           <Feature icon="volume" title="Listen">Hear the question and explanation.</Feature>
           <Feature icon="hand" title="Watch">See the explanation in sign language.</Feature>
@@ -97,7 +90,7 @@ function App() {
       </section>
 
       <section className="progress-section" aria-labelledby="progress-title">
-        <div className="progress-copy"><h2 id="progress-title">Every step feels<br/>like progress.</h2><p>Short, focused lessons help you<br/>build your skills with confidence.</p></div>
+        <div className="progress-copy"><h2 id="progress-title">Every step feels<br/> like progress.</h2><p>Short, focused lessons help you<br/> build your skills with confidence.</p></div>
         <img src={`${assets}progress-preview.png`} alt="Water Cycle lesson path alongside correct and incorrect feedback"/>
       </section>
 
@@ -112,6 +105,59 @@ function App() {
     {signInOpen && <div className="dialog-backdrop" onMouseDown={() => setSignInOpen(false)}><div className="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" onMouseDown={event => event.stopPropagation()}><button className="dialog-close" onClick={() => setSignInOpen(false)} aria-label="Close">×</button><Brand/><h2 id="dialog-title">Welcome back</h2><p>Sign in to your educator account</p><form onSubmit={event => {event.preventDefault(); setSignInOpen(false);}}><label>Email address<input type="email" required autoFocus/></label><label>Password<input type="password" required/></label><button className="button button-primary" type="submit">Sign in</button></form></div></div>}
     {contactOpen && <div className="dialog-backdrop" onMouseDown={() => setContactOpen(false)}><div className="dialog" role="dialog" aria-modal="true" aria-labelledby="contact-title" onMouseDown={event => event.stopPropagation()}><button className="dialog-close" onClick={() => setContactOpen(false)} aria-label="Close">×</button><Brand/><h2 id="contact-title">Contact SA Educate</h2><p>Contact details will be added when the platform launches.</p></div></div>}
   </>;
+}
+
+function LogoCarousel() {
+  const viewportRef = useRef(null);
+  const pauseUntilRef = useRef(0);
+  const hoveringRef = useRef(false);
+
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const firstSet = viewport.querySelector('.logo-set');
+    const setWidth = () => firstSet.getBoundingClientRect().width;
+    const resetPosition = () => { viewport.scrollLeft = setWidth(); };
+    resetPosition();
+    const observer = new ResizeObserver(resetPosition);
+    observer.observe(viewport);
+    let frame;
+    let previous = performance.now();
+    const tick = now => {
+      const elapsed = Math.min(now - previous, 50);
+      previous = now;
+      if (!media.matches && !document.hidden && !hoveringRef.current && now >= pauseUntilRef.current) {
+        viewport.scrollLeft += elapsed * 0.035;
+      }
+      const width = setWidth();
+      if (width > 0) {
+        if (viewport.scrollLeft >= width * 2) viewport.scrollLeft -= width;
+        if (viewport.scrollLeft < width) viewport.scrollLeft += width;
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); };
+  }, []);
+
+  const move = direction => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const items = viewport.querySelectorAll('.logo-item');
+    const step = items[1].getBoundingClientRect().left - items[0].getBoundingClientRect().left;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    pauseUntilRef.current = performance.now() + (reducedMotion ? 0 : 850);
+    viewport.scrollBy({ left: direction * step, behavior: reducedMotion ? 'auto' : 'smooth' });
+  };
+
+  return <div className="logo-carousel" onMouseEnter={() => { hoveringRef.current = true; }} onMouseLeave={() => { hoveringRef.current = false; }} onFocus={() => { hoveringRef.current = true; }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) hoveringRef.current = false; }}>
+    <button className="carousel-arrow" onClick={() => move(-1)} aria-label="Previous logos">‹</button>
+    <div className="logo-viewport" ref={viewportRef} role="img" aria-label={logos.map(item => item.alt).join(', ')}>
+      <div className="logo-track">{[0, 1, 2].map(copy => <div className="logo-set" aria-hidden="true" key={copy}>{logos.map(item => <div className="logo-item" key={`${copy}-${item.src}`}><img src={`${assets}${item.src}`} alt="" /></div>)}</div>)}</div>
+    </div>
+    <button className="carousel-arrow" onClick={() => move(1)} aria-label="Next logos">›</button>
+  </div>;
 }
 
 function Icon({ name }) {

@@ -1,4 +1,3 @@
-node_modules/
-dist/
-qa/
-.vite/
+/node_modules/
+/qa/
+*.tar.gz
