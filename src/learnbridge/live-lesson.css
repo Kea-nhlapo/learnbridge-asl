@@ -17,3 +17,4 @@
 .lb-source-field { display: flex; flex-direction: column; gap: 6px; font-weight: 800; margin: 0 0 16px; }
 .lb-source-field input, .lb-source-field textarea { font: inherit; font-weight: 400; padding: 12px 14px; border: 1.5px solid #c5d6e8; border-radius: 12px; }
 .lb-source-field span { font-weight: 400; font-size: .9rem; color: #5c6f87; }
+.lb-sign-entry { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; text-decoration: none; }

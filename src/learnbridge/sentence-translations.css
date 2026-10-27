@@ -1,0 +1,7 @@
+.lb-sentence-translations { margin-top: 14px; padding-top: 12px; border-top: 1px solid #dbe6f1; display: grid; gap: 10px; }
+.lb-sentence-translation { display: grid; gap: 2px; }
+.lb-sentence-translation > span { font-size: .8rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #5c6f87; }
+.lb-sentence-translation p { margin: 0; font-size: 1.05rem; }
+.lb-sentence-translation .lb-listen { justify-self: start; margin: 4px 0 0; }
+.lb-sentence-translations .lb-translating { opacity: .65; }
+.lb-sentence-translations small { opacity: .7; }
