@@ -33,3 +33,23 @@ test('without a Gemini key, or when Gemini fails, the caption error is returned'
     assert.equal((await ask({ url: 'https://youtu.be/jNQXAC9IVRw' }, { GEMINI_API_KEY: 'k' })).status, 404);
   });
 });
+
+test('read aloud uses Gemini speech first, as a WAV file', async () => {
+  const seen = [];
+  const pcm = Buffer.alloc(4800).toString('base64');
+  await withFetch(async (url, init = {}) => {
+    url = String(url); seen.push({ url, body: init.body });
+    if (url.includes('generativelanguage')) return Response.json({ candidates: [{ content: { parts: [{ inlineData: { mimeType: 'audio/l16; rate=24000', data: pcm } }] } }] });
+    return new Response('?', { status: 404 });
+  }, async () => {
+    const r = await gateway.fetch(new Request('http://x/api/speak', { method: 'POST', body: JSON.stringify({ text: 'Sawubona', lang: 'zu' }) }), { GEMINI_API_KEY: 'k' });
+    assert.equal(r.status, 200);
+    assert.equal(r.headers.get('x-voice'), 'gemini');
+    const wav = Buffer.from(await r.arrayBuffer());
+    assert.equal(wav.subarray(0, 4).toString(), 'RIFF');
+    assert.equal(wav.readUInt32LE(24), 24000);
+    assert.equal(wav.length, 44 + 4800);
+    assert.match(JSON.parse(seen[0].body).contents[0].parts[0].text, /isiZulu/);
+    assert.ok(seen.every(s => !s.url.includes('omnivoice')));
+  });
+});

@@ -134,10 +134,35 @@ async function translate(request,env){
     return Response.json({text:out.join('\n\n')},{headers:{...baseHeaders,'cache-control':'no-store'}});
   }catch(error){return jsonError(error.message===BUSY?BUSY:'The translation service could not be reached.',502)}
 }
+// Gemini text-to-speech first when GEMINI_API_KEY is set (its own free allowance), else OmniVoice.
+const GEMINI_SPEAKERS={en:'South African English',zu:'isiZulu',nso:'Sepedi (Northern Sotho)'};
+function pcmToWav(pcm,rate){
+  const header=new DataView(new ArrayBuffer(44));const text=(o,t)=>[...t].forEach((c,i)=>header.setUint8(o+i,c.charCodeAt(0)));
+  text(0,'RIFF');header.setUint32(4,36+pcm.byteLength,true);text(8,'WAVE');text(12,'fmt ');header.setUint32(16,16,true);header.setUint16(20,1,true);header.setUint16(22,1,true);header.setUint32(24,rate,true);header.setUint32(28,rate*2,true);header.setUint16(32,2,true);header.setUint16(34,16,true);text(36,'data');header.setUint32(40,pcm.byteLength,true);
+  return new Blob([header.buffer,pcm],{type:'audio/wav'});
+}
+async function geminiSpeech(text,lang,apiKey){
+  for(const model of ['gemini-3.1-flash-tts-preview','gemini-2.5-flash-preview-tts']){
+    const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{method:'POST',headers:{'x-goog-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({
+      contents:[{parts:[{text:`Read this aloud clearly, as a native ${GEMINI_SPEAKERS[lang]} speaker: ${text}`}]}],
+      generationConfig:{responseModalities:['AUDIO'],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:'Kore'}}}}}),signal:AbortSignal.timeout(60000)});
+    if(!response.ok){if([429,500,503].includes(response.status))continue;return null}
+    const part=(await response.json())?.candidates?.[0]?.content?.parts?.find(p=>p.inlineData?.data);
+    if(!part)continue;
+    const pcm=Uint8Array.from(atob(part.inlineData.data),c=>c.charCodeAt(0));
+    if(pcm.byteLength<1000)continue;
+    return pcmToWav(pcm,Number(part.inlineData.mimeType.match(/rate=(\d+)/)?.[1]||24000));
+  }
+  return null;
+}
 async function speak(request,env){
   const data=await readJSON(request,5000);
   if(!data||typeof data.text!=='string'||!data.text.trim()||data.text.length>400)return jsonError('Provide 1–400 characters to read aloud.',400);
   if(!VOICE_NAMES[data.lang])return jsonError('Choose English, isiZulu or Sepedi.',400);
+  if(env?.GEMINI_API_KEY){
+    const audio=await geminiSpeech(data.text.trim(),data.lang,env.GEMINI_API_KEY).catch(()=>null);
+    if(audio)return new Response(audio,{headers:{...baseHeaders,'content-type':'audio/wav','cache-control':'no-store','x-voice':'gemini'}});
+  }
   try{
     const [audio]=await gradioCall(SPACES.speak,[data.text.trim(),VOICE_NAMES[data.lang],16,2.0,true,1.0,null,true,true,'Auto','Auto','Auto','Auto','Auto','Auto'],env);
     if(!audio?.url||!audio.url.startsWith('https://k2-fsa-omnivoice.hf.space/'))throw Error(BUSY);
