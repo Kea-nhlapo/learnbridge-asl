@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
   const middleware = signReconstructionMiddleware(env.GEMINI_API_KEY || process.env.GEMINI_API_KEY, env.GEMINI_MODEL || process.env.GEMINI_MODEL);
   const signApi = { name: 'sign-reconstruction-api', configureServer(server) { server.middlewares.use(middleware); }, configurePreviewServer(server) { server.middlewares.use(middleware); } };
   // LearnBridge's translation, voice, transcription, YouTube and ASL routes. HF_TOKEN (optional) raises the free allowance.
-  const learnBridge = learnBridgeMiddleware(loadEnv(mode, process.cwd(), 'HF_').HF_TOKEN || process.env.HF_TOKEN);
+  const learnBridge = learnBridgeMiddleware(loadEnv(mode, process.cwd(), 'HF_').HF_TOKEN || process.env.HF_TOKEN, env.GEMINI_API_KEY || process.env.GEMINI_API_KEY);
   const learnBridgeApi = { name: 'learnbridge-api', configureServer(server) { server.middlewares.use(learnBridge); }, configurePreviewServer(server) { server.middlewares.use(learnBridge); } };
   // The sign introduction is a live camera session. A Vite HMR reconnect or
   // full reload would tear down MediaPipe and lose the participant's capture.

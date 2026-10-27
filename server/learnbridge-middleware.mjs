@@ -6,7 +6,7 @@ import gateway from './learnbridge-gateway.mjs';
 const ROUTES = new Set(['/api/translate', '/api/speak', '/api/transcribe', '/api/youtube', '/api/asl']);
 const MAX_BODY = 5 * 1024 * 1024;
 
-export function learnBridgeMiddleware(hfToken) {
+export function learnBridgeMiddleware(hfToken, geminiKey) {
   return async (req, res, next) => {
     const path = req.url?.split('?')[0];
     if (!ROUTES.has(path)) return next();
@@ -19,7 +19,7 @@ export function learnBridgeMiddleware(hfToken) {
       }
       const body = Buffer.concat(chunks);
       const request = new Request(`http://${req.headers.host}${req.url}`, { method: req.method, headers: req.headers, ...(body.length ? { body } : {}) });
-      const response = await gateway.fetch(request, { HF_TOKEN: hfToken });
+      const response = await gateway.fetch(request, { HF_TOKEN: hfToken, GEMINI_API_KEY: geminiKey });
       res.writeHead(response.status, Object.fromEntries(response.headers));
       res.end(Buffer.from(await response.arrayBuffer()));
     } catch (error) {

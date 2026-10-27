@@ -17,27 +17,59 @@ export const liveLesson = () => live.lesson;
 // The journey's 1.2 s auto-advance must wait while a real job is running.
 export const liveJobRunning = () => !!live.job && !['ready', 'failed'].includes(live.job.status);
 
+const youtubeVideoId = url => String(url).match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/)?.[1] || null;
+const SOURCES = [['pdf', 'PDF document'], ['youtube', 'YouTube video'], ['text', 'Paste text']];
+
 export function LiveUpload({ next, ui: { AppShell, Btn, Ic } }) {
   const state = useLive();
   const input = useRef(null);
+  const [mode, setMode] = useState('pdf');
   const [file, setFile] = useState(null);
+  const [url, setUrl] = useState('');
+  const [text, setText] = useState('');
+  const [busy, setBusy] = useState('');
   const [dragging, setDragging] = useState(false);
   const choose = f => { if (!f) return; if (f.type !== 'application/pdf' && !/\.pdf$/i.test(f.name)) { update({ error: 'Choose a PDF file.' }); return; } update({ error: '' }); setFile(f); };
+  const begin = (fileName, job) => { update({ fileName, lesson: null, results: [], error: '', job }); next(); };
   const start = async () => {
-    if (!file) { input.current?.click(); return; }
+    if (busy) return;
+    update({ error: '' });
     try {
-      update({ fileName: file.name, lesson: null, results: [], error: '', job: await api.uploadPdf(file, { title: '' }) });
-      next();
+      if (mode === 'pdf') {
+        if (!file) { input.current?.click(); return; }
+        setBusy('Uploading…');
+        begin(file.name, await api.uploadPdf(file, { title: '' }));
+      } else if (mode === 'youtube') {
+        const videoId = youtubeVideoId(url);
+        if (!videoId) throw Error('Paste a YouTube video link.');
+        setBusy('Getting the video’s transcript…');
+        const response = await fetch('/api/youtube', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url, language: 'en' }) });
+        const found = await response.json();
+        if (!response.ok) throw Error(found.error || 'The video’s transcript could not be found.');
+        setBusy('Starting the lesson…');
+        begin(found.title || 'YouTube video', await api.createFromYoutube(videoId, found.text, { title: '' }));
+      } else {
+        if (text.trim().split(/\s+/).length < 30) throw Error('Paste at least a paragraph (30 words or more).');
+        setBusy('Starting the lesson…');
+        begin('your text', await api.createFromScript(text, { title: '' }));
+      }
     } catch (error) { update({ error: error.message }); }
+    finally { setBusy(''); }
   };
-  return <AppShell active="Create"><main className="dj-content narrow"><h1>Upload your curriculum document</h1><p>Upload a CAPS document, past paper or any curriculum guide (PDF).</p>
-    <section className={'dj-upload lb-dropzone' + (dragging ? ' dragging' : '')} onClick={() => input.current?.click()} onDragOver={e => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={e => { e.preventDefault(); setDragging(false); choose(e.dataTransfer.files[0]); }}>
-      <Ic>⇧</Ic><b>Drag and drop your PDF here</b><span>or</span><Btn className="outline" type="button">Choose a file</Btn>
-      <input ref={input} type="file" accept="application/pdf,.pdf" hidden onChange={e => choose(e.target.files[0])} />
-    </section>
-    {state.error ? <div className="dj-upload-error"><b>We could not use that file.</b><span>{state.error}</span></div>
-      : file && <div className="dj-file"><Ic>PDF</Ic><div><b>{file.name}</b><span>{(file.size / 1e6).toFixed(1)} MB</span></div><strong>✓</strong></div>}
-    <Btn className="next" onClick={start}>{file ? 'Continue' : 'Choose a PDF'}</Btn></main></AppShell>;
+  const ready = mode === 'pdf' ? !!file : mode === 'youtube' ? !!youtubeVideoId(url) : text.trim().length > 0;
+  return <AppShell active="Create"><main className="dj-content narrow"><h1>Add your learning material</h1><p>Upload a CAPS document or past paper, use a YouTube video, or paste your own lesson text.</p>
+    <div className="lb-source-tabs" role="tablist">{SOURCES.map(([key, label]) => <button key={key} type="button" role="tab" aria-selected={mode === key} className={mode === key ? 'on' : ''} onClick={() => { setMode(key); update({ error: '' }); }}>{label}</button>)}</div>
+    {mode === 'pdf' && <>
+      <section className={'dj-upload lb-dropzone' + (dragging ? ' dragging' : '')} onClick={() => input.current?.click()} onDragOver={e => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={e => { e.preventDefault(); setDragging(false); choose(e.dataTransfer.files[0]); }}>
+        <Ic>⇧</Ic><b>Drag and drop your PDF here</b><span>or</span><Btn className="outline" type="button">Choose a file</Btn>
+        <input ref={input} type="file" accept="application/pdf,.pdf" hidden onChange={e => choose(e.target.files[0])} />
+      </section>
+      {file && !state.error && <div className="dj-file"><Ic>PDF</Ic><div><b>{file.name}</b><span>{(file.size / 1e6).toFixed(1)} MB</span></div><strong>✓</strong></div>}
+    </>}
+    {mode === 'youtube' && <label className="lb-source-field">YouTube link<input type="url" value={url} onChange={e => setUrl(e.target.value)} placeholder="https://www.youtube.com/watch?v=…" /><span>We use the video’s captions, or transcribe it when it has none.</span></label>}
+    {mode === 'text' && <label className="lb-source-field">Lesson text<textarea rows={8} value={text} onChange={e => setText(e.target.value)} placeholder="Paste your lesson, notes or a transcript…" /></label>}
+    {state.error && <div className="dj-upload-error"><b>We could not use that.</b><span>{state.error}</span></div>}
+    <Btn className="next" disabled={!!busy} onClick={start}>{busy || (ready ? 'Continue' : mode === 'pdf' ? 'Choose a PDF' : 'Continue')}</Btn></main></AppShell>;
 }
 
 const STEPS = [['extracting', 'Reading your document...'], ['generating_questions', 'Writing practice questions from it...'], ['ready', 'Checking every question against the document...']];

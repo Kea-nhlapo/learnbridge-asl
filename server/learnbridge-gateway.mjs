@@ -60,11 +60,33 @@ export function captionsToText(xml){
   return [...String(xml).matchAll(/<text[^>]*>([\s\S]*?)<\/text>/g)].map(([,t])=>decodeEntities(decodeEntities(t)).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim()).filter(Boolean).join(' ').replace(/\s+/g,' ').trim();
 }
 const YT_BLOCKED='YouTube did not share captions for this video right now. Paste the transcript instead.';
+// Captions first; when a video has none (or YouTube blocks the request) and GEMINI_API_KEY is set,
+// Gemini transcribes the video from its link (no download), up to its first 15 minutes.
 async function youtube(request,env){
   const data=await readJSON(request,2000);
   const id=data&&youtubeId(data.url);
   if(!id)return jsonError('That is not a YouTube video link.',400);
   const language=YT_LANGS[data.language]?data.language:'en';
+  const captions=await youtubeCaptions(id,language);
+  if(captions.ok||!env?.GEMINI_API_KEY)return captions;
+  return (await geminiYouTube(id,env.GEMINI_API_KEY).catch(()=>null))||captions;
+}
+const GEMINI_TRANSCRIPT_SCHEMA={type:'object',properties:{language:{type:'string',enum:['en','zu','nso','other']},text:{type:'string'}},required:['language','text']};
+async function geminiYouTube(id,apiKey){
+  for(const model of ['gemini-3.5-flash-lite','gemini-2.5-flash']){
+    const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{method:'POST',headers:{'x-goog-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({
+      contents:[{role:'user',parts:[{fileData:{fileUri:`https://www.youtube.com/watch?v=${id}`},videoMetadata:{endOffset:'900s'}},{text:'Transcribe the speech in this video word for word, in the language it is spoken in. No timestamps or speaker labels. language: en for English, zu for isiZulu, nso for Sepedi, other for anything else.'}]}],
+      generationConfig:{responseMimeType:'application/json',responseJsonSchema:GEMINI_TRANSCRIPT_SCHEMA}}),signal:AbortSignal.timeout(180000)});
+    if(!response.ok){if([429,500,503].includes(response.status))continue;return null}
+    const parsed=JSON.parse((await response.json())?.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('')||'{}');
+    const text=String(parsed.text||'').replace(/\s+/g,' ').trim();
+    if(text.split(' ').length<5)return null;
+    let title=null;try{title=(await (await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`,{signal:AbortSignal.timeout(10000)})).json()).title||null}catch{}
+    return Response.json({text,language:YT_LANGS[parsed.language]?parsed.language:'en',automatic:true,transcribedBy:'gemini',title},{headers:{...baseHeaders,'cache-control':'no-store'}});
+  }
+  return null;
+}
+async function youtubeCaptions(id,language){
   try{
     const headers={'Accept-Language':'en-US,en;q=0.9','User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36'};
     let html=await (await fetch(`https://www.youtube.com/watch?v=${id}`,{headers,signal:AbortSignal.timeout(20000)})).text();

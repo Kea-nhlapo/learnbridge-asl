@@ -11,3 +11,9 @@
 .lb-help-overlay aside .dj-close { position: absolute; top: 18px; right: 22px; font-size: 26px; background: none; border: 0; cursor: pointer; }
 .lb-help-overlay .nia-sign-stage { height: 360px; }
 .lb-help-overlay aside > p { font-size: 17px; line-height: 1.7; color: #40536d; }
+.lb-source-tabs { display: inline-flex; gap: 6px; padding: 4px; border-radius: 12px; background: #eef4fb; margin: 6px 0 18px; }
+.lb-source-tabs button { font: inherit; font-weight: 800; border: 0; border-radius: 9px; padding: 9px 16px; background: transparent; color: #40536d; cursor: pointer; }
+.lb-source-tabs button.on { background: #fff; color: #0c5bd0; box-shadow: 0 2px 8px #07192c1a; }
+.lb-source-field { display: flex; flex-direction: column; gap: 6px; font-weight: 800; margin: 0 0 16px; }
+.lb-source-field input, .lb-source-field textarea { font: inherit; font-weight: 400; padding: 12px 14px; border: 1.5px solid #c5d6e8; border-radius: 12px; }
+.lb-source-field span { font-weight: 400; font-size: .9rem; color: #5c6f87; }
