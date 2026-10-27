@@ -12,7 +12,8 @@ const SPACES={
   translate:{base:'https://unesco-nllb.hf.space',endpoint:'translate'},                                                         // NLLB-200 (CC-BY-NC-4.0)
   speak:{base:'https://k2-fsa-omnivoice.hf.space/gradio_api',endpoint:'_design_fn'}                                            // OmniVoice (CC-BY-NC weights)
 };
-const NLLB_NAMES={en:'English',zu:'Zulu',nso:'Northern Sotho'};
+// nl (Dutch) feeds Nia's NGT dictionary in SA Educate.
+const NLLB_NAMES={en:'English',zu:'Zulu',nso:'Northern Sotho',nl:'Dutch'};
 const VOICE_NAMES={en:'English',zu:'Zulu',nso:'Pedi'};
 const BUSY='The free speech service is busy or its free GPU allowance is used up. Wait a few minutes and try again.';
 

@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite';
 import { signReconstructionMiddleware } from './server/sign-reconstruct.mjs';
 import { learnBridgeMiddleware } from './server/learnbridge-middleware.mjs';
 import { createLessonJobs } from './server/lesson-jobs.mjs';
+import { ngtSignsMiddleware } from './server/ngt-signs.mjs';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'GEMINI_');
@@ -16,5 +17,8 @@ export default defineConfig(({ mode }) => {
   // Lesson preparation (src/lesson-integration contract): Gemini writes questions checked against the source.
   const lessonJobs = createLessonJobs({ apiKey: env.GEMINI_API_KEY || process.env.GEMINI_API_KEY });
   const lessonApi = { name: 'lesson-jobs-api', configureServer(server) { server.middlewares.use(lessonJobs.handle); }, configurePreviewServer(server) { server.middlewares.use(lessonJobs.handle); } };
-  return { plugins: [signApi, learnBridgeApi, lessonApi], server: { hmr: false } };
+  // Any sign from Nia's NGT dictionary, for /nia-sign.
+  const ngtSigns = ngtSignsMiddleware(new URL('./public', import.meta.url).pathname);
+  const ngtApi = { name: 'ngt-signs', configureServer(server) { server.middlewares.use(ngtSigns); }, configurePreviewServer(server) { server.middlewares.use(ngtSigns); } };
+  return { plugins: [signApi, learnBridgeApi, lessonApi, ngtApi], server: { hmr: false } };
 });
