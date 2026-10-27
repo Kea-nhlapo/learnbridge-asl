@@ -110,3 +110,10 @@ test('inline mode (serverless): the POST waits for the job and returns the lesso
   assert.doesNotThrow(() => validateLesson(created.body.lesson));
   assert.equal(created.body.lesson.questions.length, 3);
 });
+
+test('text read from a PDF in the browser keeps its page references', async () => {
+  const text = '[Page 1]\nWater is always moving. The sun warms water in rivers, lakes and oceans, and some of it becomes water vapour that rises into the air.\n\n[Page 2]\nAs water vapour rises, it cools and changes into tiny droplets that form clouds. When the droplets become heavy enough, water falls from the clouds as rain, snow or hail.';
+  const jobs = createLessonJobs({ apiKey: 'k', fetchImpl: fakeGemini([GEMINI_QUESTIONS]), inline: true });
+  const created = await call(jobs, 'POST', '/api/lesson-jobs/script', { text });
+  assert.deepEqual(created.body.lesson.questions.map(q => q.sourceRefs[0].page), [1, 2, 2]);
+});

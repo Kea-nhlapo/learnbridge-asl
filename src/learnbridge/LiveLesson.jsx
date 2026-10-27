@@ -23,6 +23,29 @@ export const liveJobRunning = () => !!live.job;
 const youtubeVideoId = url => String(url).match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/)?.[1] || null;
 const SOURCES = [['pdf', 'PDF document'], ['youtube', 'YouTube video'], ['text', 'Paste text']];
 
+// Vercel accepts request bodies up to about 4.5 MB. Smaller PDFs go to the server (Gemini also reads scanned
+// pages); larger ones are read in the browser with PDF.js and only their text is sent.
+const DIRECT_PDF_LIMIT = 4 * 1024 * 1024;
+const PDFJS = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/';
+const MAX_TEXT_CHARS = 60000;
+async function pdfText(file, progress) {
+  progress('Reading your PDF…');
+  const pdfjs = await import(/* @vite-ignore */ `${PDFJS}pdf.min.mjs`);
+  pdfjs.GlobalWorkerOptions.workerSrc = `${PDFJS}pdf.worker.min.mjs`;
+  const pdf = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()), isEvalSupported: false }).promise;
+  let text = '';
+  try {
+    for (let n = 1; n <= pdf.numPages && text.length < MAX_TEXT_CHARS; n++) {
+      progress(`Reading page ${n} of ${pdf.numPages}…`);
+      const content = await (await pdf.getPage(n)).getTextContent();
+      const pageText = content.items.map(item => item.str + (item.hasEOL ? '\n' : ' ')).join('').trim();
+      if (pageText) text += `[Page ${n}]\n${pageText}\n\n`;
+    }
+  } finally { await pdf.destroy(); }
+  if (text.replace(/\[Page \d+\]/g, '').trim().split(/\s+/).length < 30) throw Error('This PDF has no readable text (it may be scanned). Use a PDF under 4 MB, or paste the text instead.');
+  return text.slice(0, MAX_TEXT_CHARS);
+}
+
 export function LiveUpload({ next, ui: { AppShell, Btn, Ic, UploadCloudIcon, PdfIcon, CheckCircleIcon } }) {
   const state = useLive();
   const input = useRef(null);
@@ -40,8 +63,15 @@ export function LiveUpload({ next, ui: { AppShell, Btn, Ic, UploadCloudIcon, Pdf
     try {
       if (mode === 'pdf') {
         if (!file) { input.current?.click(); return; }
-        setBusy('Uploading…');
-        begin(file.name, await api.uploadPdf(file, { title: '' }));
+        if (file.size > DIRECT_PDF_LIMIT) {
+          // Too big to upload in one request on Vercel: read the text here and send only the text.
+          const text = await pdfText(file, setBusy);
+          setBusy('Starting the lesson…');
+          begin(file.name, await api.createFromScript(text, { title: '' }));
+        } else {
+          setBusy('Uploading…');
+          begin(file.name, await api.uploadPdf(file, { title: '' }));
+        }
       } else if (mode === 'youtube') {
         const videoId = youtubeVideoId(url);
         if (!videoId) throw Error('Paste a YouTube video link.');

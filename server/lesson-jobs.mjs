@@ -131,6 +131,8 @@ export function createLessonJobs({ apiKey, fetchImpl = fetch, newId = () => cryp
         text = pages.map(p => `[Page ${p.page}]\n${p.text}`).join('\n\n');
         if (normalise(text).split(' ').length < 30) throw new UserError('This PDF has too little readable text to build a lesson. Paste the text as a script instead.');
       }
+      // Text read from a PDF in the browser carries [Page n] markers; use them for page references.
+      if (!input.pdf && /\[Page \d+\]/.test(text)) pages = [...text.matchAll(/\[Page (\d+)\]\n?([\s\S]*?)(?=\[Page \d+\]|$)/g)].map(m => ({ page: Number(m[1]), text: m[2] }));
       update({ status: 'generating_questions' });
       const raw = await gemini(apiKey, [{ text: questionPrompt(text, input.metadata) }], QUESTION_SCHEMA, fetchImpl);
       const { questions, rejected } = buildQuestions(raw, text, pages);
