@@ -31,7 +31,7 @@ export default function NiaLab() {
             performs.appendCanvasTo(mount.current);
             animationDuration.current = Math.max(1, ...((performs.scriptApp?.msg?.data || []).map(item => Number(item.end) || 0)));
             setReady(true);
-            setStatus(`Nia loaded with ${glosses.length} NGT glosses and matching English narration.`);
+            setStatus(`Nia loaded with ${glosses.length} signs and matching English narration.`);
           }, 0);
         },
       });
@@ -76,7 +76,7 @@ export default function NiaLab() {
       link.download = 'nia-question-27-ngt-prototype.webm';
       link.click();
       setTimeout(() => URL.revokeObjectURL(url), 30000);
-      setStatus(`Saved ${Math.round(blob.size / 1024)} KB Nia clip with narration. Fluent NGT review is still required.`);
+      setStatus(`Saved ${Math.round(blob.size / 1024)} KB Nia clip with narration. Fluent signer review is still required.`);
       setRecording(false);
     };
     recorder.start();
@@ -86,5 +86,5 @@ export default function NiaLab() {
     setTimeout(() => { if (recorder.state === 'recording') recorder.stop(); }, durationMs);
   }
 
-  return <main className="nia-lab"><div className="nia-lab-head"><Brand href="/"/><a className="nia-lab-back" href="/app?screen=q1">← Question 27</a><h1>Nia explanation prototype</h1><p>Nia performs a complete multi-sign NGT prototype while the matching English explanation is narrated. The gloss sequence still needs review by a fluent NGT signer.</p></div><div ref={mount} className="nia-lab-stage" aria-label="Nia avatar stage"/><audio ref={audio} src={narrationUrl} preload="auto"/><div className="nia-lab-controls"><p role="status">{status}</p><button type="button" disabled={!ready || recording} onClick={play}>Play full explanation</button><button type="button" disabled={!ready || recording} onClick={record}>Record explanation</button></div></main>;
+  return <main className="nia-lab"><div className="nia-lab-head"><Brand href="/"/><a className="nia-lab-back" href="/app?screen=q1">← Question 27</a><h1>Nia explanation prototype</h1><p>Nia performs a complete multi-sign prototype while the matching English explanation is narrated. The sign sequence still needs review by a fluent signer.</p></div><div ref={mount} className="nia-lab-stage" aria-label="Nia avatar stage"/><audio ref={audio} src={narrationUrl} preload="auto"/><div className="nia-lab-controls"><p role="status">{status}</p><button type="button" disabled={!ready || recording} onClick={play}>Play full explanation</button><button type="button" disabled={!ready || recording} onClick={record}>Record explanation</button></div></main>;
 }

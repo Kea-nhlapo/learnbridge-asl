@@ -45,7 +45,7 @@ try {
     await page.screenshot({ path: path.join(output, 'desktop.png'), fullPage: true });
     console.log(JSON.stringify({ desktop: path.join(output, 'desktop.png'), height: await page.evaluate(() => document.documentElement.scrollHeight) }));
     assert.equal(await page.locator('img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)), true, 'All landing-page images load');
-    assert.equal(await page.locator('.logo-track .logo-item').count(), 10, 'Carousel duplicates logos for a continuous loop');
+    assert.equal(await page.locator('.logo-track .logo-item').count(), 15, 'Carousel renders three complete logo copies for a continuous loop');
     await page.getByRole('button', { name: 'Can I edit generated lessons?' }).click();
     assert.equal(await page.getByText('Yes. You can review and edit a lesson before assigning it to a class.').isVisible(), true);
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();

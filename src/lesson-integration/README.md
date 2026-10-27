@@ -71,6 +71,12 @@ Minimum lesson:
 
 The `videoUrl` must serve a completed, playable clip from the same origin or with appropriate CORS permissions. It should be versioned so an edited explanation cannot use a stale clip. The backend must confirm the signing language and reviewed script; this client does not claim arbitrary sign-language translation. Do not mark a job ready when its clip is only queued or its URL has merely been allocated.
 
+## Implemented locally (server/lesson-jobs.mjs)
+
+The Vite dev/preview server now answers all five routes. Gemini (`GEMINI_API_KEY` in `.env.local`) writes 3–5 questions; each must quote the source sentence it is based on, and questions whose quote is not in the source are dropped. PDFs are read by Gemini (page references included, scanned PDFs work). Jobs and lessons are kept in memory, so they are lost when the server restarts.
+
+Signed explanations cannot be rendered yet, so each question's `help.status` is `text_only`: `validateLesson` accepts it, and `session.openHelp()` opens the drawer without loading a video (`state.helpTextOnly` is `true`). Show the written explanation and "Signed explanation not available yet."
+
 ## Work still needed for a real demonstration
 
 Connect a lesson-generation service, PDF extraction, storage, TTS, and a Nia/Performs renderer. First prove that Nia can render and save **one** reviewed explanation with narration. Then return that verified asset from the help endpoint and run the wrong-answer flow end to end. The current landing page has no educator or learner routes yet.

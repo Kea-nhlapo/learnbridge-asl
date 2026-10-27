@@ -18,6 +18,19 @@ test('rejects a lesson whose signed help is unfinished', () => {
   assert.throws(() => validateLesson({ ...lesson, questions: [{ ...lesson.questions[0], help: { ...lesson.questions[0].help, status: 'rendering' } }] }), /not ready/);
 });
 
+test('text-only help: the lesson is accepted and help opens without loading a video', async () => {
+  const textOnly = { ...lesson, questions: [{ ...lesson.questions[0], help: { id: 'help-1', version: '1', language: 'ASL', status: 'text_only' } }] };
+  assert.doesNotThrow(() => validateLesson(textOnly));
+  let fetchCount = 0;
+  const session = createLessonSession(textOnly, { videoCache: createVideoCache({ fetchImpl: async () => { fetchCount += 1; throw new Error('no video'); } }) });
+  session.select('b'); session.check();
+  await session.openHelp();
+  const state = session.snapshot();
+  assert.equal(state.helpOpen, true); assert.equal(state.helpTextOnly, true); assert.equal(state.helpError, null); assert.equal(state.helpVideoUrl, null);
+  assert.equal(fetchCount, 0);
+  session.dispose();
+});
+
 test('wrong answer, cached help, retry, and completion preserve question state', async () => {
   let fetchCount = 0;
   const cache = createVideoCache({

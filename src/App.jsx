@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useRef, useState } from 'react';
 import VisionDemo from './DemoJourney.jsx';
 import Brand from './Brand.jsx';
 const NiaLab = React.lazy(() => import('./NiaLab.jsx'));
+const NiaSign = React.lazy(() => import('./learnbridge/NiaSign.jsx'));
 const SignIntroduction = React.lazy(() => import('./SignConversation.jsx'));
 const SignCalibration = React.lazy(() => import('./SignCalibration.jsx'));
 
@@ -26,6 +27,7 @@ function App() {
   // `/app` is the product experience reached from the public homepage.
   // Keep the original prototype URL working for existing bookmarks and demos.
   if (['/app', '/vision-demo'].includes(window.location.pathname)) return <VisionDemo />;
+  if (window.location.pathname === '/nia-sign') return <React.Suspense fallback={<p>Loading Nia…</p>}><NiaSign /></React.Suspense>;
   if (window.location.pathname === '/nia-lab') return <React.Suspense fallback={<p>Loading Nia lab…</p>}><NiaLab /></React.Suspense>;
   if (window.location.pathname === '/sign-introduction') return <React.Suspense fallback={<p>Loading sign introduction…</p>}><SignIntroduction /></React.Suspense>;
   if (window.location.pathname === '/sign-calibration') return <React.Suspense fallback={<p>Loading calibration…</p>}><SignCalibration /></React.Suspense>;

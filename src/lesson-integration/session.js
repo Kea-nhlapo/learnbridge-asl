@@ -16,10 +16,12 @@ export function createLessonSession(lesson, { videoCache = createVideoCache() } 
   let generation = 0;
   const listeners = new Set();
   const question = () => lesson.questions[index];
-  const makeSnapshot = () => ({ lesson, questionIndex: index, question: completed ? null : question(), selectedOptionId, result, attempts, helpOpen, helpVideoUrl, helpLoading, helpError, completed });
+  const textOnly = () => !completed && question().help.status === 'text_only';
+  const makeSnapshot = () => ({ lesson, questionIndex: index, question: completed ? null : question(), selectedOptionId, result, attempts, helpOpen, helpVideoUrl, helpLoading, helpError, helpTextOnly: textOnly(), completed });
   let snapshot = makeSnapshot();
   const emit = () => { snapshot = makeSnapshot(); listeners.forEach(listener => listener(snapshot)); };
   const warm = () => {
+    if (textOnly()) return;
     const current = generation;
     videoCache.preload(question().help).catch(error => {
       if (generation === current) { helpError = error.message; emit(); }
@@ -47,8 +49,9 @@ export function createLessonSession(lesson, { videoCache = createVideoCache() } 
       if (completed) return;
       const current = generation;
       helpOpen = true;
-      helpLoading = true;
       helpError = null;
+      if (textOnly()) { emit(); return; }
+      helpLoading = true;
       emit();
       try {
         const url = await videoCache.preload(question().help);

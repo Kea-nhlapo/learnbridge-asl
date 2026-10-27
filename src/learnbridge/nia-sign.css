@@ -1,0 +1,15 @@
+.nia-sign .nia-sign-field { display: flex; flex-direction: column; gap: 4px; font-weight: 700; margin: 0 0 12px; max-width: 760px; }
+.nia-sign .nia-sign-field textarea, .nia-sign .nia-sign-field select { font: inherit; font-weight: 400; padding: 8px 10px; border: 1.5px solid #c5d6e8; border-radius: 10px; }
+.nia-sign-stage { width: 100%; max-width: 760px; height: 420px; border-radius: 16px; overflow: hidden; background: #e8f2fb; }
+.nia-sign-stage canvas { width: 100% !important; height: 100% !important; display: block; }
+.nia-sign-status { font-weight: 700; margin: 10px 0; }
+.nia-sign-actions button { font: inherit; font-weight: 800; border: 0; border-radius: 999px; padding: 10px 20px; background: #1d63c9; color: #fff; cursor: pointer; margin-right: 8px; }
+.nia-sign-actions button.secondary { background: transparent; color: #1d63c9; border: 2px solid #1d63c9; }
+.nia-sign-actions button:disabled { opacity: .5; cursor: not-allowed; }
+.nia-sign-glosses { max-width: 760px; margin-top: 12px; }
+.nia-sign-glosses .sign, .nia-sign-glosses .missing { display: inline-block; margin: 2px 4px 2px 0; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: .9rem; }
+.nia-sign-glosses .sign { background: #dcebff; }
+.nia-sign-glosses .missing { background: #f1f1f1; color: #777; text-decoration: line-through; font-weight: 400; }
+.nia-sign-note { max-width: 760px; font-size: .85rem; opacity: .75; }
+.nia-sign > .nia-sign-field, .nia-sign > .nia-sign-player { width: min(100%, 960px); margin-left: auto; margin-right: auto; }
+.nia-sign > .nia-sign-field { max-width: none; }

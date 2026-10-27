@@ -11,6 +11,135 @@
   .dj-explain-loading{display:grid;grid-template-columns:40% 1fr;gap:28px}.dj-explain-loading .dj-sk.video{float:none;width:100%;height:430px;margin:0}.dj-explain-loading-copy{display:grid;align-content:start;gap:16px}.dj-explain-loading-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px}.dj-explain-loading-tabs .dj-sk{width:100%;height:64px}.dj-explain-loading-copy>.dj-sk:first-of-type{height:92px}.dj-explain-loading-copy>.dj-sk{height:20px}
   .dj-celebrate{min-height:calc(100dvh - 30px);margin:15px;border:1.5px solid #c6e3f5;border-radius:12px;overflow:hidden}.dj-celebrate main{padding-top:48px}.dj-medal{width:250px;height:205px}.dj-medal img{width:360px;height:218px;transform:translateX(-52px)}.dj-celebrate h1{font-size:44px}.dj-celebrate main>p{font-size:19px}.dj-awards article{width:240px;height:112px}.dj-celebrate main>div:last-child .dj-btn{width:320px}
 }
+
+/* Responsive login: keep the complete form usable on narrow and short screens. */
+@media (max-width:900px){
+  .demo-journey:has(.dj-login){
+    overflow-y:auto;
+    overflow-x:hidden;
+    min-height:100dvh;
+  }
+  .dj-login{
+    min-height:100dvh;
+    height:auto;
+    padding:72px 16px 28px;
+    align-items:flex-start;
+  }
+  .dj-login>.brand{
+    top:18px;
+    left:50%;
+    width:min(210px,58vw);
+    transform:translateX(-50%);
+  }
+  .dj-login>.brand img{
+    width:100%;
+    height:auto;
+    max-height:58px;
+    object-fit:contain;
+  }
+  .dj-back{
+    left:16px;
+    top:20px;
+    z-index:2;
+    font-size:24px;
+    font-weight:900;
+    line-height:1;
+    padding:8px;
+  }
+  .dj-login>section{
+    width:min(100%,640px);
+    margin:58px auto 0;
+    padding:36px clamp(18px,5vw,44px) 28px;
+    border-radius:15px;
+    box-shadow:0 6px 20px #183c6114;
+  }
+  .dj-login h1{
+    font-size:clamp(32px,8vw,44px);
+    line-height:1.12;
+  }
+  .dj-login p{
+    font-size:clamp(16px,4.5vw,21px);
+    line-height:1.35;
+    margin:10px 0 24px;
+  }
+  .dj-login .dj-field{margin:14px 0}
+  .dj-login .dj-field input{
+    height:58px;
+    font-size:16px;
+    border-radius:10px;
+    padding-left:54px;
+  }
+  .dj-login .dj-field span{left:17px}
+  .dj-login .dj-btn{
+    min-height:58px;
+    font-size:18px;
+    border-radius:10px;
+  }
+  .dj-login a{font-size:14px;margin:14px 8px}
+  .dj-login>section>i{margin:18px 0 14px;font-size:16px}
+  .dj-login .google-btn{gap:12px;font-size:17px}
+  .dj-login .google-btn img{width:25px;height:25px}
+  .dj-login small{font-size:13px;line-height:1.45;margin-top:18px}
+}
+/* Some embedded browsers report a tablet CSS viewport even when the visible
+   panel is narrower. Apply the same single-column dashboard treatment there. */
+@media (max-width:1100px){
+  .dj-app>.dj-side{display:none}
+  .dj-app>.dj-stage{width:100%}
+  .dj-dashboard{
+    display:block!important;
+    height:auto!important;
+    min-height:calc(100dvh - 58px);
+    padding:28px 24px 40px!important;
+  }
+  .dj-dashboard-intro{margin:0 0 24px;max-width:none}
+  .dj-dashboard .dj-stats{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:12px;
+    margin:0 0 20px;
+    overflow:visible;
+  }
+  .dj-dashboard .dj-stats article{width:auto!important;min-width:0;height:104px!important;padding:12px!important}
+  .dj-dashboard .dj-panel{width:100%;min-height:0!important;margin:0 0 18px;padding:22px!important}
+  .dj-dashboard .dj-continue-card{min-height:145px;height:auto;display:flex;align-items:center;gap:16px;padding:18px}
+  .dj-dashboard .dj-continue-card>div{min-width:0;flex:1}
+}
+
+@media (max-width:900px){
+  .dj-library-app .dj-top{height:72px;padding:0 20px;gap:18px}
+  .dj-library-app .dj-bell-svg{width:30px;height:30px}
+  .dj-library-app .dj-teacher-menu{font-size:16px}
+  .dj-library-app .dj-profile-svg{width:44px;height:44px}
+  .dj-library-app .dj-profile-svg svg{width:27px;height:27px}
+  .dj-library-app .dj-library{padding:24px 18px 32px!important}
+  .dj-library-app .dj-library-heading{height:auto;min-height:58px}
+  .dj-library-app .dj-library-heading h1{font-size:32px!important;line-height:1.15}
+  .dj-library-app .dj-library-controls{grid-template-columns:minmax(0,1fr) 132px;gap:10px;margin-top:14px}
+  .dj-library-app .dj-library-search,.dj-library-app .dj-library-filter{height:60px}
+  .dj-library-app .dj-library-search input{font-size:17px}
+  .dj-library-app .dj-library-filter{font-size:17px;padding:0 15px}
+  .dj-library-app .dj-library .dj-subjects{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px!important;margin-top:20px}
+  .dj-library-app .dj-library .dj-subjects article{height:220px!important;border-radius:16px}
+  .dj-library-app .dj-library .dj-subjects b{font-size:19px;line-height:1.2;white-space:normal}
+  .dj-library-app .dj-library .dj-subjects span:not(.dj-sk){font-size:16px}
+  .dj-library-app .dj-subject-icon{width:82px;height:82px}
+  .dj-library-app .dj-teacher-dropdown{width:220px;padding:14px}
+  .dj-library-app .dj-teacher-dropdown strong{font-size:20px}
+  .dj-library-app .dj-teacher-dropdown a{font-size:18px}
+}
+
+@media (max-width:420px){
+  .dj-login{padding-left:10px;padding-right:10px;padding-top:62px}
+  .dj-login>.brand{top:12px;left:50%;width:180px;transform:translateX(-50%)}
+  .dj-back{left:8px;top:14px}
+  .dj-login>section{margin-top:48px;padding:28px 14px 22px}
+  .dj-login h1{font-size:31px}
+  .dj-login p{font-size:16px;margin-bottom:20px}
+  .dj-login .dj-field input{height:54px;font-size:15px}
+  .dj-login .dj-btn{min-height:54px;font-size:17px}
+  .dj-login .google-btn{font-size:15px}
+}
 .dj-paper-head{height:58px;display:flex;align-items:center;justify-content:space-between;padding:10px 24px 6px;color:#061f49}.dj-paper-head strong{font-size:23px}.dj-paper-head strong span{display:inline-block;margin-right:28px}.dj-paper-head i{border:2px solid #68c7f2;border-radius:18px;background:#edf9ff;padding:7px 15px;color:#08275b;font-size:13px;font-style:normal;font-weight:800}.dj-question>header,.dj-question>main,.dj-question>footer,.dj-question>.dj-feedback{border-left:2px solid #74cff3;border-right:2px solid #74cff3}.dj-question>header{border-top:2px solid #74cff3;border-radius:14px 14px 0 0}.dj-question>footer,.dj-question>.dj-feedback{border-bottom:2px solid #74cff3;border-radius:0 0 14px 14px}.dj-question>.dj-feedback{border-top-color:#c4edbd}.dj-assignment-summary{width:min(420px,90%);display:flex;justify-content:space-between;margin:0 0 22px;padding:16px 20px;border:1px solid #d7e4ee;border-radius:10px;background:#f8fcff}.dj-assignment-summary span{color:#64758b}.dj-assignment>.dj-btn{width:260px;margin:5px}
 .dj-explain.loading .dj-explainbg .dj-paper-head{display:none}
 .dj-login .dj-field{display:block!important;position:relative;text-align:left}.dj-login .dj-field span{position:absolute;left:16px;top:50%;transform:translateY(-50%);z-index:1;color:#496886}.dj-login .dj-field input{width:100%;padding-left:54px}
@@ -40,4 +169,211 @@
 }
 @media(max-width:640px){
   .dj-dashboard .dj-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;overflow:visible}.dj-dashboard .dj-stats article{min-width:0;width:auto;height:82px;padding:8px;grid-template-columns:30px 1fr}.dj-dashboard .dj-stats .dj-ic{width:30px}.dj-dashboard .dj-stats span{font-size:10px}.dj-dashboard .dj-stats b{font-size:16px}.dj-dashboard .dj-panel{min-height:0;padding:24px}.dj-dashboard .dj-continue-card{min-height:150px;height:auto;padding:12px}.dj-dashboard .dj-continue-card p{font-size:13px}.dj-dashboard .dj-continue-card h3{font-size:18px}.dj-dashboard .dj-recent .dj-row{padding:12px 2px}
+}
+
+/* Final login alignment overrides (kept last so shared brand rules cannot shift it). */
+.dj-login>.brand{left:50%;width:max-content;transform:translateX(-50%)!important}
+.dj-login>.brand span{white-space:nowrap}
+.dj-login .dj-back{
+  font-weight:900;
+}
+@media(max-width:900px){
+  .dj-login>.brand{left:calc(50% + 27px);width:min(210px,58vw)}
+}
+@media(max-width:420px){
+  .dj-login>.brand{left:calc(50% + 27px);width:180px}
+}
+
+/* App pages should grow with their content and scroll vertically when needed. */
+.demo-journey:has(.dj-app){
+  min-height:100dvh;
+  height:auto;
+  overflow-x:hidden;
+  overflow-y:auto;
+}
+.demo-journey:has(.dj-app) .dj-reference-shell,
+.demo-journey:has(.dj-app) .dj-screen-frame{
+  height:auto;
+  min-height:100dvh;
+  overflow:visible;
+}
+.demo-journey:has(.dj-app) .dj-app{
+  min-height:100dvh;
+  height:auto;
+}
+.demo-journey:has(.dj-app) .dj-stage{
+  min-height:100dvh;
+  height:auto;
+  min-width:0;
+  overflow-x:hidden;
+}
+.demo-journey:has(.dj-app){
+  overflow:visible;
+}
+.demo-journey:has(.dj-app) .dj-content{
+  height:auto!important;
+}
+
+/* Shared app navigation: use the approved SA Educate sidebar on every page. */
+@media (min-width:1101px){
+  .dj-app>.dj-side{
+    width:370px;
+    flex:0 0 370px;
+    padding:22px 12px;
+    border-right:1px solid #d9e7ef;
+  }
+  .dj-app>.dj-side .brand{
+    width:max-content;
+    margin:0 auto;
+    gap:11px;
+    transform:none;
+  }
+  .dj-app>.dj-side .brand svg{width:78px;height:78px}
+  .dj-app>.dj-side .brand span{font-size:43px;letter-spacing:-.045em;font-weight:900;color:#0752a3}
+  .dj-app>.dj-side nav{margin-top:22px;gap:4px}
+  .dj-app>.dj-side nav div{
+    height:66px;
+    gap:18px;
+    padding:0 23px;
+    border-radius:9px;
+    color:#214b79;
+    font-size:24px;
+    font-weight:800;
+    cursor:pointer;
+  }
+  .dj-app>.dj-side nav div:hover{background:#edf8ff}
+  .dj-app>.dj-side nav .on{background:#d8f0ff;color:#0075e9}
+  .dj-app>.dj-side .dj-nav-svg{width:35px;height:35px;color:#52759a}
+  .dj-app>.dj-side nav .on .dj-nav-svg{color:#0878ed}
+}
+
+/* Dashboard responsive layout for tablets and narrow desktop windows. */
+@media (max-width:900px){
+  .dj-dashboard{
+    display:block!important;
+    height:auto!important;
+    min-height:calc(100dvh - 58px);
+    padding:28px 24px 40px!important;
+  }
+  .dj-dashboard-intro{
+    margin:0 0 24px;
+    max-width:none;
+  }
+  .dj-dashboard-intro h1{font-size:clamp(28px,6vw,38px)}
+  .dj-dashboard-intro p{font-size:clamp(16px,3.5vw,20px);line-height:1.35}
+  .dj-dashboard .dj-stats{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:12px;
+    margin:0 0 20px;
+    overflow:visible;
+  }
+  .dj-dashboard .dj-stats article{
+    width:auto!important;
+    min-width:0;
+    height:104px!important;
+    padding:12px!important;
+  }
+  .dj-dashboard .dj-stats .dj-ic{width:42px;height:42px;font-size:20px}
+  .dj-dashboard .dj-stats span{font-size:14px;white-space:nowrap}
+  .dj-dashboard .dj-stats b{font-size:23px}
+  .dj-dashboard .dj-panel{
+    width:100%;
+    min-height:0!important;
+    margin:0 0 18px;
+    padding:22px!important;
+  }
+  .dj-dashboard .dj-continue-card{
+    min-height:145px;
+    height:auto;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:18px;
+  }
+  .dj-dashboard .dj-continue-card>div{min-width:0;flex:1}
+  .dj-dashboard .dj-continue-card p{font-size:14px;line-height:1.35}
+  .dj-dashboard .dj-continue-card h3{font-size:20px;line-height:1.2}
+  .dj-dashboard .dj-continue-card .dj-btn{flex:none;min-height:48px;padding:0 18px}
+  .dj-dashboard .dj-recent .dj-row{min-height:64px;padding:14px 2px}
+}
+@media (max-width:520px){
+  .dj-dashboard{padding:22px 16px 32px!important}
+  .dj-dashboard .dj-stats{grid-template-columns:1fr;gap:10px}
+  .dj-dashboard .dj-stats article{height:78px!important;grid-template-columns:44px 1fr!important;grid-template-rows:1fr 1fr}
+  .dj-dashboard .dj-stats .dj-ic{grid-row:1/3}
+  .dj-dashboard .dj-continue-card{display:grid;grid-template-columns:1fr;gap:12px}
+  .dj-dashboard .dj-continue-card .dj-btn{width:100%}
+}
+@media (max-width:700px){
+  .dj-app>.dj-side{display:none}
+  .dj-app>.dj-stage{width:100%}
+}
+
+/* Login reference fidelity: use the supplied institutional mark and real UI glyphs. */
+.demo-journey .brand{gap:0;transform:none}
+.demo-journey .brand img{width:370px;height:120px;object-fit:contain}
+.demo-journey .brand span{display:none}
+.dj-login .dj-field span svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.dj-login .google-btn img{width:28px;height:28px}
+.dj-stat-icon,.dj-row-icon{display:grid;place-items:center;flex:none;border-radius:8px;background:#e4f5ff;color:#58738f}
+.dj-stat-icon{grid-row:1/3;width:54px;height:54px}
+.dj-row-icon{width:42px;height:42px}
+.dj-stat-icon .dj-nav-svg,.dj-row-icon .dj-nav-svg{width:25px;height:25px}
+.dj-row-icon.row-0{background:#ffb51b;color:#fff}.dj-row-icon.row-1{background:#a6f0d1;color:#087d62}.dj-row-icon.row-2{background:#8a42ed;color:#fff}
+@media (max-width:900px){
+  .dj-side{width:250px;padding:24px 18px}
+  .dj-side .brand{font-size:25px}.dj-side .brand svg{width:44px;height:44px}
+  .dj-side nav{margin-top:34px}.dj-side nav div{padding:13px 12px;font-size:16px}
+  .dj-dashboard{padding:30px 28px;display:grid;grid-template-columns:1fr;grid-template-rows:auto;gap:18px;height:auto}
+  .dj-dashboard-intro{margin:0}.dj-dashboard .dj-stats{grid-row:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .dj-dashboard .dj-stats article{width:auto;height:86px;padding:10px;grid-template-columns:36px 1fr}.dj-stat-icon{width:36px;height:36px}.dj-stat-icon .dj-nav-svg{width:20px;height:20px}
+  .dj-dashboard .dj-continue,.dj-dashboard .dj-recent{margin:0;min-height:0}.dj-dashboard .dj-continue-card{min-height:145px}
+}
+@media (max-width:640px){
+  .dj-app{display:block}.dj-side{display:none}.dj-top{height:58px;padding:0 18px}
+  .dj-dashboard{padding:24px 16px;display:block}.dj-dashboard-intro h1{font-size:28px}.dj-dashboard-intro p{font-size:14px}
+  .dj-dashboard .dj-stats{margin:20px 0;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.dj-dashboard .dj-stats article{height:78px;padding:7px;grid-template-columns:28px 1fr}.dj-dashboard .dj-stats span:not(.dj-stat-icon){font-size:10px}.dj-dashboard .dj-stats b{font-size:18px}.dj-stat-icon{width:28px;height:28px}.dj-stat-icon .dj-nav-svg{width:16px;height:16px}
+  .dj-dashboard .dj-panel{padding:18px;margin-top:14px}.dj-dashboard .dj-continue-card{display:flex;align-items:center;gap:10px;min-height:130px;padding:12px}.dj-dashboard .dj-continue-card p{font-size:12px}.dj-dashboard .dj-continue-card h3{font-size:17px}.dj-dashboard .dj-continue-card .dj-btn{padding:0 14px;min-height:40px}
+  .dj-dashboard .dj-row{padding:13px 2px;gap:10px}.dj-row-icon{width:34px;height:34px}.dj-row-icon .dj-nav-svg{width:19px;height:19px}.dj-dashboard .dj-row b{font-size:14px}.dj-dashboard .dj-row span{font-size:11px}.dj-dashboard .dj-row em{font-size:10px;padding:4px 7px}
+}
+
+/* Keep the dashboard viewport scrollable when content exceeds the screen. */
+.demo-journey{overflow-x:hidden;overflow-y:auto;min-height:100vh}
+.dj-screen-frame{overflow-x:hidden;overflow-y:auto}
+.dj-app{min-height:100%;height:auto}
+@media (max-width:900px){.dj-screen-frame{height:auto;min-height:100vh}.dj-app{height:auto;min-height:100vh}}
+
+/* Match the generating screens while leaving the dashboard navigation untouched. */
+@media (min-width:901px){
+  .screen-generating-lesson .dj-reference-title,.screen-generating-questions .dj-reference-title,.screen-generating-lesson .dj-reference-title{display:block;margin:0;padding:24px 42px 18px;font-size:42px;line-height:1;background:#fff;color:#111;text-align:left}
+  .screen-generating-lesson .dj-screen-frame,.screen-generating-questions .dj-screen-frame{height:calc(100vh - 88px);margin:0 30px;border:3px solid #d5ecfb;border-radius:24px;overflow:hidden}
+  .screen-generating-lesson .dj-generating,.screen-generating-questions .dj-generating{min-height:100%;padding:38px 20px 60px}
+  .screen-generating-lesson .dj-generating>.brand,.screen-generating-questions .dj-generating>.brand{top:36px}
+  .screen-generating-lesson .dj-generating>.dj-ic,.screen-generating-questions .dj-generating>.dj-ic{font-size:120px;margin:88px 0 22px;color:#078ff0}
+  .screen-generating-lesson .dj-generating h1,.screen-generating-questions .dj-generating h1{font-size:52px}
+  .screen-generating-lesson .dj-generating p,.screen-generating-questions .dj-generating p{font-size:25px}
+  .screen-generating-lesson .dj-progress,.screen-generating-questions .dj-progress{width:min(1400px,78vw);height:20px;margin:32px auto}
+  .screen-generating-lesson .dj-gen,.screen-generating-questions .dj-gen{width:760px;font-size:24px;margin:12px auto}
+}
+.dj-login .google-btn{padding-left:18px;padding-right:18px}
+.dj-login .google-content{display:flex;width:max-content;align-items:center;justify-content:center;gap:14px;margin-inline:auto;white-space:nowrap}
+.demo-journey .brand img{display:none}
+.demo-journey .brand span{display:inline}
+.demo-journey .brand{gap:11px}
+@media (min-width:901px){
+  .dj-side{width:390px;padding:34px 30px}
+  .dj-side nav{margin-top:62px;gap:12px}
+  .dj-side nav div{padding:18px 22px;font-size:20px}
+  .dj-top{height:82px;padding:0 42px}
+  .dj-dashboard{padding:52px 52px 42px;grid-template-columns:minmax(0,1.7fr) minmax(300px,.95fr);grid-template-rows:auto 280px minmax(300px,1fr);gap:24px 30px}
+  .dj-dashboard .dj-continue{min-height:0}
+  .dj-dashboard .dj-continue-card{min-height:170px}
+  .dj-dashboard .dj-recent{min-height:0}
+  .dj-dashboard .dj-row{padding:20px 6px}
+  .dj-login{padding-top:120px}
+  .dj-login>.brand{top:0;left:50%;transform:translateX(-50%);width:max-content}
+  .dj-login>section{width:820px;margin-top:0;padding:54px 52px 48px;border-radius:12px}
+  .dj-login h1{font-size:46px;line-height:1.15}
+  .dj-login p{margin-bottom:26px}
 }
