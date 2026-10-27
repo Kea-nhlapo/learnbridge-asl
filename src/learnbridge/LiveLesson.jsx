@@ -113,7 +113,7 @@ export function LiveGenerating({ setId, ui: { Brand, Ic } }) {
     if (!state.job || state.job.status === 'failed') return;
     if (state.job.status === 'ready') {
       // Serverless hosts return the finished lesson with the job (see server/lesson-jobs.mjs, inline mode).
-      if (state.job.lesson && !state.lesson) { try { update({ lesson: validateLesson(state.job.lesson) }); setId('review-loading'); } catch (error) { update({ job: { ...state.job, status: 'failed' }, error: error.message }); } }
+      if (state.job.lesson && !state.lesson) { try { update({ lesson: validateLesson(state.job.lesson) }); setId('review'); } catch (error) { update({ job: { ...state.job, status: 'failed' }, error: error.message }); } }
       return;
     }
     let stopped = false;
@@ -121,7 +121,7 @@ export function LiveGenerating({ setId, ui: { Brand, Ic } }) {
       try {
         const job = await api.getJob(state.job.id);
         if (stopped) return;
-        if (job.status === 'ready') { update({ job, lesson: await api.getLesson(job.lessonId) }); setId('review-loading'); return; }
+        if (job.status === 'ready') { update({ job, lesson: await api.getLesson(job.lessonId) }); setId('review'); return; }
         update({ job, ...(job.status === 'failed' ? { error: job.error || 'The lesson could not be prepared.' } : {}) });
         if (job.status !== 'failed') setTimeout(poll, 1000);
       } catch (error) { if (!stopped) update({ job: { ...state.job, status: 'failed' }, error: error.message }); }
