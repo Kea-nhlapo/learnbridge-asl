@@ -22,3 +22,4 @@
 .lb-generating-tip { margin-top: 22px; max-width: 520px; font-size: .95rem; color: #40536d; min-height: 2.6em; }
 /* Keep the progress bar from being squeezed to 0 px when the generating screen's content is tall. */
 .dj-generating .dj-progress { flex-shrink: 0; }
+.dj-library-empty { margin: 24px 0; font-size: 1.05rem; color: #40536d; }
