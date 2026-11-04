@@ -337,12 +337,48 @@
   .dj-dashboard .dj-panel{padding:18px;margin-top:14px}.dj-dashboard .dj-continue-card{display:flex;align-items:center;gap:10px;min-height:130px;padding:12px}.dj-dashboard .dj-continue-card p{font-size:12px}.dj-dashboard .dj-continue-card h3{font-size:17px}.dj-dashboard .dj-continue-card .dj-btn{padding:0 14px;min-height:40px}
   .dj-dashboard .dj-row{padding:13px 2px;gap:10px}.dj-row-icon{width:34px;height:34px}.dj-row-icon .dj-nav-svg{width:19px;height:19px}.dj-dashboard .dj-row b{font-size:14px}.dj-dashboard .dj-row span{font-size:11px}.dj-dashboard .dj-row em{font-size:10px;padding:4px 7px}
 }
+@media (max-width:520px){
+  .dj-dashboard .dj-stats{grid-template-columns:1fr;gap:10px}
+  .dj-dashboard .dj-stats article{grid-template-columns:44px 1fr!important;grid-template-rows:1fr 1fr;padding:10px!important}
+  .dj-dashboard .dj-stats .dj-stat-icon{grid-row:1/3;width:36px;height:36px}
+  .dj-dashboard .dj-stats span:not(.dj-stat-icon){font-size:13px}
+  .dj-dashboard .dj-continue-card{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;gap:12px;min-height:0}
+  .dj-dashboard .dj-continue-card .dj-btn{width:100%;min-height:44px}
+}
 
 /* Keep the dashboard viewport scrollable when content exceeds the screen. */
 .demo-journey{overflow-x:hidden;overflow-y:auto;min-height:100vh}
 .dj-screen-frame{overflow-x:hidden;overflow-y:auto}
 .dj-app{min-height:100%;height:auto}
 @media (max-width:900px){.dj-screen-frame{height:auto;min-height:100vh}.dj-app{height:auto;min-height:100vh}}
+
+/* Keep primary navigation available whenever the sidebar is hidden. */
+.dj-mobile-nav{display:none}
+@media (max-width:1100px){
+  .dj-top{position:relative;z-index:5}
+  .dj-mobile-nav{display:block;margin-right:auto}
+  .dj-mobile-nav summary{display:flex;align-items:center;justify-content:center;gap:9px;min-width:88px;min-height:44px;padding:0 12px;border:1px solid #bed5e8;border-radius:9px;color:#173d70;font-size:16px;font-weight:800;cursor:pointer;list-style:none}
+  .dj-mobile-nav summary::-webkit-details-marker{display:none}
+  .dj-mobile-nav summary:focus-visible,.dj-mobile-nav nav a:focus-visible{outline:3px solid #f4ad20;outline-offset:2px}
+  .dj-mobile-nav nav{position:absolute;top:calc(100% - 1px);left:12px;right:12px;z-index:20;display:grid;gap:2px;max-height:calc(100dvh - 82px);overflow-y:auto;padding:10px;border:1px solid #bed5e8;border-radius:0 0 12px 12px;background:#fff;box-shadow:0 14px 28px #173d7029}
+  .dj-mobile-nav:not([open]) nav{display:none}
+  .dj-mobile-nav nav a{display:flex;align-items:center;gap:12px;min-height:44px;padding:9px 12px;border-radius:8px;color:#173d70;font-size:16px;font-weight:800}
+  .dj-mobile-nav nav a:hover,.dj-mobile-nav nav a[aria-current="page"]{background:#e8f6ff;color:#0075e9}
+  .dj-mobile-nav nav .dj-nav-svg{width:23px;height:23px}
+}
+@media (max-width:640px){
+  .dj-reviewbody .dj-lessontitle{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:start}
+  .dj-reviewbody .dj-lessontitle>.dj-btn{grid-column:2;justify-self:start}
+  .dj-explain-loading{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+  .dj-explain-loading .dj-sk.video{float:none;width:100%;height:240px;margin:0}
+  .dj-explain-loading-copy{display:grid;gap:12px}
+  .dj-explain-loading-tabs{display:flex;gap:12px}
+  .dj-explain-loading-tabs .dj-sk{width:90px}
+  .dj-celebrate header{height:auto;min-height:96px;flex-direction:column;justify-content:center;gap:4px;padding:10px 16px}
+  .dj-celebrate header>span{font-size:13px;text-align:center}
+  .dj-awards article{height:auto;min-height:104px;gap:3px;grid-template-rows:auto auto auto}
+  .dj-awards article span{font-size:11px;line-height:1.2}
+}
 
 /* Match the generating screens while leaving the dashboard navigation untouched. */
 @media (min-width:901px){
@@ -357,6 +393,19 @@
   .screen-generating-lesson .dj-gen,.screen-generating-questions .dj-gen{width:760px;font-size:24px;margin:12px auto}
 }
 .dj-login .google-btn{padding-left:18px;padding-right:18px}
+.dj-index{display:none}
+.dj-login>.brand span,.dj-login section>a,.dj-login section>b,.dj-login section small b{color:#075a9a}
+.dj-login .dj-or,.dj-choice article.hot span{color:#4b5f79}
+.dj-reviewbody nav .on,.dj-tabs>b,.dj-question.incorrect main>small{color:#075a9a}
+.dj-question-tools button.help{color:#075a9a}
+.dj-question>footer .help>span{color:#075a9a}
+.dj-explainbg .dj-paper-head{visibility:hidden}
+.dj-brain-wrap{width:min(740px,70vw,100%);display:flex;flex-direction:column;align-items:flex-start;flex:none;margin:12px 0 2px}
+.dj-brain-wrap{position:relative;padding-bottom:18px}
+.dj-brain-wrap img{width:100%;height:auto;clip-path:none}
+.dj-brain-wrap span{position:absolute;left:29%;bottom:0;background:#fff;color:#111;font:900 40px/1 Arial,sans-serif}
+@media(max-width:900px){.dj-brain-wrap{width:min(90vw,100%)}}
+@media(max-width:640px){.dj-brain-wrap{padding-bottom:12px}.dj-brain-wrap span{font-size:22px}}
 .dj-login .google-content{display:flex;width:max-content;align-items:center;justify-content:center;gap:14px;margin-inline:auto;white-space:nowrap}
 .demo-journey .brand img{display:none}
 .demo-journey .brand span{display:inline}
@@ -376,4 +425,103 @@
   .dj-login>section{width:820px;margin-top:0;padding:54px 52px 48px;border-radius:12px}
   .dj-login h1{font-size:46px;line-height:1.15}
   .dj-login p{margin-bottom:26px}
+}
+.dj-pathart .dj-sk.picture{width:min(100%,520px);height:auto;aspect-ratio:4/3;margin-inline:auto}
+.dj-question .dj-options{width:min(100%,1000px)!important;align-self:center!important}
+.dj-explain{background:#fff}
+.dj-explainbg{filter:none;opacity:.18}
+@media(max-width:900px){.dj-pathbody{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}}
+@media(max-width:640px){
+  .dj-pathbody{display:block}
+  .dj-pathart .dj-sk.picture{width:min(100%,320px)}
+  .dj-question .dj-options{width:min(100%,calc(100vw - 64px))!important}
+  .dj-create-page .dj-choice article{display:grid;grid-template-columns:40px minmax(0,1fr) 22px;gap:10px;padding:16px}
+  .dj-create-page .dj-choice article .dj-choice-svg{width:40px;height:40px}
+  .dj-create-page .dj-choice article>div{min-width:0}
+  .dj-reviewbody nav{scrollbar-width:thin}
+}
+.dj-stats article .dj-sk.icon{grid-row:1/3;width:36px;height:36px;align-self:center}
+.dj-stats article .dj-sk.text{width:min(100%,130px);height:13px;align-self:center}
+.dj-continue-card .dj-sk.button,.dj-lessontitle .dj-sk.button{width:120px;height:44px;flex:none}
+.dj-row .dj-sk.icon,.dj-classes .dj-sk.icon{width:36px;height:36px;flex:none}
+.dj-row .dj-sk.status{width:65px;height:24px;flex:none}
+.dj-row .dj-sk.text,.dj-classes .dj-sk.text{width:min(100%,180px);height:14px}
+.dj-classes .dj-sk.radio{width:18px;height:18px;border-radius:50%;flex:none}
+.dj-reviewhead .dj-sk.text{margin-top:12px}
+.dj-reviewbody section .dj-sk.review-line{width:min(100%,540px);height:16px;margin:12px 0}
+.dj-reviewbody section .dj-sk.tag{width:76px;height:32px;border-radius:18px}
+.dj-reviewbody section>.dj-sk.text{margin:24px 0 14px}
+.dj-paper-head .dj-sk.paper-title{width:260px;height:26px}
+.dj-question.loading main>.dj-sk.picture{width:min(1100px,76vw);height:min(400px,40vh);flex:none;margin:8px 0}
+.dj-question.loading main>.dj-sk.title{width:min(620px,80%);height:28px;margin:8px 0}
+.dj-question.loading main>.dj-sk.listen{width:100px;height:38px;border-radius:20px;margin:5px 0 20px}
+.dj-question.loading .dj-options .dj-sk.option{width:100%;height:54px;margin:0}
+.dj-explain aside{overflow:auto}
+.dj-explain{height:100dvh;overflow:hidden}
+.dj-explainbg{position:absolute;inset:0;overflow:hidden}
+.dj-explainbg>.dj-question{height:100%}
+.dj-explain-content{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;margin-top:24px;align-items:start}
+.dj-explain-content .nia-sign-player{min-width:0}
+.dj-explain-content .nia-sign-stage,.dj-explain-sign-skeleton .dj-sk.video{width:100%;height:380px;float:none;margin:0;border-radius:12px}
+.dj-explain-content .nia-sign-stage{background:#e8f2fb}
+.dj-explain-content .nia-sign-status,.dj-explain-sign-skeleton .dj-sk.text{margin:12px 0;width:80%}
+.dj-explain-content .nia-sign-actions button,.dj-explain-sign-skeleton .dj-sk.button{min-height:40px}
+.dj-explain-content .nia-sign-note{font-size:13px}
+.dj-explain-copy{min-width:0}
+.dj-explain-copy p{font-size:20px;line-height:1.5;color:#40536d}
+.dj-explain-copy .dj-sk.tab{width:105px;height:25px}
+.dj-explain-copy .dj-sk.line{width:100%;height:20px;margin-top:15px}
+.dj-explain-copy .dj-sk.line:last-child{width:66%}
+.dj-library-app .dj-library-filter{min-width:150px;max-width:230px;appearance:auto;font-size:18px;padding:0 14px}
+.dj-subjects article[role=button],.dj-classes article[role=radio]{cursor:pointer}
+.dj-subjects article[role=button]:focus-visible,.dj-classes article[role=radio]:focus-visible,.dj-create-page .dj-choice article[role=button]:focus-visible{outline:3px solid #075a9a;outline-offset:3px}
+.dj-reviewbody nav button{display:block;width:100%;padding:15px;text-align:left;border:0;border-radius:8px;background:transparent;color:inherit;font:inherit;font-weight:800;cursor:pointer}
+.dj-reviewbody nav button.on{background:#e3f5ff;color:#075a9a}
+.dj-reviewbody nav button:disabled{cursor:default}
+.dj-review-nav{min-width:0;width:100%;overflow:hidden}
+.dj-reviewbody section{min-width:0}
+.dj-reviewbody .dj-lessontitle>div{min-width:0}
+.dj-reviewbody .dj-lessontitle .dj-sk.title{width:100%;max-width:200px}
+.dj-reviewbody .dj-lessontitle .dj-sk.text{width:80%;max-width:170px}
+.dj-review-nav-hint{display:none}
+.dj-reviewbody .dj-title-edit{width:100%;min-width:0;font:inherit;font-size:22px;font-weight:900;color:#082954;border:1px solid #b4d6ed;border-radius:7px;padding:6px}
+.dj-reviewbody section>p,.dj-reviewbody section li{line-height:1.55}
+@media(max-width:420px) and (max-height:700px){
+  .dj-question{height:100dvh}
+  .dj-question .dj-paper-head{height:44px;flex:none}
+  .dj-question>header{height:52px;flex:none}
+  .dj-question>main{overflow-y:auto;padding-bottom:10px}
+  .dj-question main>img{height:110px;max-height:110px;margin:2px 0}
+  .dj-question .dj-brain-wrap{width:min(230px,78vw);margin:2px 0}
+  .dj-question .dj-brain-wrap img{max-height:110px;object-fit:contain}
+  .dj-question main h1{font-size:17px;line-height:1.2;margin:2px 0 5px}
+  .dj-question .lb-listen{margin:2px 0 7px;padding:4px 12px}
+  .dj-question .dj-options{gap:5px;flex:none}
+  .dj-question .dj-options button{min-height:38px}
+  .dj-question>footer{height:64px;flex:none}
+  .dj-question.loading main>.dj-sk.picture{height:110px}
+  .dj-question.loading main>.dj-sk.listen{margin:2px 0 7px}
+  .dj-question.loading .dj-options .dj-sk.option{height:38px}
+}
+@media(max-width:640px){
+  .dj-reviewbody{grid-template-columns:minmax(0,1fr)}
+  .dj-reviewbody nav{max-width:100%;overflow-x:auto}
+  .dj-reviewbody section{overflow-wrap:anywhere}
+  .dj-explain{height:auto;min-height:100dvh;overflow:visible}
+  .dj-explainbg{display:none}
+  .dj-explain aside{position:relative;top:auto;right:auto;bottom:auto;width:100%;height:auto;min-height:100dvh;overflow:visible}
+  .dj-continue-card .dj-sk.button{width:100%}
+  .dj-question.loading main>.dj-sk.picture{width:min(90vw,100%);height:min(255px,34vh)}
+  .dj-question.loading main>.dj-sk.title{height:42px}
+  .dj-question.loading .dj-options .dj-sk.option{height:44px}
+  .dj-explain-content{grid-template-columns:1fr;gap:16px}
+  .dj-explain-content .nia-sign-stage,.dj-explain-sign-skeleton .dj-sk.video{height:240px}
+  .dj-explain-copy p{font-size:16px}
+  .dj-library-filter{max-width:none}
+  .dj-reviewbody nav button{width:auto;white-space:nowrap;padding:10px}
+  .dj-review-nav-hint{display:block;text-align:right;margin-top:2px;color:#075a9a;font-size:12px;font-weight:800}
+}
+@media(max-width:420px) and (max-height:700px){
+  .dj-question.loading main>.dj-sk.picture{height:110px}
+  .dj-question.loading .dj-options .dj-sk.option{height:38px}
 }

@@ -60,7 +60,7 @@ async function pdfText(file, progress = () => {}) {
 export function LiveUpload({ next, ui: { AppShell, Btn, Ic, UploadCloudIcon, PdfIcon, CheckCircleIcon } }) {
   const state = useLive();
   const input = useRef(null);
-  const [mode, setMode] = useState('pdf');
+  const [mode, setMode] = useState(() => new URLSearchParams(location.search).get('source') === 'text' ? 'text' : 'pdf');
   const [file, setFile] = useState(null);
   const [url, setUrl] = useState('');
   const [text, setText] = useState('');
@@ -117,7 +117,7 @@ export function LiveUpload({ next, ui: { AppShell, Btn, Ic, UploadCloudIcon, Pdf
     {mode === 'youtube' && <label className="lb-source-field">YouTube link<input type="url" value={url} onChange={e => setUrl(e.target.value)} placeholder="https://www.youtube.com/watch?v=…" /><span>We use the video’s captions, or transcribe it when it has none.</span></label>}
     {mode === 'text' && <label className="lb-source-field">Lesson text<textarea rows={8} value={text} onChange={e => setText(e.target.value)} placeholder="Paste your lesson, notes or a transcript…" /></label>}
     {state.error && <div className="dj-upload-error"><b>We could not use that.</b><span>{state.error}</span></div>}
-    <Btn className="next" onClick={start}>{ready ? 'Continue' : mode === 'pdf' ? 'Choose a PDF' : 'Continue'}</Btn></main></AppShell>;
+    {(mode !== 'pdf' || ready) && <Btn className="next" onClick={start}>Continue</Btn>}</main></AppShell>;
 }
 
 const STEPS = [['extracting', 'Reading your document...'], ['generating_questions', 'Writing practice questions from it...'], ['ready', 'Checking every question against the document...']];

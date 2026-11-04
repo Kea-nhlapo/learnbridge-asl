@@ -27,14 +27,24 @@ export function NiaSigner({ text, language = 'en', autoSign = false, preload = f
   useEffect(() => {
     const app = new Performs();
     performs.current = app;
+    const moveCanvas = () => {
+      const canvas = app.renderer?.domElement;
+      if (canvas && mount.current && canvas.parentElement !== mount.current) mount.current.appendChild(canvas);
+    };
+    const observer = new MutationObserver(moveCanvas);
+    observer.observe(document.body, { childList: true });
+    const timeout = setTimeout(() => setState(s => s.status === 'Loading Nia…'
+      ? { ...s, status: 'Nia could not load. Please try again later.' }
+      : s), 8000);
     try {
       app.init({
         avatar: 'Nia', color: '#e8f2fb', autoplay: false, applyIdle: false,
         scripts: [{ type: 'sigml', name: `${SIGNS}OOG.sigml` }], // Performs needs a first script to start in signing mode.
         onReady: () => setTimeout(() => { if (mount.current) { app.appendCanvasTo(mount.current); setReady(true); setState(s => ({ ...s, status: 'Nia is ready.' })); } }, 0),
       });
+      moveCanvas();
     } catch (error) { setState(s => ({ ...s, status: `Nia could not start: ${error.message}` })); }
-    return () => { performs.current = null; };
+    return () => { clearTimeout(timeout); observer.disconnect(); app.renderer?.domElement?.remove(); performs.current = null; };
   }, []);
 
   // Translation, sign lookup and sign files for the current text, fetched once and reused.
@@ -73,7 +83,9 @@ export function NiaSigner({ text, language = 'en', autoSign = false, preload = f
   useEffect(() => { if ((autoSign || play) && ready) sign(); }, [autoSign, play, ready, text]);
 
   return <div className="nia-sign-player">
-    <div ref={mount} className="nia-sign-stage" aria-label="Nia signing avatar" />
+    <div ref={mount} className="nia-sign-stage" role="img" aria-label="Nia signing avatar">
+      {!ready && <><video className="nia-sign-preview" src="/nia/nia-question-27-ngt-prototype.webm" autoPlay muted loop playsInline aria-label="Preview of Nia, the signing avatar" /><span className="nia-preview-label">Nia avatar preview</span></>}
+    </div>
     <p className="nia-sign-status" role="status">{state.status}</p>
     <div className="nia-sign-actions">
       <button type="button" disabled={!ready || state.busy || !text.trim()} onClick={sign}>{state.glosses.length ? 'Sign again' : 'Sign with Nia'}</button>

@@ -114,3 +114,15 @@
   .dj-library-app.is-loading .dj-library-heading{height:80px}
   .dj-teacher-menu{font-size:14px}.dj-profile-svg{width:36px;height:36px}.dj-profile-svg svg{width:24px;height:24px}
 }
+@media(max-width:520px){
+  .dj-library-app .dj-library-controls,
+  .dj-library-app.is-loading .dj-library-controls{grid-template-columns:minmax(0,1fr)}
+  .dj-library-app .dj-library-search{min-width:0}
+  .dj-library-app .dj-library-search input{min-width:0}
+  .dj-library-app .dj-library-filter{width:100%}
+}
+@media(max-width:360px){
+  .dj-library-app .dj-top{padding:0 12px;gap:12px}
+  .dj-library-app .dj-teacher-menu summary{gap:6px}
+  .dj-library-app .dj-teacher-menu summary>span:nth-child(2){display:none}
+}

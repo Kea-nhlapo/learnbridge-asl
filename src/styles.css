@@ -65,6 +65,10 @@
 }
 
 @media (max-width:1100px){
+  .how-section{height:auto;min-height:587px}
+  .steps{align-items:stretch}
+  .step-arrow{align-self:center}
+  .step-card{height:auto;min-height:343px;padding-bottom:24px}
   .header-inner{max-width:calc(100% - 48px);align-items:center;padding-top:0}
   .brand{font-size:29px;letter-spacing:-.045em}
   .brand svg{width:50px;height:50px}
@@ -197,8 +201,21 @@
   .collaborators,.logo-carousel{height:76px}
   .logo-item{height:67px}
 }
+.button-primary{background:#0066be;border-color:#0066be}.section-heading>p,.step-card p{color:#4f5f7d}
 @media (max-width:760px){
   .hero{min-height:calc(100dvh - 72px)}
   .collaborators,.logo-carousel{height:76px}
   .logo-item{height:67px}
 }
+@media (min-width:1101px){
+  .dashboard-section,.progress-section{height:auto;min-height:0;overflow:visible;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:32px;padding-block:48px}
+  .dashboard-copy{align-self:center;margin:0;padding:0}
+  .dashboard-preview,.progress-section img{width:100%;max-width:100%;justify-self:center}
+  .progress-copy{min-width:0}
+}
+@media (min-width:921px){
+  .hero-illustration{object-position:right bottom}
+  .steps,.benefit-grid{width:min(1320px,calc(100% - 96px));max-width:none}
+}
+@media (min-width:901px){.dj-login>section{max-width:600px}}
+@media (max-width:920px){.hero{min-height:0}.hero-illustration{margin-bottom:0}}
