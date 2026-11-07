@@ -1,6 +1,6 @@
 node_modules/
-dist/
-qa/
+/dist/
+/qa/
 .vite/
 .env.local
-public/nia/nia-ngt-oog-motion-test.webm
+client/public/nia/nia-ngt-oog-motion-test.webm

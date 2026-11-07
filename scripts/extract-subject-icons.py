@@ -6,7 +6,7 @@ from pathlib import Path
 from PIL import Image
 
 source = Image.open(r"C:\Screenshots\lesson-plan-library-borderless.png").convert("RGB")
-output = Path(__file__).resolve().parents[1] / "public" / "assets" / "subjects"
+output = Path(__file__).resolve().parents[1] / "client" / "public" / "assets" / "subjects"
 output.mkdir(parents=True, exist_ok=True)
 
 boxes = {

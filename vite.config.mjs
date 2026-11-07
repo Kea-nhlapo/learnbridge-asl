@@ -1,8 +1,8 @@
 import { defineConfig, loadEnv } from 'vite';
-import { signReconstructionMiddleware } from './server/sign-reconstruct.mjs';
-import { learnBridgeMiddleware } from './server/learnbridge-middleware.mjs';
-import { createLessonJobs } from './server/lesson-jobs.mjs';
-import { ngtSignsMiddleware } from './server/ngt-signs.mjs';
+import { signReconstructionMiddleware } from './server/signing/sign-reconstruct.mjs';
+import { learnBridgeMiddleware } from './server/gateway/learnbridge-middleware.mjs';
+import { createLessonJobs } from './server/lessons/lesson-jobs.mjs';
+import { ngtSignsMiddleware } from './server/signing/ngt-signs.mjs';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'GEMINI_');
@@ -14,12 +14,12 @@ export default defineConfig(({ mode }) => {
   // The sign introduction is a live camera session. A Vite HMR reconnect or
   // full reload would tear down MediaPipe and lose the participant's capture.
   // Keep the demo stable; restart/refresh manually when changing source.
-  // Lesson preparation (src/lesson-integration contract): Gemini writes questions checked against the source.
+  // Lesson preparation (shared/lesson-contract): Gemini writes questions checked against the source.
   // LESSON_JOBS_INLINE=1 reproduces the Vercel behaviour (lesson returned within the POST) locally.
   const lessonJobs = createLessonJobs({ apiKey: env.GEMINI_API_KEY || process.env.GEMINI_API_KEY, inline: process.env.LESSON_JOBS_INLINE === '1' });
   const lessonApi = { name: 'lesson-jobs-api', configureServer(server) { server.middlewares.use(lessonJobs.handle); }, configurePreviewServer(server) { server.middlewares.use(lessonJobs.handle); } };
   // Any sign from Nia's NGT dictionary, for /nia-sign.
-  const ngtSigns = ngtSignsMiddleware(new URL('./public', import.meta.url).pathname);
+  const ngtSigns = ngtSignsMiddleware(new URL('./client/public', import.meta.url).pathname);
   const ngtApi = { name: 'ngt-signs', configureServer(server) { server.middlewares.use(ngtSigns); }, configurePreviewServer(server) { server.middlewares.use(ngtSigns); } };
-  return { plugins: [signApi, learnBridgeApi, lessonApi, ngtApi], server: { hmr: false } };
+  return { root: 'client', build: { outDir: '../dist', emptyOutDir: true }, plugins: [signApi, learnBridgeApi, lessonApi, ngtApi], server: { hmr: false } };
 });

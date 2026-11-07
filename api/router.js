@@ -3,9 +3,9 @@
 // LearnBridge's gateway (translation, voices, transcription, YouTube, ASL), lesson preparation and
 // Signchat sentence reconstruction. Keys come from the Vercel project's environment variables.
 import { Readable } from 'node:stream';
-import gateway from '../server/learnbridge-gateway.mjs';
-import { createLessonJobs } from '../server/lesson-jobs.mjs';
-import { signReconstructionMiddleware } from '../server/sign-reconstruct.mjs';
+import gateway from '../server/ai/learnbridge-gateway.mjs';
+import { createLessonJobs } from '../server/lessons/lesson-jobs.mjs';
+import { signReconstructionMiddleware } from '../server/signing/sign-reconstruct.mjs';
 
 const GATEWAY_ROUTES = new Set(['/api/translate', '/api/speak', '/api/transcribe', '/api/youtube', '/api/asl']);
 // Serverless instances do not share memory, so lessons are generated within the request.

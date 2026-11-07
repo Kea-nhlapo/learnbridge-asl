@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const base = join(root, 'public', 'vendor', 'signchat');
+const base = join(root, 'client', 'public', 'vendor', 'signchat');
 const mediaWasm = join(base, 'mediapipe', 'wasm');
 const mediaModels = join(base, 'mediapipe', 'models');
 const ortDir = join(base, 'ort');

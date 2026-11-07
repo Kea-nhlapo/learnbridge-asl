@@ -3,7 +3,7 @@
 // have a fluent speaker review before relying on it.
 // Usage: start the dev server (npm run dev), then: node scripts/translate-sample-lessons.mjs [base-url]
 import { writeFile } from 'node:fs/promises';
-import { allSampleLessons } from '../src/learnbridge/sample-lessons.js';
+import { allSampleLessons } from '../client/src/features/lessons/sample-lessons.js';
 
 const BASE = process.argv[2] || 'http://127.0.0.1:8765';
 const out = {};
@@ -25,5 +25,5 @@ for (let i = 0; i < lessons.length; i += 3) {
     for (const to of ['zu', 'nso']) { out[lesson.id][to] = await translate(texts, to); console.log(`${lesson.id} ${to} ✓`); }
   }));
 }
-await writeFile(new URL('../src/learnbridge/sample-lessons-translations.json', import.meta.url), JSON.stringify(out, null, 1) + '\n');
+await writeFile(new URL('../client/src/features/lessons/sample-lessons-translations.json', import.meta.url), JSON.stringify(out, null, 1) + '\n');
 console.log(`Saved translations for ${Object.keys(out).length} lessons.`);

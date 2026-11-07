@@ -7,10 +7,11 @@
     "dev": "vite --host 127.0.0.1 --port 8765",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1 --port 8765",
-    "screenshot": "node screenshot.mjs",
-    "screenshot:demo": "node qa-screenshots.mjs",
-    "verify": "node verify.mjs",
-    "test:integration": "node --test src/lesson-integration/*.test.js"
+    "screenshot": "node scripts/qa/screenshot.mjs",
+    "screenshot:demo": "node scripts/qa/qa-screenshots.mjs",
+    "verify": "node scripts/verify.mjs",
+    "test": "node --test",
+    "test:integration": "node --test client/src/features/lessons/integration/*.test.js"
   },
   "dependencies": {
     "@fontsource/nunito": "^5.2.7",
