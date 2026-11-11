@@ -42,25 +42,29 @@ const PAGES_SCHEMA = {
 
 class UserError extends Error {}
 
-async function gemini(apiKey, parts, schema, fetchImpl) {
+// When every model is busy (Gemini's "high demand" spikes are short), wait and go round once more.
+async function gemini(apiKey, parts, schema, fetchImpl, retryDelayMs = 4000) {
   if (!apiKey) throw new UserError('Set GEMINI_API_KEY in .env.local to generate lessons.');
   let lastError = 'Gemini did not answer.';
-  for (const model of MODELS) {
-    const response = await fetchImpl(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-      method: 'POST',
-      headers: { 'x-goog-api-key': apiKey, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ role: 'user', parts }], generationConfig: { responseMimeType: 'application/json', responseJsonSchema: schema, temperature: 0.4 } }),
-      signal: AbortSignal.timeout(120000),
-    }).catch(error => ({ ok: false, status: 0, json: async () => ({ error: { message: error.message } }) }));
-    if (response.ok) {
-      const data = await response.json();
-      const text = data?.candidates?.[0]?.content?.parts?.map(part => part.text || '').join('') || '';
-      try { return JSON.parse(text); } catch { lastError = 'Gemini returned text that was not valid JSON.'; continue; }
+  for (let round = 0; round < 2; round++) {
+    if (round) await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+    for (const model of MODELS) {
+      const response = await fetchImpl(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+        method: 'POST',
+        headers: { 'x-goog-api-key': apiKey, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ role: 'user', parts }], generationConfig: { responseMimeType: 'application/json', responseJsonSchema: schema, temperature: 0.4 } }),
+        signal: AbortSignal.timeout(120000),
+      }).catch(error => ({ ok: false, status: 0, json: async () => ({ error: { message: error.message } }) }));
+      if (response.ok) {
+        const data = await response.json();
+        const text = data?.candidates?.[0]?.content?.parts?.map(part => part.text || '').join('') || '';
+        try { return JSON.parse(text); } catch { lastError = 'Gemini returned text that was not valid JSON.'; continue; }
+      }
+      const detail = (await response.json().catch(() => ({})))?.error?.message || `HTTP ${response.status}`;
+      lastError = `Gemini (${model}): ${detail}`;
+      // Other errors (bad key, bad request) stop here.
+      if (!tryNextModel(response.status, detail)) throw new Error(lastError);
     }
-    const detail = (await response.json().catch(() => ({})))?.error?.message || `HTTP ${response.status}`;
-    lastError = `Gemini (${model}): ${detail}`;
-    // Other errors (bad key, bad request) stop here.
-    if (!tryNextModel(response.status, detail)) break;
   }
   throw new Error(lastError);
 }
@@ -114,7 +118,7 @@ ${text.slice(0, MAX_SOURCE_CHARS)}`;
 
 // inline: finish the job within the POST request and return the lesson with it. Serverless hosts (Vercel)
 // cannot keep jobs in memory between requests, so polling another instance would not find the job.
-export function createLessonJobs({ apiKey, fetchImpl = fetch, newId = () => crypto.randomUUID().slice(0, 8), inline = false } = {}) {
+export function createLessonJobs({ apiKey, fetchImpl = fetch, newId = () => crypto.randomUUID().slice(0, 8), inline = false, retryDelayMs = 4000 } = {}) {
   const jobs = new Map();
   const lessons = new Map();
 
@@ -128,7 +132,7 @@ export function createLessonJobs({ apiKey, fetchImpl = fetch, newId = () => cryp
         const result = await gemini(apiKey, [
           { inlineData: { mimeType: 'application/pdf', data: input.pdf.toString('base64') } },
           { text: 'Transcribe the readable text of every page of this PDF, in order, exactly as written (no summary). Return one entry per page with its page number.' },
-        ], PAGES_SCHEMA, fetchImpl);
+        ], PAGES_SCHEMA, fetchImpl, retryDelayMs);
         pages = (result?.pages || []).filter(p => Number.isInteger(p.page) && String(p.text || '').trim());
         text = pages.map(p => `[Page ${p.page}]\n${p.text}`).join('\n\n');
         if (normalise(text).split(' ').length < 30) throw new UserError('This PDF has too little readable text to build a lesson. Paste the text as a script instead.');
@@ -136,7 +140,7 @@ export function createLessonJobs({ apiKey, fetchImpl = fetch, newId = () => cryp
       // Text read from a PDF in the browser carries [Page n] markers; use them for page references.
       if (!input.pdf && /\[Page \d+\]/.test(text)) pages = [...text.matchAll(/\[Page (\d+)\]\n?([\s\S]*?)(?=\[Page \d+\]|$)/g)].map(m => ({ page: Number(m[1]), text: m[2] }));
       update({ status: 'generating_questions' });
-      const raw = await gemini(apiKey, [{ text: questionPrompt(text, input.metadata) }], QUESTION_SCHEMA, fetchImpl);
+      const raw = await gemini(apiKey, [{ text: questionPrompt(text, input.metadata) }], QUESTION_SCHEMA, fetchImpl, retryDelayMs);
       const { questions, rejected } = buildQuestions(raw, text, pages);
       if (questions.length < MIN_QUESTIONS) throw new UserError(`Only ${questions.length} questions could be checked against the source (${rejected.length} rejected). Try a longer or clearer source.`);
       const lessonId = `lesson-${newId()}`;

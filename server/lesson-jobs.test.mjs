@@ -126,3 +126,15 @@ test('a retired fallback model is skipped, not treated as a failure', async () =
   assert.equal(created.body.status, 'ready');
   assert.equal(calls.length, 3);
 });
+
+test('when every model is busy, it waits and goes round once more', async () => {
+  const calls = [];
+  const busy = () => Response.json({ error: { message: 'high demand' } }, { status: 503 });
+  const jobs = createLessonJobs({ apiKey: 'k', fetchImpl: fakeGemini([busy(), busy(), busy(), GEMINI_QUESTIONS], calls), inline: true, retryDelayMs: 1 });
+  const created = await call(jobs, 'POST', '/api/lesson-jobs/script', { text: SOURCE });
+  assert.equal(created.body.status, 'ready');
+  assert.equal(calls.length, 4);
+  const stillBusy = createLessonJobs({ apiKey: 'k', fetchImpl: fakeGemini([busy(), busy(), busy(), busy(), busy(), busy()]), inline: true, retryDelayMs: 1 });
+  const failed = await call(stillBusy, 'POST', '/api/lesson-jobs/script', { text: SOURCE });
+  assert.match(failed.body.error, /high demand/);
+});
