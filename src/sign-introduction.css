@@ -47,3 +47,4 @@
 @media(max-width:560px){.sign-intro-header>button{font-size:13px}.sign-intro-header .brand{transform:scale(.85);transform-origin:left center}}
 .sign-intro-camera-actions>small,.sign-intro-last{color:#4f6685}
 .sign-intro-words em{color:#5f7392}.sign-conversation-controls>small{color:#4f6685}
+.sign-intro-account a{color:#1268d5;font-weight:800}

@@ -30,3 +30,17 @@ test('created accounts are signed in at once, stored without the plain password,
   await assert.rejects(createAccount({ name: 'X', email: 'bad', password: 'secret1', role: 'learner' }), /valid email/);
   await assert.rejects(createAccount({ name: 'X', email: 'x@y.org', password: '123', role: 'learner' }), /6 characters/);
 });
+
+test('accessibility profiles follow from needs and can be changed', async () => {
+  const { getProfile, saveProfile, profileFromNeeds, allLearners } = await import('./accounts.js');
+  assert.deepEqual(getProfile('learner1@saeducate.test'), { needs: ['blind'], language: 'en', voiceAnswers: true, readAloud: true, largeText: false, highContrast: false, signedHelp: false });
+  assert.equal(getProfile('learner2@saeducate.test').signedHelp, true);
+  assert.equal(getProfile('learner4@saeducate.test').language, 'zu');
+  saveProfile('LEARNER1@saeducate.test', { ...profileFromNeeds(['blind']), largeText: true });
+  assert.equal(getProfile('learner1@saeducate.test').largeText, true);
+  await createAccount({ name: 'Mpho', email: 'mpho@example.org', password: 'secret1', role: 'learner', needs: ['low-vision', 'unknown'], language: 'xx' });
+  assert.deepEqual(getProfile('mpho@example.org').needs, ['low-vision']);
+  assert.equal(getProfile('mpho@example.org').language, 'en');
+  assert.ok(allLearners().some(l => l.name === 'Mpho' && l.profile.largeText));
+  assert.ok(allLearners().every(l => l.role === 'learner'));
+});

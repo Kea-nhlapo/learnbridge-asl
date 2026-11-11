@@ -1,0 +1,19 @@
+.lb-profile { max-width: 720px; margin: 0 auto; padding: 24px 18px 60px; font-family: Nunito, sans-serif; color: #10243f; }
+.lb-profile header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.lb-profile header a { color: #0566b0; font-weight: 800; text-decoration: none; }
+.lb-profile h1 { margin: 6px 0 4px; font-size: clamp(26px, 6vw, 36px); }
+.lb-profile-who { color: #40536d; }
+.lb-profile-who button { font: inherit; font-weight: 800; color: #0566b0; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
+.lb-profile fieldset { border: 1.5px solid #c5d6e8; border-radius: 14px; padding: 14px 18px 18px; margin: 18px 0; background: #fff; }
+.lb-profile legend { font-weight: 900; font-size: 1.15rem; padding: 0 6px; }
+.lb-profile-hint { margin: 0 0 8px; color: #40536d; }
+.lb-profile-check { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; font-size: 1.05rem; cursor: pointer; }
+.lb-profile-check + .lb-profile-check { border-top: 1px solid #e3ecf5; }
+.lb-profile-check input { width: 22px; height: 22px; margin: 2px 0 0; flex-shrink: 0; accent-color: #0c5bd0; }
+.lb-profile-check span { display: grid; gap: 2px; }
+.lb-profile-check small { color: #40536d; font-size: .92rem; }
+.lb-profile-language { display: grid; gap: 6px; margin-top: 12px; font-weight: 800; }
+.lb-profile-language select { font: inherit; font-weight: 400; padding: 10px 12px; border: 1.5px solid #c5d6e8; border-radius: 10px; max-width: 280px; }
+.lb-profile-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.lb-profile-actions span { font-weight: 700; color: #1a6b2d; }
+.lb-profile-primary { display: inline-block; font: inherit; font-weight: 800; border: 0; border-radius: 999px; padding: 12px 22px; background: #0c5bd0; color: #fff !important; cursor: pointer; text-decoration: none; }

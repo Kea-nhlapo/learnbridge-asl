@@ -1,3 +1,4 @@
+import { SAMPLE_CAPS } from './caps.js';
 // Sample lessons for the lesson library, written for SA Educate (original text, not copied from any textbook),
 // so the library has real content to open and turn into practice questions.
 export const TEXTBOOK = 'SA Educate Open Textbook (sample lessons)';
@@ -109,7 +110,7 @@ Behind the pupil is the lens. The lens changes its shape to focus light onto the
 Several defects can affect vision. Short-sightedness happens when the eyeball is too long and is corrected with concave lenses. Long-sightedness happens when the eyeball is too short and is corrected with convex lenses. Astigmatism is caused by an uneven curvature of the cornea or lens, which makes the image blurred.`,
     },
     {
-      id: 'life-photosynthesis', grade: 10, chapter: 7, title: 'Photosynthesis',
+      id: 'life-photosynthesis', grade: 11, chapter: 7, title: 'Photosynthesis',
       text: `Photosynthesis is the process by which green plants make their own food. Plants use light energy from the sun to change carbon dioxide and water into glucose and oxygen.
 
 Photosynthesis takes place mainly in the leaves, inside structures called chloroplasts. Chloroplasts contain a green pigment called chlorophyll, which absorbs light energy. This is why leaves are green.
@@ -145,4 +146,6 @@ Colours can also be described as warm or cool. Warm colours such as red, orange 
   ],
 };
 
+// Each lesson carries its CAPS tags (checked by hand, see caps.js).
+for (const lessons of Object.values(SAMPLE_LESSONS)) for (const lesson of lessons) lesson.caps = SAMPLE_CAPS[lesson.id] || null;
 export const allSampleLessons = () => Object.entries(SAMPLE_LESSONS).flatMap(([subject, lessons]) => lessons.map(lesson => ({ ...lesson, subject })));

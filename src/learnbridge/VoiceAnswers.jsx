@@ -5,10 +5,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { speakLines, useQuestionLanguage } from './QuestionLanguage.jsx';
 import { matchAnswer, questionSpeech, LETTERS } from './voice-answers.js';
+import { activeProfile } from './learner-profile.js';
 import './voice-answers.css';
 
 const STORAGE_KEY = 'sae-voice-answers';
-const readOn = () => { try { return localStorage.getItem(STORAGE_KEY) === 'on'; } catch { return false; } };
+// The learner's own choice on this screen, else their profile.
+const readOn = () => { try { const choice = localStorage.getItem(STORAGE_KEY); if (choice) return choice === 'on'; } catch {} return !!activeProfile()?.voiceAnswers; };
+export const voiceAnswersOn = readOn;
 
 let vadPromise = null;
 let onSpeech = null; // the current listener: one quiz screen at a time

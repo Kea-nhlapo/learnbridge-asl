@@ -37,3 +37,5 @@
 .lb-figures-review h3 { margin: 0 0 6px; }
 .lb-figures-review p { margin: 4px 0; color: #40536d; }
 .lb-figures-review ul { margin: 8px 0 0; padding-left: 20px; line-height: 1.6; }
+.lb-sign-entry + .lb-sign-entry { margin-left: 10px; }
+.lb-review-caps { font-weight: 700; color: #1a6b2d; margin: 4px 0 12px; }

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { SAMPLE_LESSONS, TEXTBOOK, allSampleLessons } from './sample-lessons.js';
 import { useQuestionLanguage, LanguageSelect, TranslationNote } from './QuestionLanguage.jsx';
 import { AudioLesson } from './AudioLesson.jsx';
+import { capsLabel, capsWords } from './caps.js';
 import TRANSLATIONS from './sample-lessons-translations.json';
 import './lesson-library-views.css';
 
@@ -13,7 +14,7 @@ export const lessonCount = subject => SAMPLE_LESSONS[subject]?.length || 0;
 export function searchLessons(query) {
   const q = query.trim().toLowerCase();
   if (!q) return [];
-  return allSampleLessons().filter(lesson => `${lesson.title} ${lesson.subject}`.toLowerCase().includes(q) || lesson.text.toLowerCase().includes(q));
+  return allSampleLessons().filter(lesson => `${lesson.title} ${lesson.subject} ${capsWords(lesson.caps)}`.toLowerCase().includes(q) || lesson.text.toLowerCase().includes(q));
 }
 
 export function LessonList({ lessons, onOpen, showSubject = false }) {
@@ -21,6 +22,7 @@ export function LessonList({ lessons, onOpen, showSubject = false }) {
     <button type="button" key={lesson.id} className="lb-lesson-card" onClick={() => onOpen(lesson)}>
       <span className="lb-lesson-meta">{showSubject ? `${lesson.subject} · ` : ''}Grade {lesson.grade} · Chapter {lesson.chapter}</span>
       <b>{lesson.title}</b>
+      {lesson.caps && <span className="lb-lesson-caps">{capsLabel(lesson.caps)}</span>}
       <span className="lb-lesson-excerpt">{lesson.text.split('\n')[0].slice(0, 150)}…</span>
     </button>)}
   </div>;
@@ -45,6 +47,7 @@ export function LessonReader({ lesson, onBack, onPractice, Btn }) {
   return <main className="dj-content lb-library-view lb-reader">
     <button type="button" className="lb-back" onClick={onBack}>← {lesson.subject}</button>
     <span className="lb-lesson-meta">{lesson.subject} · Grade {lesson.grade} · Chapter {lesson.chapter}</span>
+    {lesson.caps && <p className="lb-lesson-caps">{capsLabel(lesson.caps)}{lesson.caps.note ? ` (${lesson.caps.note})` : ''}</p>}
     <h1 className={reading === 0 ? 'lb-reading' : undefined}>{title}</h1>
     <div className="lb-reader-tools"><LanguageSelect translating={lang.translating} /></div>
     <AudioLesson parts={[title, ...shown]} language={lang.language} title={title} onPart={setReading} />

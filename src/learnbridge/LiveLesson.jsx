@@ -4,9 +4,14 @@
 import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createLessonApi } from '../lesson-integration/api.js';
 import { validateLesson } from '../lesson-integration/contract.js';
-import { useQuestionLanguage, LanguageSelect, ListenButton, TranslationNote } from './QuestionLanguage.jsx';
+import { useQuestionLanguage, LanguageSelect, ListenButton, TranslationNote, speakLines } from './QuestionLanguage.jsx';
 import { NiaSigner } from './NiaSign.jsx';
-import { VoiceAnswers } from './VoiceAnswers.jsx';
+import { VoiceAnswers, voiceAnswersOn } from './VoiceAnswers.jsx';
+import { questionSpeech } from './voice-answers.js';
+import { currentAccount } from './accounts.js';
+import { activeProfile } from './learner-profile.js';
+import { recordResult } from './results.js';
+import { capsLabel } from './caps.js';
 import './live-lesson.css';
 
 const api = createLessonApi();
@@ -23,11 +28,11 @@ export const liveLesson = () => live.lesson;
 export const liveJobRunning = () => !!live.job;
 
 // Library lessons: send the lesson's text to the generator and follow it on the generating screen.
-export function startLessonFromText({ title, text, subject, grade }, setId) {
+export function startLessonFromText({ title, text, subject, grade, caps }, setId) {
   describing++;
   update({ fileName: title, lesson: null, results: [], error: '', figures: [], figuresStatus: '', job: { id: 'pending', status: 'generating_questions', pending: true, startedAt: Date.now(), stageAt: Date.now() } });
   setId('generating-lesson');
-  api.createFromScript(text, { title, subject, grade: grade ? String(grade) : undefined })
+  api.createFromScript(text, { title, subject, grade: grade ? String(grade) : undefined, ...(caps ? { caps } : {}) })
     .then(job => update({ job, ...(job.status === 'failed' ? { error: job.error || 'The lesson could not be prepared.' } : {}) }))
     .catch(error => update({ job: { id: 'pending', status: 'failed' }, error: error.message }));
 }
@@ -234,6 +239,7 @@ export function LiveReview({ next, ui: { AppShell, Btn, Ic } }) {
   return <AppShell active="Lesson Plans"><main className="dj-content review"><div className="dj-reviewhead"><h1>Review your lesson plan</h1><p>Check the questions before assigning them.</p></div>
     <div className="dj-reviewbody"><nav>{['Overview', `Questions (${lesson.questions.length})`, 'Save'].map((x, i) => <div className={!i ? 'on' : ''} key={x} onClick={x === 'Save' ? next : undefined}>{x}</div>)}</nav>
       <section><div className="dj-lessontitle"><Ic>♟</Ic><div><h2>{lesson.title}</h2><p>Generated from {fileName}</p></div></div>
+        {lesson.caps && <p className="lb-review-caps">{capsLabel(lesson.caps)}{lesson.caps.suggested ? ' (suggested by AI — check it)' : ''}</p>}
         <h3>Questions</h3><ol className="lb-review-questions">{lesson.questions.map(q => <li key={q.id}><b>{q.prompt}</b><span>Answer: {q.options.find(o => o.id === q.correctOptionId).label}{q.sourceRefs?.[0]?.page ? ` · page ${q.sourceRefs[0].page}` : ''}</span></li>)}</ol>
         <FigureReview />
         <Btn className="next" onClick={next}>Save and assign</Btn></section></div></main></AppShell>;
@@ -246,12 +252,20 @@ export function LiveQuiz({ setId, ui: { Btn } }) {
   const [result, setResult] = useState(null);
   const [attempts, setAttempts] = useState(0);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [profile] = useState(activeProfile);
+  const used = useRef({ help: false, voice: false }); // for the teacher's results
   const q = lesson.questions[index];
   const lang = useQuestionLanguage([q.prompt, ...q.options.map(o => o.label), q.explanation]);
   const tPrompt = lang.texts[0], tOptions = lang.texts.slice(1, -1), tExplanation = lang.texts.at(-1);
   const check = (choice = selected) => { if (!choice) return; setSelected(choice); setAttempts(a => a + 1); setResult(choice === q.correctOptionId ? 'correct' : 'incorrect'); };
   const tryAgain = () => { setResult(null); setSelected(null); setHelpOpen(false); };
   const next = () => {
+    const account = currentAccount();
+    recordResult({
+      learner: account?.email || 'guest', learnerName: account?.name || 'Guest', lessonId: lesson.id, lessonTitle: lesson.title, caps: lesson.caps || null,
+      questionId: q.id, prompt: q.prompt, firstTry: attempts === 1, attempts, helpUsed: used.current.help, voiceUsed: used.current.voice,
+    });
+    used.current = { help: false, voice: false };
     const results = [...live.results, { id: q.id, firstTry: attempts === 1 }];
     update({ results });
     if (index + 1 === lesson.questions.length) { setId('celebration'); return; }
@@ -264,6 +278,16 @@ export function LiveQuiz({ setId, ui: { Btn } }) {
   const heading = useRef(null), feedback = useRef(null), drawerClose = useRef(null), watchButton = useRef(null);
   useEffect(() => { heading.current?.focus(); }, [index]);
   useEffect(() => { if (result) feedback.current?.querySelector('button')?.focus(); }, [result]);
+  // Profile: Deaf and hard-of-hearing learners get the signed explanation straight away after a wrong answer;
+  // "read each question aloud" reads it when it appears (unless voice answers is already doing so).
+  useEffect(() => { if (result === 'incorrect' && profile?.signedHelp) setHelpOpen(true); }, [result]);
+  useEffect(() => { if (helpOpen) used.current.help = true; }, [helpOpen]);
+  useEffect(() => {
+    if (!profile?.readAloud || voiceAnswersOn() || lang.translating) return;
+    const controller = new AbortController();
+    speakLines(questionSpeech(tPrompt, tOptions), lang.language, controller.signal).catch(() => {});
+    return () => { controller.abort(); window.speechSynthesis?.cancel(); };
+  }, [index, lang.translating, lang.language]);
   useEffect(() => {
     if (!helpOpen) return;
     drawerClose.current?.focus();
@@ -273,7 +297,7 @@ export function LiveQuiz({ setId, ui: { Btn } }) {
   }, [helpOpen]);
   return <div className={'dj-question lb-live-question ' + (result || '')}>
     <header><button type="button" aria-label="Leave the quiz" onClick={() => setId('path')}>×</button><div className="dj-qbar"><span style={{ width: `${(index + 1) / lesson.questions.length * 100}%` }} /></div><b>Question {index + 1} of {lesson.questions.length}</b><LanguageSelect translating={lang.translating} /></header>
-    <main><small>{lesson.title}{page ? ` · page ${page}` : ''}</small><h1 ref={heading} tabIndex={-1}>{tPrompt}</h1><ListenButton lines={[tPrompt, ...tOptions]} language={lang.language} /><VoiceAnswers question={{ number: index + 1, total: lesson.questions.length, prompt: tPrompt, options: tOptions, explanation: tExplanation, figure }} result={result} language={lang.language} onAnswer={i => check(q.options[i].id)} onNext={next} onTryAgain={tryAgain} /><TranslationNote translated={lang.translated} error={lang.error} />
+    <main><small>{lesson.title}{page ? ` · page ${page}` : ''}</small><h1 ref={heading} tabIndex={-1}>{tPrompt}</h1><ListenButton lines={[tPrompt, ...tOptions]} language={lang.language} /><VoiceAnswers question={{ number: index + 1, total: lesson.questions.length, prompt: tPrompt, options: tOptions, explanation: tExplanation, figure }} result={result} language={lang.language} onAnswer={i => { used.current.voice = true; check(q.options[i].id); }} onNext={next} onTryAgain={tryAgain} /><TranslationNote translated={lang.translated} error={lang.error} />
       {figure && <details className="lb-figure"><summary>🖼 Picture on page {page}: description</summary><p>{figure}</p><ListenButton lines={[figure]} language={lang.language} /></details>}
       <div className="dj-options" role="group" aria-label="Answers">{q.options.map((o, i) => {
         const cls = result === 'correct' && o.id === q.correctOptionId ? 'right' : result === 'incorrect' && o.id === selected ? 'wrong' : selected === o.id ? 'selected' : '';

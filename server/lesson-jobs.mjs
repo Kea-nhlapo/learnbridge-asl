@@ -16,6 +16,7 @@ const QUESTION_SCHEMA = {
   type: 'object',
   properties: {
     title: { type: 'string' },
+    caps: { type: 'object', properties: { subject: { type: 'string' }, grade: { type: 'integer' }, term: { type: 'integer' }, topic: { type: 'string' } } },
     questions: {
       type: 'array',
       items: {
@@ -103,6 +104,14 @@ export function buildQuestions(raw, sourceText, pages = []) {
   return { questions: kept, rejected };
 }
 
+// CAPS tags from Gemini or the library, tidied: a real grade, a term only when 1-4.
+export function cleanCaps(caps) {
+  const text = value => String(value || '').trim().slice(0, 100);
+  const grade = Number(caps?.grade), term = Number(caps?.term);
+  if (!text(caps?.subject) || !(grade >= 1 && grade <= 12)) return null;
+  return { subject: text(caps.subject), grade, term: term >= 1 && term <= 4 ? term : null, topic: text(caps.topic), ...(caps.strand ? { strand: text(caps.strand) } : {}), ...(caps.note ? { note: text(caps.note) } : {}) };
+}
+
 function questionPrompt(text, metadata) {
   const about = [metadata.subject && `Subject: ${metadata.subject}`, metadata.grade && `Grade: ${metadata.grade}`].filter(Boolean).join('\n');
   return `You write short multiple-choice practice questions for South African school learners, using only the source below.
@@ -110,6 +119,7 @@ Write ${MAX_QUESTIONS} questions. Each has 3 or 4 answer options with exactly on
 Wrong options must be plausible but clearly wrong according to the source. The explanation (1–2 sentences, plain English) says why the answer is right.
 sourceQuote must be copied word for word from the source: the sentence that supports the correct answer. If the source has page markers, give the page.
 Also give the lesson a short title. Do not use facts that are not in the source.
+Suggest CAPS tags (South Africa's Curriculum and Assessment Policy Statement): the CAPS subject name, the grade, the term (1-4) only if you are sure (otherwise 0), and the CAPS topic the source fits.
 ${about}
 
 SOURCE:
@@ -149,6 +159,7 @@ export function createLessonJobs({ apiKey, fetchImpl = fetch, newId = () => cryp
         title: input.metadata.title || String(raw.title || 'Practice lesson').trim(),
         source: { id: `source-${job.id}`, version: '1', kind: input.kind, ...(input.videoId ? { videoId: input.videoId } : {}) },
         questions,
+        caps: input.metadata.caps ? { ...cleanCaps(input.metadata.caps), suggested: false } : cleanCaps(raw.caps) && { ...cleanCaps(raw.caps), suggested: true },
         generatedBy: 'gemini',
         rejectedQuestions: rejected.length,
       });

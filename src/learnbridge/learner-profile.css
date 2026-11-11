@@ -1,0 +1,20 @@
+/* Large text (low vision): the reading parts of the learner screens, not the whole layout. */
+html.lb-large-text .dj-question main h1 { font-size: clamp(26px, 6vw, 40px) !important; line-height: 1.3; }
+html.lb-large-text .dj-options button { font-size: clamp(18px, 4.6vw, 24px) !important; min-height: 64px !important; }
+html.lb-large-text .dj-feedback h2 { font-size: 26px !important; }
+html.lb-large-text .dj-feedback p, html.lb-large-text .lb-figure p, html.lb-large-text .lb-help-overlay aside > p { font-size: 20px !important; line-height: 1.6; }
+html.lb-large-text .lb-reader-page p { font-size: 1.4rem !important; line-height: 1.8; }
+html.lb-large-text .lb-reader h1 { font-size: 2.2rem; }
+html.lb-large-text .lb-lesson-card b { font-size: 1.45rem; }
+html.lb-large-text .lb-listen, html.lb-large-text .lb-language select { font-size: 1.1rem; }
+
+/* Stronger contrast (low vision): black text, solid borders, underlined links, a clear focus ring. */
+html.lb-high-contrast body, html.lb-high-contrast p, html.lb-high-contrast li, html.lb-high-contrast h1, html.lb-high-contrast h2, html.lb-high-contrast h3,
+html.lb-high-contrast .dj-question main > small, html.lb-high-contrast .lb-lesson-meta, html.lb-high-contrast .lb-lesson-excerpt { color: #000 !important; }
+html.lb-high-contrast .dj-options button { border: 2px solid #000 !important; color: #000 !important; background: #fff !important; }
+html.lb-high-contrast .dj-options button.selected { outline: 4px solid #000; outline-offset: 2px; }
+html.lb-high-contrast .dj-options button.right { background: #d7f5d0 !important; }
+html.lb-high-contrast .dj-options button.wrong { background: #ffd9d9 !important; }
+html.lb-high-contrast .lb-reader-page, html.lb-high-contrast .lb-lesson-card, html.lb-high-contrast .lb-figure, html.lb-high-contrast .lb-audio { border: 2px solid #000 !important; background: #fff !important; }
+html.lb-high-contrast a, html.lb-high-contrast .lb-back { color: #00379e !important; text-decoration: underline !important; }
+html.lb-high-contrast :focus-visible { outline: 3px solid #000 !important; outline-offset: 3px; }

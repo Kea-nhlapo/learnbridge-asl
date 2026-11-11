@@ -17,3 +17,4 @@
 .lb-reader-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 10px 0 2px; }
 .lb-reader-tools .lb-listen { margin: 0; }
 .lb-reader-page.is-translating { opacity: .55; transition: opacity .2s; }
+.lb-lesson-caps { font-size: .85rem; font-weight: 700; color: #1a6b2d; margin: 2px 0; }

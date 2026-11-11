@@ -138,3 +138,15 @@ test('when every model is busy, it waits and goes round once more', async () => 
   const failed = await call(stillBusy, 'POST', '/api/lesson-jobs/script', { text: SOURCE });
   assert.match(failed.body.error, /high demand/);
 });
+
+test('CAPS tags: library tags are kept, AI suggestions are tidied and marked', async () => {
+  const { cleanCaps } = await import('./lesson-jobs.mjs');
+  assert.deepEqual(cleanCaps({ subject: ' Life Sciences ', grade: 11, term: 0, topic: 'Photosynthesis' }), { subject: 'Life Sciences', grade: 11, term: null, topic: 'Photosynthesis' });
+  assert.equal(cleanCaps({ subject: 'X', grade: 14 }), null);
+  const suggested = createLessonJobs({ apiKey: 'k', fetchImpl: fakeGemini([{ ...GEMINI_QUESTIONS, caps: { subject: 'Social Sciences (Geography)', grade: 7, term: 9, topic: 'Water' } }]), inline: true });
+  const a = await call(suggested, 'POST', '/api/lesson-jobs/script', { text: SOURCE });
+  assert.deepEqual(a.body.lesson.caps, { subject: 'Social Sciences (Geography)', grade: 7, term: null, topic: 'Water', suggested: true });
+  const library = createLessonJobs({ apiKey: 'k', fetchImpl: fakeGemini([{ ...GEMINI_QUESTIONS, caps: { subject: 'Wrong', grade: 3 } }]), inline: true });
+  const b = await call(library, 'POST', '/api/lesson-jobs/script', { text: SOURCE, metadata: { caps: { subject: 'Life Sciences', grade: 11, term: 2, topic: 'Photosynthesis', strand: 'Life Processes' } } });
+  assert.deepEqual(b.body.lesson.caps, { subject: 'Life Sciences', grade: 11, term: 2, topic: 'Photosynthesis', strand: 'Life Processes', suggested: false });
+});
