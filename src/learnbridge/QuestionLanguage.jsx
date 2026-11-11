@@ -73,7 +73,7 @@ export function LanguageSelect({ translating = false }) {
 }
 
 const voiceCache = new Map();
-async function speechFor(text, language, signal) {
+export async function speechFor(text, language, signal) {
   const key = `${language}\u0000${text}`;
   if (!voiceCache.has(key)) {
     const response = await fetch('/api/speak', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text.slice(0, 400), lang: language }), signal });
@@ -82,7 +82,7 @@ async function speechFor(text, language, signal) {
   }
   return voiceCache.get(key);
 }
-function deviceVoice(language) {
+export function deviceVoice(language) {
   if (!('speechSynthesis' in window)) return null;
   const prefix = language === 'en' ? 'en' : language;
   return speechSynthesis.getVoices().find(voice => voice.lang.toLowerCase().replace('_', '-').startsWith(prefix)) || null;

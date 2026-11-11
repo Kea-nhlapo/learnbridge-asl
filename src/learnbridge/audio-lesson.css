@@ -1,0 +1,12 @@
+.lb-audio { display: grid; gap: 8px; padding: 12px 16px; border: 1.5px solid #c5d6e8; border-radius: 14px; background: #f5f9fe; margin: 10px 0 4px; max-width: 640px; }
+.lb-audio-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.lb-audio-controls > button { font: inherit; font-size: 1.1rem; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #0c5bd0; background: #fff; color: #0c5bd0; cursor: pointer; }
+.lb-audio-controls > button:disabled { opacity: .4; cursor: default; }
+.lb-audio-controls > .lb-audio-play { width: 52px; height: 52px; background: #0c5bd0; color: #fff; }
+.lb-audio-controls > .lb-audio-stop { width: auto; height: 36px; border-radius: 999px; padding: 0 14px; font-size: .95rem; font-weight: 700; }
+.lb-audio-where { font-weight: 800; color: #1f2f45; margin-left: 4px; }
+.lb-audio-download { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: .95rem; color: #40536d; }
+.lb-audio-download button, .lb-audio-save { font: inherit; font-weight: 700; color: #0566b0; background: none; border: 0; padding: 4px 0; cursor: pointer; text-decoration: underline; }
+.lb-audio-download button:disabled { color: #5c6f87; cursor: wait; }
+.lb-reader-page p.lb-reading, .lb-reader h1.lb-reading { background: #fff6d6; box-shadow: 0 0 0 6px #fff6d6; border-radius: 4px; }
+.lb-audio-controls > button { display: inline-grid; place-items: center; padding: 0; }

@@ -1,9 +1,9 @@
 // Library views for the sample lessons: a subject's lesson list, and a textbook-style reader whose
 // "Make practice questions" button sends the lesson to the real lesson generator.
-import React from 'react';
+import React, { useState } from 'react';
 import { SAMPLE_LESSONS, TEXTBOOK, allSampleLessons } from './sample-lessons.js';
-import { useQuestionLanguage, LanguageSelect, ListenButton, TranslationNote } from './QuestionLanguage.jsx';
-import { speechPieces } from './speech-pieces.js';
+import { useQuestionLanguage, LanguageSelect, TranslationNote } from './QuestionLanguage.jsx';
+import { AudioLesson } from './AudioLesson.jsx';
 import TRANSLATIONS from './sample-lessons-translations.json';
 import './lesson-library-views.css';
 
@@ -41,13 +41,15 @@ export function LessonReader({ lesson, onBack, onPractice, Btn }) {
   // Title first, then each paragraph: translated together into isiZulu or Sepedi when chosen.
   const lang = useQuestionLanguage([lesson.title, ...paragraphs], TRANSLATIONS[lesson.id]);
   const [title, ...shown] = lang.texts;
+  const [reading, setReading] = useState(-1); // part being read aloud: 0 = title, then paragraphs
   return <main className="dj-content lb-library-view lb-reader">
     <button type="button" className="lb-back" onClick={onBack}>← {lesson.subject}</button>
     <span className="lb-lesson-meta">{lesson.subject} · Grade {lesson.grade} · Chapter {lesson.chapter}</span>
-    <h1>{title}</h1>
-    <div className="lb-reader-tools"><LanguageSelect translating={lang.translating} /><ListenButton lines={speechPieces([title, ...shown])} language={lang.language} /></div>
+    <h1 className={reading === 0 ? 'lb-reading' : undefined}>{title}</h1>
+    <div className="lb-reader-tools"><LanguageSelect translating={lang.translating} /></div>
+    <AudioLesson parts={[title, ...shown]} language={lang.language} title={title} onPart={setReading} />
     <TranslationNote translated={lang.translated} error={lang.error} />
-    <article className={'lb-reader-page' + (lang.translating ? ' is-translating' : '')}>{shown.map((paragraph, i) => <p key={i}>{paragraph}</p>)}</article>
+    <article className={'lb-reader-page' + (lang.translating ? ' is-translating' : '')}>{shown.map((paragraph, i) => <p key={i} className={reading === i + 1 ? 'lb-reading' : undefined}>{paragraph}</p>)}</article>
     <p className="lb-library-source">From the {TEXTBOOK}.</p>
     <div className="lb-library-actions"><Btn onClick={onPractice}>Make practice questions</Btn><Btn className="outline" onClick={onBack}>Back to {lesson.subject}</Btn></div>
   </main>;
