@@ -42,3 +42,6 @@
 .sign-calibration-progress{height:10px;margin:13px 0 6px;border-radius:999px;background:#dce9f9;overflow:hidden}.sign-calibration-progress span{display:block;height:100%;border-radius:inherit;background:#176de0;transition:width .25s ease}.sign-calibration-progress-copy{color:#5a7598;font-size:12px;font-weight:800}
 .sign-ready{padding:12px 0}.sign-ready p{margin-bottom:10px}.sign-circle-timer{width:86px;height:86px;margin:14px auto;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#176de0 var(--progress),#dce9f9 0);color:#17345d;font-size:20px;font-weight:900;position:relative}.sign-circle-timer::after{content:"";position:absolute;inset:8px;border-radius:50%;background:#fff}
 .sign-circle-timer{isolation:isolate}.sign-circle-timer::after{z-index:-1}
+.sign-intro-header>.sign-intro-account{margin-left:auto;font-weight:700}.sign-intro-account+button{margin-left:0!important}.sign-intro-account button{border:0;background:none;padding:0;color:#1268d5;font:inherit;font-weight:800;cursor:pointer}
+@media(max-width:900px){.sign-intro-header{gap:14px}.sign-intro-header>.sign-intro-account{display:inline;font-size:13px}}
+@media(max-width:560px){.sign-intro-header>button{font-size:13px}.sign-intro-header .brand{transform:scale(.85);transform-origin:left center}}

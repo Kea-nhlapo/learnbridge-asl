@@ -1,0 +1,7 @@
+.lb-account { height: auto; min-height: 100vh; padding-bottom: 40px; }
+.lb-account form { margin: 0; }
+.lb-role { display: flex; gap: 6px; padding: 4px; border-radius: 12px; background: #eef4fb; margin: 18px 0 4px; }
+.lb-role button { flex: 1; font: inherit; font-weight: 800; border: 0; border-radius: 9px; padding: 12px; background: transparent; color: #40536d; cursor: pointer; }
+.lb-role button.on { background: #fff; color: #0c5bd0; box-shadow: 0 2px 8px #07192c1a; }
+.lb-account-error { color: #b42318 !important; font-weight: 700; margin: 4px 0 14px; }
+.lb-account-switch { font: inherit; font-weight: 800; color: #0781da; background: none; border: 0; padding: 0; cursor: pointer; }

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import Brand from './Brand.jsx';
+import { currentAccount, signOut } from './learnbridge/accounts.js';
 import { MediaPipeOnnxClassifier } from './signchat/runtime/sign-pipeline/mediapipe-onnx-classifier.ts';
 import { createModeController } from './signchat/runtime/mode-controller/mode-controller.ts';
 import { classifyLetter, classifyPrototype, handFeatures, loadProfiles, multiHandFeatures, nameLetters, nextExpectedLetter, readyToSpellName, saveProfiles, SAMPLES_PER_LETTER } from './fingerspelling.js';
@@ -44,6 +45,8 @@ function speak(sentence, done) {
 }
 
 export default function SignConversation({ calibrationOnly = false }) {
+  const account = useMemo(currentAccount, []);
+  const learner = account?.role === 'learner';
   const controller = useMemo(() => createModeController({ mode: 'manual' }), []);
   const snapshot = useSyncExternalStore(controller.subscribe, controller.snapshot);
   const classifierRef = useRef(null);
@@ -351,7 +354,7 @@ export default function SignConversation({ calibrationOnly = false }) {
   function goDashboard() {
     window.speechSynthesis?.cancel();
     void classifierRef.current?.stop();
-    window.location.href = '/app?screen=dashboard';
+    window.location.href = learner ? '/app?screen=path' : '/app?screen=dashboard';
   }
 
   const tokens = snapshot.buffer.tokens.length ? snapshot.buffer.tokens : lastTokens;
@@ -361,7 +364,7 @@ export default function SignConversation({ calibrationOnly = false }) {
   const liveName = namePrefixMatches ? `${spelled.split('').join('-')} (${profileName})` : (spelled ? spelled.split('').join('-') : '…');
   const liveSentence = nameStarted ? `Hello, my name is ${liveName}${spelled && !spelling ? '.' : ''}` : tokens.some(token => token.label.toUpperCase() === 'HELLO') ? 'Hello…' : '';
   return <div className={`sign-intro-page${calibrationOnly ? ' sign-calibration-page' : ''}`}>
-    <header className="sign-intro-header"><Brand href="/"/><span>{calibrationOnly ? 'SA Educate · Signer calibration' : 'SA Educate · Communication'}</span><button type="button" onClick={() => { window.location.href = calibrationOnly ? '/sign-introduction' : '/app?screen=dashboard'; }}>{calibrationOnly ? 'Back to introduction →' : 'Go to dashboard →'}</button></header>
+    <header className="sign-intro-header"><Brand href="/"/><span>{calibrationOnly ? 'SA Educate · Signer calibration' : 'SA Educate · Communication'}</span>{account && <span className="sign-intro-account">Signed in as {account.name} · <button type="button" onClick={() => { signOut(); window.location.href = '/app?screen=login'; }}>Sign out</button></span>}<button type="button" onClick={() => { if (calibrationOnly) window.location.href = '/sign-introduction'; else goDashboard(); }}>{calibrationOnly ? 'Back to introduction →' : learner ? 'Go to my lessons →' : 'Go to dashboard →'}</button></header>
     <main className="sign-intro-main">
       <div className="sign-intro-heading"><span className="sign-intro-eyebrow">{calibrationOnly ? 'SIGNER SETUP' : 'WELCOME TO SA EDUCATE'}</span><h1>{calibrationOnly ? 'Manage signer calibration.' : 'Start with a sign.'}</h1><p>{calibrationOnly ? 'Create and test a local profile for each participant before the live introduction. Capture HELLO, MY, and every letter in their name.' : 'In one capture, sign HELLO and MY, then fingerspell your name. The sentence builds as you sign; review it before it is spoken.'}</p></div>
       <div className="sign-intro-grid">
@@ -392,7 +395,7 @@ export default function SignConversation({ calibrationOnly = false }) {
           {requestError && <div className="sign-intro-error" role="alert">{requestError}{lastTokens.length > 0 && <button type="button" onClick={() => { controller.retry(lastTokens); void reconstruct(lastTokens, spelled === activeProfile?.name.trim().toUpperCase().replaceAll(/\s+/g, '') ? activeProfile.name : ''); }}>Retry sentence</button>}</div>}
           {snapshot.state === 'preview' && <div className="sign-conversation-review"><label htmlFor="sentence-review">Review and edit the suggested sentence</label><textarea id="sentence-review" value={sentence} onChange={event => setSentence(event.target.value)} maxLength={500}/><p>Model confidence: {snapshot.preview?.confidence}. Check the wording before speaking.</p><div><button type="button" onClick={approve} disabled={!sentence.trim()}>Speak this sentence</button><button type="button" className="secondary" onClick={() => { controller.discard(); setLastTokens([]); }}>Discard</button></div></div>}
           {approved && <div className="sign-conversation-approved"><strong>Spoken sentence</strong><p>{approved}</p><SentenceTranslations sentence={approved} /><button type="button" onClick={() => { setSpeaking(speak(approved, () => setSpeaking(false))); }}>Speak again</button>{speaking && <button type="button" className="secondary" onClick={() => { window.speechSynthesis.cancel(); setSpeaking(false); controller.speakingDone(); }}>Stop speech</button>}</div>}
-          <div className="sign-intro-bottom">{calibrationOnly ? <><button type="button" className="sign-profile-bottom" onClick={() => { window.location.href = '/sign-introduction'; }}>← Back to introduction</button><button type="button" className="sign-intro-next" onClick={() => { window.location.href = '/sign-introduction'; }}>Continue to introduction →</button></> : <><button type="button" className="sign-profile-bottom" onClick={() => { window.location.href = '/sign-calibration'; }}>Manage profiles</button><button type="button" className="sign-intro-next" onClick={goDashboard}>Continue to dashboard →</button></>}</div>
+          <div className="sign-intro-bottom">{calibrationOnly ? <><button type="button" className="sign-profile-bottom" onClick={() => { window.location.href = '/sign-introduction'; }}>← Back to introduction</button><button type="button" className="sign-intro-next" onClick={() => { window.location.href = '/sign-introduction'; }}>Continue to introduction →</button></> : <><button type="button" className="sign-profile-bottom" onClick={() => { window.location.href = '/sign-calibration'; }}>Manage profiles</button><button type="button" className="sign-intro-next" onClick={goDashboard}>{learner ? 'Continue to my lessons →' : 'Continue to dashboard →'}</button></>}</div>
         </section>
       </div>
       <p className="sign-intro-limit">Powered by <a href="https://github.com/nlevites/signchat" target="_blank" rel="noopener noreferrer">Signchat’s ASL classifier and sentence approach</a>. This recognises isolated ASL signs. Personal fingerspelling profiles recognise trained static letters for the selected signer; they do not identify a person automatically, translate unrestricted ASL, or detect moving J and Z. Camera video and calibration stay on this device. When needed, recognised labels, scores, and a completed spelled name are sent to Google Gemini. Review the suggestion before speaking.</p>
