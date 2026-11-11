@@ -196,19 +196,31 @@ export function LiveQuiz({ setId, ui: { Btn } }) {
     setIndex(index + 1); setSelected(null); setResult(null); setAttempts(0); setHelpOpen(false);
   };
   const page = q.sourceRefs?.[0]?.page;
+  // Screen readers and keyboards: each new question's heading takes focus, the feedback's first button
+  // takes focus when an answer is checked, and the help drawer behaves as a dialog (focus, Escape).
+  const heading = useRef(null), feedback = useRef(null), drawerClose = useRef(null), watchButton = useRef(null);
+  useEffect(() => { heading.current?.focus(); }, [index]);
+  useEffect(() => { if (result) feedback.current?.querySelector('button')?.focus(); }, [result]);
+  useEffect(() => {
+    if (!helpOpen) return;
+    drawerClose.current?.focus();
+    const onKey = event => { if (event.key === 'Escape') setHelpOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => { window.removeEventListener('keydown', onKey); watchButton.current?.focus(); };
+  }, [helpOpen]);
   return <div className={'dj-question lb-live-question ' + (result || '')}>
-    <header><button type="button" onClick={() => setId('path')}>×</button><div className="dj-qbar"><span style={{ width: `${(index + 1) / lesson.questions.length * 100}%` }} /></div><b>Question {index + 1} of {lesson.questions.length}</b><LanguageSelect translating={lang.translating} /></header>
-    <main><small>{lesson.title}{page ? ` · page ${page}` : ''}</small><h1>{tPrompt}</h1><ListenButton lines={[tPrompt, ...tOptions]} language={lang.language} /><VoiceAnswers question={{ number: index + 1, total: lesson.questions.length, prompt: tPrompt, options: tOptions, explanation: tExplanation }} result={result} language={lang.language} onAnswer={i => check(q.options[i].id)} onNext={next} onTryAgain={tryAgain} /><TranslationNote translated={lang.translated} error={lang.error} />
-      <div className="dj-options">{q.options.map((o, i) => {
+    <header><button type="button" aria-label="Leave the quiz" onClick={() => setId('path')}>×</button><div className="dj-qbar"><span style={{ width: `${(index + 1) / lesson.questions.length * 100}%` }} /></div><b>Question {index + 1} of {lesson.questions.length}</b><LanguageSelect translating={lang.translating} /></header>
+    <main><small>{lesson.title}{page ? ` · page ${page}` : ''}</small><h1 ref={heading} tabIndex={-1}>{tPrompt}</h1><ListenButton lines={[tPrompt, ...tOptions]} language={lang.language} /><VoiceAnswers question={{ number: index + 1, total: lesson.questions.length, prompt: tPrompt, options: tOptions, explanation: tExplanation }} result={result} language={lang.language} onAnswer={i => check(q.options[i].id)} onNext={next} onTryAgain={tryAgain} /><TranslationNote translated={lang.translated} error={lang.error} />
+      <div className="dj-options" role="group" aria-label="Answers">{q.options.map((o, i) => {
         const cls = result === 'correct' && o.id === q.correctOptionId ? 'right' : result === 'incorrect' && o.id === selected ? 'wrong' : selected === o.id ? 'selected' : '';
-        return <button type="button" key={o.id} className={cls} disabled={!!result} onClick={() => setSelected(o.id)}>{tOptions[i]}{cls === 'right' && <i>✓</i>}{cls === 'wrong' && <i>×</i>}</button>;
+        return <button type="button" key={o.id} className={cls} aria-pressed={selected === o.id} disabled={!!result} onClick={() => setSelected(o.id)}>{tOptions[i]}{cls === 'right' && <><i aria-hidden="true">✓</i><span className="lb-sr">, correct answer</span></>}{cls === 'wrong' && <><i aria-hidden="true">×</i><span className="lb-sr">, your answer, not correct</span></>}</button>;
       })}</div></main>
     {!result && <footer><span /><span /><Btn disabled={!selected} onClick={() => check()}>Check</Btn></footer>}
-    {result === 'correct' && <section className="dj-feedback"><i>✓</i><div><h2>Correct!</h2><p>{tExplanation}</p></div><Btn onClick={next}>Continue</Btn></section>}
-    {result === 'incorrect' && <section className="dj-feedback bad"><i>×</i><div><h2>Not quite</h2><p>Watch the explanation, then try again.</p></div><Btn className="outline" onClick={() => setHelpOpen(true)}>✋ Watch signed explanation</Btn><Btn onClick={tryAgain}>Try again</Btn></section>}
+    {result === 'correct' && <section className="dj-feedback" role="alert" ref={feedback}><i aria-hidden="true">✓</i><div><h2>Correct!</h2><p>{tExplanation}</p></div><Btn onClick={next}>Continue</Btn></section>}
+    {result === 'incorrect' && <section className="dj-feedback bad" role="alert" ref={feedback}><i aria-hidden="true">×</i><div><h2>Not quite</h2><p>Watch the explanation, then try again.</p></div><Btn className="outline" ref={watchButton} onClick={() => setHelpOpen(true)}>✋ Watch signed explanation</Btn><Btn onClick={tryAgain}>Try again</Btn></section>}
     {/* Always mounted so Nia and this explanation's signs load while the question is answered. */}
-    <div className={'lb-help-overlay' + (helpOpen ? '' : ' preloading')} role="dialog" aria-label="Signed explanation" aria-hidden={!helpOpen}><aside>
-      <button type="button" className="dj-close" aria-label="Close" onClick={() => setHelpOpen(false)}>×</button>
+    <div className={'lb-help-overlay' + (helpOpen ? '' : ' preloading')} role="dialog" aria-modal={helpOpen || undefined} aria-label="Signed explanation" aria-hidden={!helpOpen} inert={!helpOpen || undefined}><aside>
+      <button type="button" className="dj-close" ref={drawerClose} aria-label="Close the explanation" onClick={() => setHelpOpen(false)}>×</button>
       <h1>Why this is the answer</h1>
       <NiaSigner text={q.explanation} language="en" preload play={helpOpen} />
       <h3>Explanation</h3><p>{tExplanation}</p>

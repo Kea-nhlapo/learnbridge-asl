@@ -5,3 +5,4 @@
 .lb-role button.on { background: #fff; color: #0c5bd0; box-shadow: 0 2px 8px #07192c1a; }
 .lb-account-error { color: #b42318 !important; font-weight: 700; margin: 4px 0 14px; }
 .lb-account-switch { font: inherit; font-weight: 800; color: #0781da; background: none; border: 0; padding: 0; cursor: pointer; }
+.lb-account .brand, .lb-account .lb-account-switch { color: #0566b0; }

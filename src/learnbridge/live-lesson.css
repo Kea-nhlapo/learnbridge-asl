@@ -24,3 +24,9 @@
 .dj-generating .dj-progress { flex-shrink: 0; }
 .dj-library-empty { margin: 24px 0; font-size: 1.05rem; color: #40536d; }
 .lb-sign-entry { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; text-decoration: none; }
+/* Screen-reader-only text, and readable contrast for small labels. */
+.lb-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.dj-question.lb-live-question main > small { color: #0566b0; }
+.lb-live-question h1:focus { outline: none; }
+.lb-live-question h1:focus-visible { outline: 3px solid #0c5bd0; outline-offset: 4px; border-radius: 6px; }
+.dj-content .dj-reviewbody > nav > .on { color: #0560a8; }

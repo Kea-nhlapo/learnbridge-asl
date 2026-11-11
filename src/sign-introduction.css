@@ -45,3 +45,5 @@
 .sign-intro-header>.sign-intro-account{margin-left:auto;font-weight:700}.sign-intro-account+button{margin-left:0!important}.sign-intro-account button{border:0;background:none;padding:0;color:#1268d5;font:inherit;font-weight:800;cursor:pointer}
 @media(max-width:900px){.sign-intro-header{gap:14px}.sign-intro-header>.sign-intro-account{display:inline;font-size:13px}}
 @media(max-width:560px){.sign-intro-header>button{font-size:13px}.sign-intro-header .brand{transform:scale(.85);transform-origin:left center}}
+.sign-intro-camera-actions>small,.sign-intro-last{color:#4f6685}
+.sign-intro-words em{color:#5f7392}.sign-conversation-controls>small{color:#4f6685}

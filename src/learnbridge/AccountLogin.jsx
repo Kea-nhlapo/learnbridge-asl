@@ -28,7 +28,7 @@ export function AccountLogin({ Btn, Brand, onTeacher }) {
   const switchMode = () => { setMode(creating ? 'signin' : 'create'); setError(''); };
 
   return <div className="dj-login lb-account"><button type="button" className="dj-back" aria-label="Back to home" onClick={() => { window.location.href = '/'; }}>←</button><Brand href="/" />
-    <section><form onSubmit={submit} noValidate>
+    <section role="main"><form onSubmit={submit} noValidate>
       <h1>{creating ? 'Create an account' : 'Welcome back'}</h1>
       <p>{creating ? 'Learners start with sign-to-speech, teachers with their dashboard.' : 'Sign in to SA Educate'}</p>
       {creating && <>
