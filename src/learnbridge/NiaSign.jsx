@@ -14,6 +14,38 @@ const signName = file => file.replace(/\.(sigml|bml)$/, '');
 let glossIndex = null;
 const loadIndex = async () => glossIndex ??= fetch('/nia/ngt-glosses.json').then(r => r.json()).then(d => buildGlossIndex(d.files));
 
+// One Nia for the whole app, moved between screens. Every Performs instance opens WebGL contexts that are
+// never released, so a new one per question used up a phone's graphics memory and Chrome dropped the canvas.
+let nia = null; // { app, ready, hidden }
+const lostListeners = new Set();
+function getNia() {
+  if (nia) return nia;
+  const app = new Performs();
+  app._createRecorder = () => {}; // video export: one hidden full-screen renderer per camera, never used here
+  const current = { app, hidden: false };
+  current.ready = new Promise((resolve, reject) => {
+    try {
+      app.init({
+        avatar: 'Nia', color: '#e8f2fb', autoplay: false, applyIdle: false,
+        scripts: [{ type: 'sigml', name: `${SIGNS}OOG.sigml` }], // Performs needs a first script to start in signing mode.
+        onReady: () => resolve(app),
+      });
+    } catch (error) { reject(error); }
+  });
+  const { renderer } = app;
+  if (renderer) {
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5)); // 3x phone screens are too heavy with soft shadows
+    const render = renderer.render.bind(renderer);
+    renderer.render = (scene, camera) => { if (nia === current && !current.hidden && renderer.domElement.isConnected) render(scene, camera); };
+    renderer.domElement.addEventListener('webglcontextlost', event => {
+      event.preventDefault();
+      if (nia === current) nia = null;
+      lostListeners.forEach(listener => listener());
+    });
+  }
+  return nia = current;
+}
+
 // Reusable: <NiaSigner text="…" language="en" /> loads Nia once and signs the text when asked.
 // preload: get the signs ready in the background as soon as Nia is loaded.
 // play: when it turns true, Nia starts signing straight away (using the prepared signs).
@@ -22,20 +54,33 @@ export function NiaSigner({ text, language = 'en', autoSign = false, preload = f
   const performs = useRef(null);
   const prepared = useRef({ key: '', promise: null });
   const [ready, setReady] = useState(false);
+  const [lost, setLost] = useState(false);
+  const [generation, setGeneration] = useState(0);
   const [state, setState] = useState({ status: 'Loading Nia…', dutch: '', glosses: [], busy: false, duration: 0 });
+  const hidden = preload && !play;
 
   useEffect(() => {
-    const app = new Performs();
-    performs.current = app;
-    try {
-      app.init({
-        avatar: 'Nia', color: '#e8f2fb', autoplay: false, applyIdle: false,
-        scripts: [{ type: 'sigml', name: `${SIGNS}OOG.sigml` }], // Performs needs a first script to start in signing mode.
-        onReady: () => setTimeout(() => { if (mount.current) { app.appendCanvasTo(mount.current); setReady(true); setState(s => ({ ...s, status: 'Nia is ready.' })); } }, 0),
-      });
-    } catch (error) { setState(s => ({ ...s, status: `Nia could not start: ${error.message}` })); }
-    return () => { performs.current = null; };
-  }, []);
+    let live = true;
+    const current = getNia();
+    prepared.current = { key: '', promise: null };
+    current.ready.then(app => setTimeout(() => {
+      if (!live || !mount.current || nia !== current) return;
+      mount.current.querySelectorAll('canvas').forEach(canvas => canvas.remove()); // a canvas whose context was lost
+      app.appendCanvasTo(mount.current);
+      performs.current = app;
+      setReady(true); setLost(false);
+      setState(s => ({ ...s, status: 'Nia is ready.' }));
+    }, 0), error => live && setState(s => ({ ...s, status: `Nia could not start: ${error.message}` })));
+    const onLost = () => {
+      if (!live) return;
+      performs.current = null;
+      setReady(false); setLost(true);
+      setState(s => ({ ...s, busy: false, status: 'Nia stopped: this device ran out of graphics memory.' }));
+    };
+    lostListeners.add(onLost);
+    return () => { live = false; lostListeners.delete(onLost); performs.current = null; };
+  }, [generation]);
+  useEffect(() => { if (nia) nia.hidden = hidden; }, [hidden, ready]);
 
   // Translation, sign lookup and sign files for the current text, fetched once and reused.
   function prepare() {
@@ -76,8 +121,10 @@ export function NiaSigner({ text, language = 'en', autoSign = false, preload = f
     <div ref={mount} className="nia-sign-stage" aria-label="Nia signing avatar" />
     <p className="nia-sign-status" role="status">{state.status}</p>
     <div className="nia-sign-actions">
-      <button type="button" disabled={!ready || state.busy || !text.trim()} onClick={sign}>{state.glosses.length ? 'Sign again' : 'Sign with Nia'}</button>
-      {state.duration > 0 && <button type="button" className="secondary" disabled={state.busy} onClick={() => performs.current?.changePlayState(true)}>Replay</button>}
+      {lost
+        ? <button type="button" onClick={() => { setLost(false); setState(s => ({ ...s, status: 'Loading Nia…' })); setGeneration(g => g + 1); }}>Reload Nia</button>
+        : <button type="button" disabled={!ready || state.busy || !text.trim()} onClick={sign}>{state.glosses.length ? 'Sign again' : 'Sign with Nia'}</button>}
+      {state.duration > 0 && !lost && <button type="button" className="secondary" disabled={state.busy} onClick={() => performs.current?.changePlayState(true)}>Replay</button>}
     </div>
     <p className="nia-sign-note">Prototype signing avatar.</p>
   </div>;
