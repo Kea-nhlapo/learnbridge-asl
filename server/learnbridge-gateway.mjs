@@ -109,13 +109,31 @@ async function youtubeCaptions(id,language){
     return Response.json({text,language:captionLanguage,automatic:track.kind==='asr',title},{headers:{...baseHeaders,'cache-control':'no-store'}});
   }catch(error){return jsonError(error.message===YT_BLOCKED?YT_BLOCKED:'YouTube could not be reached. Paste the transcript instead.',502)}
 }
+// Short spoken answers (?quick=1, a few seconds): Gemini first because it is fast and also knows Sepedi.
+async function geminiTranscribe(bytes,lang,apiKey){
+  let binary='';const view=new Uint8Array(bytes);for(let i=0;i<view.length;i+=32768)binary+=String.fromCharCode(...view.subarray(i,i+32768));
+  for(const model of ['gemini-3.5-flash-lite','gemini-3.5-flash','gemini-flash-lite-latest']){
+    const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{method:'POST',headers:{'x-goog-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({
+      contents:[{parts:[{inlineData:{mimeType:'audio/wav',data:btoa(binary)}},{text:`A school learner is answering a quiz question out loud, probably in ${GEMINI_LANGUAGES[lang]}. Write down exactly what they said, in the language they spoke. Single letters such as A, B or C are written as capital letters. Return only the words, or nothing if there is no speech.`}]}],
+      generationConfig:{temperature:0}}),signal:AbortSignal.timeout(20000)});
+    if(!response.ok){const detail=await response.text().catch(()=>'');if([429,500,503].includes(response.status)||([400,404].includes(response.status)&&/no longer available|not found|not supported/i.test(detail)))continue;return null}
+    const text=(await response.json())?.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('').trim();
+    return typeof text==='string'?text:null;
+  }
+  return null;
+}
 async function transcribe(request,url,env){
   const lang=url.searchParams.get('lang');
-  if(lang==='nso')return jsonError('Automatic Sepedi transcription is not connected yet: no free hosted Sepedi speech model is available. Type or paste the Sepedi transcript instead.',501);
-  const space=SPACES.asr[lang];if(!space)return jsonError('Choose English, isiZulu or Sepedi.',400);
+  if(!GEMINI_LANGUAGES[lang]||lang==='nl')return jsonError('Choose English, isiZulu or Sepedi.',400);
   if(!(request.headers.get('content-type')||'').startsWith('audio/'))return jsonError('Send a WAV audio section.',415);
   const bytes=await request.arrayBuffer();
   if(bytes.byteLength<100||bytes.byteLength>4*1024*1024)return jsonError('Send audio in sections under 4 MB.',413);
+  if(env?.GEMINI_API_KEY&&(url.searchParams.get('quick')==='1'||lang==='nso')){
+    const text=await geminiTranscribe(bytes,lang,env.GEMINI_API_KEY).catch(()=>null);
+    if(text!==null)return Response.json({text,transcribedBy:'gemini'},{headers:{...baseHeaders,'cache-control':'no-store'}});
+  }
+  if(lang==='nso')return jsonError('Automatic Sepedi transcription is not connected yet: no free hosted Sepedi speech model is available. Type or paste the Sepedi transcript instead.',501);
+  const space=SPACES.asr[lang];
   try{const [text]=await gradioCall(space,space.data,env,{bytes,name:'section.wav',type:'audio/wav'});return Response.json({text:String(text||'').trim()},{headers:{...baseHeaders,'cache-control':'no-store'}})}
   catch(error){return jsonError(error.message===BUSY?BUSY:'The transcription service could not be reached.',502)}
 }

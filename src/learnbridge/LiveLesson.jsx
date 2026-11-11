@@ -6,6 +6,7 @@ import { createLessonApi } from '../lesson-integration/api.js';
 import { validateLesson } from '../lesson-integration/contract.js';
 import { useQuestionLanguage, LanguageSelect, ListenButton, TranslationNote } from './QuestionLanguage.jsx';
 import { NiaSigner } from './NiaSign.jsx';
+import { VoiceAnswers } from './VoiceAnswers.jsx';
 import './live-lesson.css';
 
 const api = createLessonApi();
@@ -186,7 +187,7 @@ export function LiveQuiz({ setId, ui: { Btn } }) {
   const q = lesson.questions[index];
   const lang = useQuestionLanguage([q.prompt, ...q.options.map(o => o.label), q.explanation]);
   const tPrompt = lang.texts[0], tOptions = lang.texts.slice(1, -1), tExplanation = lang.texts.at(-1);
-  const check = () => { if (!selected) return; setAttempts(a => a + 1); setResult(selected === q.correctOptionId ? 'correct' : 'incorrect'); };
+  const check = (choice = selected) => { if (!choice) return; setSelected(choice); setAttempts(a => a + 1); setResult(choice === q.correctOptionId ? 'correct' : 'incorrect'); };
   const tryAgain = () => { setResult(null); setSelected(null); setHelpOpen(false); };
   const next = () => {
     const results = [...live.results, { id: q.id, firstTry: attempts === 1 }];
@@ -197,12 +198,12 @@ export function LiveQuiz({ setId, ui: { Btn } }) {
   const page = q.sourceRefs?.[0]?.page;
   return <div className={'dj-question lb-live-question ' + (result || '')}>
     <header><button type="button" onClick={() => setId('path')}>×</button><div className="dj-qbar"><span style={{ width: `${(index + 1) / lesson.questions.length * 100}%` }} /></div><b>Question {index + 1} of {lesson.questions.length}</b><LanguageSelect translating={lang.translating} /></header>
-    <main><small>{lesson.title}{page ? ` · page ${page}` : ''}</small><h1>{tPrompt}</h1><ListenButton lines={[tPrompt, ...tOptions]} language={lang.language} /><TranslationNote translated={lang.translated} error={lang.error} />
+    <main><small>{lesson.title}{page ? ` · page ${page}` : ''}</small><h1>{tPrompt}</h1><ListenButton lines={[tPrompt, ...tOptions]} language={lang.language} /><VoiceAnswers question={{ number: index + 1, total: lesson.questions.length, prompt: tPrompt, options: tOptions, explanation: tExplanation }} result={result} language={lang.language} onAnswer={i => check(q.options[i].id)} onNext={next} onTryAgain={tryAgain} /><TranslationNote translated={lang.translated} error={lang.error} />
       <div className="dj-options">{q.options.map((o, i) => {
         const cls = result === 'correct' && o.id === q.correctOptionId ? 'right' : result === 'incorrect' && o.id === selected ? 'wrong' : selected === o.id ? 'selected' : '';
         return <button type="button" key={o.id} className={cls} disabled={!!result} onClick={() => setSelected(o.id)}>{tOptions[i]}{cls === 'right' && <i>✓</i>}{cls === 'wrong' && <i>×</i>}</button>;
       })}</div></main>
-    {!result && <footer><span /><span /><Btn disabled={!selected} onClick={check}>Check</Btn></footer>}
+    {!result && <footer><span /><span /><Btn disabled={!selected} onClick={() => check()}>Check</Btn></footer>}
     {result === 'correct' && <section className="dj-feedback"><i>✓</i><div><h2>Correct!</h2><p>{tExplanation}</p></div><Btn onClick={next}>Continue</Btn></section>}
     {result === 'incorrect' && <section className="dj-feedback bad"><i>×</i><div><h2>Not quite</h2><p>Watch the explanation, then try again.</p></div><Btn className="outline" onClick={() => setHelpOpen(true)}>✋ Watch signed explanation</Btn><Btn onClick={tryAgain}>Try again</Btn></section>}
     {/* Always mounted so Nia and this explanation's signs load while the question is answered. */}

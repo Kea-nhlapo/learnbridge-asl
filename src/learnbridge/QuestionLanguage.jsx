@@ -88,6 +88,39 @@ function deviceVoice(language) {
   return speechSynthesis.getVoices().find(voice => voice.lang.toLowerCase().replace('_', '-').startsWith(prefix)) || null;
 }
 
+// Reads lines aloud (device voice when there is one, else /api/speak) and resolves when done or stopped.
+export async function speakLines(lines, language, signal, onPlaying = () => {}) {
+  const voice = deviceVoice(language);
+  if (voice) {
+    onPlaying();
+    await new Promise(resolve => {
+      const utterance = new SpeechSynthesisUtterance(lines.join('. '));
+      utterance.voice = voice; utterance.lang = voice.lang;
+      utterance.onend = utterance.onerror = resolve;
+      signal?.addEventListener('abort', () => { speechSynthesis.cancel(); resolve(); }, { once: true });
+      speechSynthesis.speak(utterance);
+    });
+    return;
+  }
+  // Lines are joined into pieces of up to 200 characters; the next piece is fetched while one plays.
+  const pieces = [];
+  for (const line of lines) {
+    if (pieces.length && pieces.at(-1).length + line.length < 200) pieces[pieces.length - 1] += ` ${line}`;
+    else pieces.push(line);
+  }
+  let upcoming = speechFor(pieces[0], language, signal);
+  for (let i = 0; i < pieces.length; i++) {
+    if (signal?.aborted) return;
+    const blob = await upcoming;
+    if (i + 1 < pieces.length) { upcoming = speechFor(pieces[i + 1], language, signal); upcoming.catch(() => {}); }
+    const url = URL.createObjectURL(blob);
+    onPlaying();
+    const audio = new Audio(url);
+    await new Promise(resolve => { audio.onended = audio.onerror = resolve; signal?.addEventListener('abort', () => { audio.pause(); resolve(); }, { once: true }); audio.play().catch(resolve); });
+    URL.revokeObjectURL(url);
+  }
+}
+
 // Reads the given lines aloud, one after another. A second click stops.
 export function ListenButton({ lines, language }) {
   const [state, setState] = useState('idle');
@@ -99,25 +132,9 @@ export function ListenButton({ lines, language }) {
     if (state !== 'idle') { stop(); return; }
     setError('');
     const controller = new AbortController(); playback.current = controller;
-    const voice = deviceVoice(language);
-    if (voice) {
-      setState('playing');
-      const utterance = new SpeechSynthesisUtterance(lines.join('. '));
-      utterance.voice = voice; utterance.lang = voice.lang;
-      utterance.onend = utterance.onerror = () => setState('idle');
-      speechSynthesis.speak(utterance);
-      return;
-    }
-    setState('loading');
+    setState(deviceVoice(language) ? 'playing' : 'loading');
     try {
-      for (const line of lines) {
-        if (controller.signal.aborted) return;
-        const url = URL.createObjectURL(await speechFor(line, language, controller.signal));
-        setState('playing');
-        const audio = new Audio(url);
-        await new Promise(resolve => { audio.onended = audio.onerror = resolve; controller.signal.addEventListener('abort', () => { audio.pause(); resolve(); }, { once: true }); audio.play().catch(resolve); });
-        URL.revokeObjectURL(url);
-      }
+      await speakLines(lines, language, controller.signal, () => setState('playing'));
     } catch (error) {
       if (!controller.signal.aborted) setError(error.message);
     } finally {

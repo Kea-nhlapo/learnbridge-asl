@@ -68,3 +68,24 @@ test('translation falls back to Gemini when NLLB is busy, keeping paragraphs', a
     assert.ok(seen.some(u => u.includes('generativelanguage')));
   });
 });
+
+test('short spoken answers are transcribed by Gemini, including Sepedi; long audio still goes to Whisper', async () => {
+  const seen = [];
+  await withFetch(async (url, init = {}) => {
+    url = String(url); seen.push(url);
+    if (url.includes('generativelanguage')) return Response.json({ candidates: [{ content: { parts: [{ text: ' B ' }] } }] });
+    return new Response('?', { status: 404 });
+  }, async () => {
+    const wav = new Uint8Array(2000);
+    const quick = await gateway.fetch(new Request('http://x/api/transcribe?lang=en&quick=1', { method: 'POST', headers: { 'content-type': 'audio/wav' }, body: wav }), { GEMINI_API_KEY: 'k' });
+    assert.deepEqual(await quick.json(), { text: 'B', transcribedBy: 'gemini' });
+    const sepedi = await gateway.fetch(new Request('http://x/api/transcribe?lang=nso', { method: 'POST', headers: { 'content-type': 'audio/wav' }, body: wav }), { GEMINI_API_KEY: 'k' });
+    assert.equal(sepedi.status, 200);
+    seen.length = 0;
+    const long = await gateway.fetch(new Request('http://x/api/transcribe?lang=en', { method: 'POST', headers: { 'content-type': 'audio/wav' }, body: wav }), { GEMINI_API_KEY: 'k' });
+    assert.equal(long.status, 502);
+    assert.ok(seen.every(url => !url.includes('generativelanguage')));
+    const noKey = await gateway.fetch(new Request('http://x/api/transcribe?lang=nso', { method: 'POST', headers: { 'content-type': 'audio/wav' }, body: wav }), {});
+    assert.equal(noKey.status, 501);
+  });
+});
