@@ -89,3 +89,21 @@ test('short spoken answers are transcribed by Gemini, including Sepedi; long aud
     assert.equal(noKey.status, 501);
   });
 });
+
+test('page images are described for blind learners, keeping only real pages', async () => {
+  const seen = [];
+  await withFetch(async (url, init = {}) => {
+    seen.push(JSON.parse(init.body));
+    return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify({ figures: [{ page: 3, description: ' A diagram of the water cycle with arrows. ' }, { page: 9, description: 'Not a page we sent.' }] }) }] } }] });
+  }, async () => {
+    const image = { page: 3, data: 'A'.repeat(200) };
+    const r = await gateway.fetch(new Request('http://x/api/describe-images', { method: 'POST', body: JSON.stringify({ images: [image] }) }), { GEMINI_API_KEY: 'k' });
+    assert.deepEqual(await r.json(), { figures: [{ page: 3, description: 'A diagram of the water cycle with arrows.' }], describedBy: 'gemini' });
+    assert.equal(seen[0].contents[0].parts[1].inlineData.mimeType, 'image/jpeg');
+    assert.match(seen[0].contents[0].parts.at(-1).text, /blind/);
+    const bad = await gateway.fetch(new Request('http://x/api/describe-images', { method: 'POST', body: JSON.stringify({ images: [] }) }), { GEMINI_API_KEY: 'k' });
+    assert.equal(bad.status, 400);
+    const noKey = await gateway.fetch(new Request('http://x/api/describe-images', { method: 'POST', body: JSON.stringify({ images: [image] }) }), {});
+    assert.equal(noKey.status, 501);
+  });
+});

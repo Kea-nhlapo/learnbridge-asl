@@ -3,7 +3,7 @@
 // YouTube captions and ASL signing motion (sign.mt).
 import gateway from './learnbridge-gateway.mjs';
 
-const ROUTES = new Set(['/api/translate', '/api/speak', '/api/transcribe', '/api/youtube', '/api/asl']);
+const ROUTES = new Set(['/api/translate', '/api/speak', '/api/transcribe', '/api/youtube', '/api/asl', '/api/describe-images']);
 const MAX_BODY = 5 * 1024 * 1024;
 
 export function learnBridgeMiddleware(hfToken, geminiKey) {

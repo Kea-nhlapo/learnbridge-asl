@@ -31,13 +31,15 @@ export function VoiceAnswers({ question, result, language, onAnswer, onNext, onT
   const choices = `${letters.slice(0, -1).join(', ')} or ${letters.at(-1)}`;
   const phrases = useQuestionLanguage([
     `Question ${question.number} of ${question.total}.`, `Say ${choices}. Say repeat to hear it again.`,
-    'Correct!', 'Say next to continue.', 'Not quite.', 'Try again.', 'Sorry, I did not catch that.',
+    'Correct!', 'Say next to continue.', 'Not quite.', 'Try again.', 'Sorry, I did not catch that.', 'The page has a picture:',
   ]);
-  const [intro, instructions, correct, sayNext, notQuite, tryAgain, sorry] = phrases.texts;
+  const [intro, instructions, correct, sayNext, notQuite, tryAgain, sorry, picture] = phrases.texts;
+  // The question read aloud, with the page's picture described after the prompt.
+  const questionLines = () => { const [prompt, ...options] = questionSpeech(question.prompt, question.options); return [prompt, ...(question.figure ? [`${picture} ${question.figure}`] : []), ...options]; };
   const actions = useRef({}); actions.current = { onAnswer, onNext, onTryAgain };
   const toggle = () => { const next = !on; setOn(next); try { localStorage.setItem(STORAGE_KEY, next ? 'on' : 'off'); } catch {} };
 
-  const key = [on, question.number, result, language, phrases.translating, question.prompt, ...question.options].join('\u0001');
+  const key = [on, question.number, result, language, phrases.translating, question.prompt, question.figure, ...question.options].join('\u0001');
   useEffect(() => {
     if (!on || phrases.translating) { setStatus(''); return; }
     const controller = new AbortController(); const { signal } = controller;
@@ -69,7 +71,7 @@ export function VoiceAnswers({ question, result, language, onAnswer, onNext, onT
       const options = question.options;
       let lines = result === 'correct' ? [correct, question.explanation, sayNext]
         : result === 'incorrect' ? [notQuite, question.explanation, tryAgain]
-        : [intro, ...questionSpeech(question.prompt, options), instructions];
+        : [intro, ...questionLines(), instructions];
       while (!signal.aborted) {
         await say(lines);
         if (signal.aborted) return;
@@ -81,7 +83,7 @@ export function VoiceAnswers({ question, result, language, onAnswer, onNext, onT
         if (!result && match?.action === 'answer') { actions.current.onAnswer(match.index); return; }
         if (result === 'correct' && match?.action === 'next') { actions.current.onNext(); return; }
         lines = match?.action === 'repeat' || match?.action === 'help'
-          ? (result === 'correct' ? [question.explanation, sayNext] : [...questionSpeech(question.prompt, options), instructions])
+          ? (result === 'correct' ? [question.explanation, sayNext] : [...questionLines(), instructions])
           : [sorry, result === 'correct' ? sayNext : instructions];
       }
     })().catch(error => { if (!signal.aborted) setStatus(/Permission|NotAllowed/i.test(error?.name + error?.message) ? 'Allow the microphone to answer by voice.' : `Voice answers could not start: ${error.message}`); });

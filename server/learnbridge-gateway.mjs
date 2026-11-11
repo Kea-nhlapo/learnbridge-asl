@@ -171,6 +171,27 @@ async function translate(request,env){
     return jsonError(error.message===BUSY?BUSY:'The translation service could not be reached.',502);
   }
 }
+// Pictures in a PDF, described for learners who cannot see them. The browser sends JPEG snapshots of the
+// pages that contain images; Gemini describes the diagrams, graphs and photos that matter for learning.
+const FIGURE_SCHEMA={type:'object',properties:{figures:{type:'array',items:{type:'object',properties:{page:{type:'integer'},description:{type:'string'}},required:['page','description']}}},required:['figures']};
+async function describeImages(request,env){
+  if(!env?.GEMINI_API_KEY)return jsonError('Image descriptions need GEMINI_API_KEY.',501);
+  const data=await readJSON(request,3_500_000);
+  const images=Array.isArray(data?.images)?data.images:null;
+  if(!images||!images.length||images.length>8||!images.every(i=>Number.isInteger(i?.page)&&i.page>0&&typeof i.data==='string'&&i.data.length>100))return jsonError('Send 1 to 8 page images (JPEG, base64) with their page numbers.',400);
+  const parts=images.flatMap(i=>[{text:`Page ${i.page}:`},{inlineData:{mimeType:'image/jpeg',data:i.data}}]);
+  parts.push({text:'These are pages from a South African school lesson. For each diagram, graph, chart, map, table drawn as a picture, photo or illustration that matters for learning, write a description for a learner who is blind: what it shows, its labels, values, arrows and how the parts relate, in 2 to 5 plain sentences. Do not describe logos, decorations, page borders or ordinary text. Give the page number it is on. If there are none, return an empty list.'});
+  for(const model of ['gemini-3.5-flash-lite','gemini-3.5-flash','gemini-flash-lite-latest']){
+    const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{method:'POST',headers:{'x-goog-api-key':env.GEMINI_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts}],generationConfig:{responseMimeType:'application/json',responseJsonSchema:FIGURE_SCHEMA,temperature:0.2}}),signal:AbortSignal.timeout(90000)}).catch(()=>null);
+    if(!response)continue;
+    if(!response.ok){const detail=await response.text().catch(()=>'');if([429,500,503].includes(response.status)||([400,404].includes(response.status)&&/no longer available|not found|not supported/i.test(detail)))continue;return jsonError('The images could not be described.',502)}
+    let parsed;try{parsed=JSON.parse((await response.json())?.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('')||'{}')}catch{continue}
+    const pages=new Set(images.map(i=>i.page));
+    const figures=(parsed.figures||[]).filter(f=>pages.has(f.page)&&typeof f.description==='string'&&f.description.trim()).map(f=>({page:f.page,description:f.description.trim()}));
+    return Response.json({figures,describedBy:'gemini'},{headers:{...baseHeaders,'cache-control':'no-store'}});
+  }
+  return jsonError('The image service is busy. Try again in a minute.',503);
+}
 // Gemini text-to-speech first when GEMINI_API_KEY is set (its own free allowance), else OmniVoice.
 const GEMINI_SPEAKERS={en:'South African English',zu:'isiZulu',nso:'Sepedi (Northern Sotho)'};
 function pcmToWav(pcm,rate){
@@ -213,13 +234,14 @@ async function speak(request,env){
 export default {
   async fetch(request, env={}) {
     const url = new URL(request.url);
-    if (['/api/transcribe','/api/translate','/api/speak','/api/youtube'].includes(url.pathname)) {
+    if (['/api/transcribe','/api/translate','/api/speak','/api/youtube','/api/describe-images'].includes(url.pathname)) {
       if (request.method !== 'POST') return jsonError('Use POST.',405);
       const origin=request.headers.get('origin');
       if(origin && origin!==url.origin)return jsonError('Request must come from this learning workspace.',403);
       if(url.pathname==='/api/transcribe')return transcribe(request,url,env);
       if(url.pathname==='/api/translate')return translate(request,env);
       if(url.pathname==='/api/youtube')return youtube(request,env);
+      if(url.pathname==='/api/describe-images')return describeImages(request,env);
       return speak(request,env);
     }
     if (url.pathname === '/api/asl') {

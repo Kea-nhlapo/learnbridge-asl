@@ -10,8 +10,9 @@ import { VoiceAnswers } from './VoiceAnswers.jsx';
 import './live-lesson.css';
 
 const api = createLessonApi();
-let live = { fileName: '', job: null, lesson: null, error: '', results: [] };
+let live = { fileName: '', job: null, lesson: null, error: '', results: [], figures: [], figuresStatus: '' };
 const listeners = new Set();
+let describing = 0; // which upload's pictures are being described
 const update = fields => { live = { ...live, ...fields }; listeners.forEach(l => l()); };
 const useLive = () => useSyncExternalStore(l => { listeners.add(l); return () => listeners.delete(l); }, () => live);
 
@@ -23,12 +24,55 @@ export const liveJobRunning = () => !!live.job;
 
 // Library lessons: send the lesson's text to the generator and follow it on the generating screen.
 export function startLessonFromText({ title, text, subject, grade }, setId) {
-  update({ fileName: title, lesson: null, results: [], error: '', job: { id: 'pending', status: 'generating_questions', pending: true, startedAt: Date.now(), stageAt: Date.now() } });
+  describing++;
+  update({ fileName: title, lesson: null, results: [], error: '', figures: [], figuresStatus: '', job: { id: 'pending', status: 'generating_questions', pending: true, startedAt: Date.now(), stageAt: Date.now() } });
   setId('generating-lesson');
   api.createFromScript(text, { title, subject, grade: grade ? String(grade) : undefined })
     .then(job => update({ job, ...(job.status === 'failed' ? { error: job.error || 'The lesson could not be prepared.' } : {}) }))
     .catch(error => update({ job: { id: 'pending', status: 'failed' }, error: error.message }));
 }
+
+// Pages with pictures, as JPEG snapshots (at most 8), for /api/describe-images. A page counts when it
+// draws an embedded image, or at least 6 filled or outlined shapes (diagrams in textbooks are often drawn, not pasted in).
+async function pdfPictures(file) {
+  const { pdfjs, pdf } = await openPdf(file);
+  const images = [];
+  try {
+    const { OPS } = pdfjs;
+    const drawsImage = new Set([OPS.paintImageXObject, OPS.paintInlineImageXObject, OPS.paintImageXObjectRepeat].filter(Boolean));
+    const paints = new Set([OPS.fill, OPS.eoFill, OPS.stroke, OPS.closeStroke, OPS.fillStroke, OPS.eoFillStroke, OPS.closeFillStroke, OPS.closeEOFillStroke].filter(Boolean));
+    for (let n = 1; n <= Math.min(pdf.numPages, 40) && images.length < 8; n++) {
+      const page = await pdf.getPage(n);
+      const { fnArray } = await page.getOperatorList();
+      const shapes = fnArray.filter(fn => paints.has(fn)).length; // filled or outlined shapes (clipping paths do not count)
+      if (!fnArray.some(fn => drawsImage.has(fn)) && shapes < 6) continue;
+      const viewport = page.getViewport({ scale: Math.min(2, 1100 / page.getViewport({ scale: 1 }).width) });
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(viewport.width); canvas.height = Math.round(viewport.height);
+      const context = canvas.getContext('2d'); context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height);
+      await page.render({ canvasContext: context, viewport }).promise;
+      images.push({ page: n, data: canvas.toDataURL('image/jpeg', 0.7).split(',')[1] });
+    }
+  } finally { await pdf.destroy(); }
+  return images;
+}
+// Describes the PDF's pictures alongside lesson generation; the result is kept only for the same upload.
+function describePictures(file) {
+  const run = ++describing;
+  const done = fields => { if (run === describing) update(fields); };
+  done({ figures: [], figuresStatus: 'working' });
+  pdfPictures(file)
+    .then(async images => {
+      if (!images.length) return [];
+      const response = await fetch('/api/describe-images', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ images }) });
+      const data = await response.json();
+      if (!response.ok) throw Error(data.error || 'The pictures could not be described.');
+      return data.figures;
+    })
+    .then(figures => done({ figures, figuresStatus: 'done' }), () => done({ figures: [], figuresStatus: 'failed' }));
+}
+// Descriptions of the pictures on a page, joined.
+const figureOn = (figures, page) => figures.filter(f => f.page === page).map(f => f.description).join(' ');
 
 const youtubeVideoId = url => String(url).match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/)?.[1] || null;
 const SOURCES = [['pdf', 'PDF document'], ['youtube', 'YouTube video'], ['text', 'Paste text']];
@@ -41,10 +85,13 @@ const MAX_TEXT_CHARS = 60000;
 let pdfjsModule = null;
 // Starts downloading the PDF reader early (when the upload screen opens), so reading a file starts at once.
 const loadPdfjs = () => pdfjsModule ??= import(/* @vite-ignore */ `${PDFJS}pdf.min.mjs`).catch(error => { pdfjsModule = null; throw error; });
-async function pdfText(file, progress = () => {}) {
+async function openPdf(file) {
   const pdfjs = await loadPdfjs();
   pdfjs.GlobalWorkerOptions.workerSrc = `${PDFJS}pdf.worker.min.mjs`;
-  const pdf = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()), isEvalSupported: false }).promise;
+  return { pdfjs, pdf: await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()), isEvalSupported: false }).promise };
+}
+async function pdfText(file, progress = () => {}) {
+  const { pdf } = await openPdf(file);
   let text = '';
   try {
     for (let n = 1; n <= pdf.numPages && text.length < MAX_TEXT_CHARS; n++) {
@@ -70,7 +117,8 @@ export function LiveUpload({ next, ui: { AppShell, Btn, Ic, UploadCloudIcon, Pdf
   const choose = f => { if (!f) return; if (f.type !== 'application/pdf' && !/\.pdf$/i.test(f.name)) { update({ error: 'Choose a PDF file.' }); return; } update({ error: '' }); setFile(f); };
   // Show the generating screen straight away and do the work behind it; `work` reports its stage as it goes.
   const begin = (fileName, work) => {
-    update({ fileName, lesson: null, results: [], error: '', job: { id: 'pending', status: 'extracting', pending: true, startedAt: Date.now() } });
+    describing++;
+    update({ fileName, lesson: null, results: [], error: '', figures: [], figuresStatus: '', job: { id: 'pending', status: 'extracting', pending: true, startedAt: Date.now() } });
     next();
     const stage = status => update({ job: { ...live.job, status, stageAt: Date.now() } });
     work(stage).then(job => update({ job, ...(job.status === 'failed' ? { error: job.error || 'The lesson could not be prepared.' } : {}) }))
@@ -86,7 +134,7 @@ export function LiveUpload({ next, ui: { AppShell, Btn, Ic, UploadCloudIcon, Pdf
         // instead of two. Scanned PDFs (no text) under 4 MB are sent to Gemini to read instead.
         let text = null;
         try { text = await pdfText(file); } catch (error) { if (file.size > DIRECT_PDF_LIMIT || error.name !== 'NoTextError') throw error; }
-        if (text) stage('generating_questions');
+        if (text) { stage('generating_questions'); describePictures(file); }
         return text ? api.createFromScript(text, { title: '' }) : api.uploadPdf(file, { title: '' });
       });
     } else if (mode === 'youtube') {
@@ -168,17 +216,31 @@ export function LiveGenerating({ setId, ui: { Brand, Ic } }) {
     <p className="lb-generating-tip" aria-live="polite">💡 {tip}</p></div>;
 }
 
+function FigureReview() {
+  const { figures, figuresStatus } = useLive();
+  if (!figuresStatus) return null;
+  return <section className="lb-figures-review" aria-live="polite">
+    <h3>Picture descriptions</h3>
+    {figuresStatus === 'working' && <p>Describing the pictures in your PDF for learners who cannot see them…</p>}
+    {figuresStatus === 'failed' && <p>The pictures could not be described this time.</p>}
+    {figuresStatus === 'done' && (figures.length
+      ? <><p>Written by AI for learners who cannot see the pictures. Check them before assigning.</p><ul>{figures.map((f, i) => <li key={i}><b>Page {f.page}:</b> {f.description}</li>)}</ul></>
+      : <p>No diagrams or pictures were found.</p>)}
+  </section>;
+}
+
 export function LiveReview({ next, ui: { AppShell, Btn, Ic } }) {
   const { lesson, fileName } = useLive();
   return <AppShell active="Lesson Plans"><main className="dj-content review"><div className="dj-reviewhead"><h1>Review your lesson plan</h1><p>Check the questions before assigning them.</p></div>
     <div className="dj-reviewbody"><nav>{['Overview', `Questions (${lesson.questions.length})`, 'Save'].map((x, i) => <div className={!i ? 'on' : ''} key={x} onClick={x === 'Save' ? next : undefined}>{x}</div>)}</nav>
       <section><div className="dj-lessontitle"><Ic>♟</Ic><div><h2>{lesson.title}</h2><p>Generated from {fileName}</p></div></div>
         <h3>Questions</h3><ol className="lb-review-questions">{lesson.questions.map(q => <li key={q.id}><b>{q.prompt}</b><span>Answer: {q.options.find(o => o.id === q.correctOptionId).label}{q.sourceRefs?.[0]?.page ? ` · page ${q.sourceRefs[0].page}` : ''}</span></li>)}</ol>
+        <FigureReview />
         <Btn className="next" onClick={next}>Save and assign</Btn></section></div></main></AppShell>;
 }
 
 export function LiveQuiz({ setId, ui: { Btn } }) {
-  const { lesson } = useLive();
+  const { lesson, figures } = useLive();
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState(null);
   const [result, setResult] = useState(null);
@@ -196,6 +258,7 @@ export function LiveQuiz({ setId, ui: { Btn } }) {
     setIndex(index + 1); setSelected(null); setResult(null); setAttempts(0); setHelpOpen(false);
   };
   const page = q.sourceRefs?.[0]?.page;
+  const figure = useQuestionLanguage([figureOn(figures, page)].filter(Boolean)).texts[0] || '';
   // Screen readers and keyboards: each new question's heading takes focus, the feedback's first button
   // takes focus when an answer is checked, and the help drawer behaves as a dialog (focus, Escape).
   const heading = useRef(null), feedback = useRef(null), drawerClose = useRef(null), watchButton = useRef(null);
@@ -210,7 +273,8 @@ export function LiveQuiz({ setId, ui: { Btn } }) {
   }, [helpOpen]);
   return <div className={'dj-question lb-live-question ' + (result || '')}>
     <header><button type="button" aria-label="Leave the quiz" onClick={() => setId('path')}>×</button><div className="dj-qbar"><span style={{ width: `${(index + 1) / lesson.questions.length * 100}%` }} /></div><b>Question {index + 1} of {lesson.questions.length}</b><LanguageSelect translating={lang.translating} /></header>
-    <main><small>{lesson.title}{page ? ` · page ${page}` : ''}</small><h1 ref={heading} tabIndex={-1}>{tPrompt}</h1><ListenButton lines={[tPrompt, ...tOptions]} language={lang.language} /><VoiceAnswers question={{ number: index + 1, total: lesson.questions.length, prompt: tPrompt, options: tOptions, explanation: tExplanation }} result={result} language={lang.language} onAnswer={i => check(q.options[i].id)} onNext={next} onTryAgain={tryAgain} /><TranslationNote translated={lang.translated} error={lang.error} />
+    <main><small>{lesson.title}{page ? ` · page ${page}` : ''}</small><h1 ref={heading} tabIndex={-1}>{tPrompt}</h1><ListenButton lines={[tPrompt, ...tOptions]} language={lang.language} /><VoiceAnswers question={{ number: index + 1, total: lesson.questions.length, prompt: tPrompt, options: tOptions, explanation: tExplanation, figure }} result={result} language={lang.language} onAnswer={i => check(q.options[i].id)} onNext={next} onTryAgain={tryAgain} /><TranslationNote translated={lang.translated} error={lang.error} />
+      {figure && <details className="lb-figure"><summary>🖼 Picture on page {page}: description</summary><p>{figure}</p><ListenButton lines={[figure]} language={lang.language} /></details>}
       <div className="dj-options" role="group" aria-label="Answers">{q.options.map((o, i) => {
         const cls = result === 'correct' && o.id === q.correctOptionId ? 'right' : result === 'incorrect' && o.id === selected ? 'wrong' : selected === o.id ? 'selected' : '';
         return <button type="button" key={o.id} className={cls} aria-pressed={selected === o.id} disabled={!!result} onClick={() => setSelected(o.id)}>{tOptions[i]}{cls === 'right' && <><i aria-hidden="true">✓</i><span className="lb-sr">, correct answer</span></>}{cls === 'wrong' && <><i aria-hidden="true">×</i><span className="lb-sr">, your answer, not correct</span></>}</button>;

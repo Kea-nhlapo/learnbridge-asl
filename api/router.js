@@ -7,7 +7,7 @@ import gateway from '../server/learnbridge-gateway.mjs';
 import { createLessonJobs } from '../server/lesson-jobs.mjs';
 import { signReconstructionMiddleware } from '../server/sign-reconstruct.mjs';
 
-const GATEWAY_ROUTES = new Set(['/api/translate', '/api/speak', '/api/transcribe', '/api/youtube', '/api/asl']);
+const GATEWAY_ROUTES = new Set(['/api/translate', '/api/speak', '/api/transcribe', '/api/youtube', '/api/asl', '/api/describe-images']);
 // Serverless instances do not share memory, so lessons are generated within the request.
 const lessons = createLessonJobs({ apiKey: process.env.GEMINI_API_KEY, inline: true });
 const signReconstruct = signReconstructionMiddleware(process.env.GEMINI_API_KEY, process.env.GEMINI_MODEL);
