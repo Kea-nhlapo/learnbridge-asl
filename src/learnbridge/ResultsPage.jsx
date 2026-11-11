@@ -37,7 +37,8 @@ export default function ResultsPage() {
   if (account?.role !== 'teacher') {
     return <main className="lb-res"><Brand href="/" /><h1>Learner results</h1><p>Sign in with a teacher account to see learner results.</p><a className="lb-res-primary" href="/app?screen=login">Sign in</a></main>;
   }
-  const addDemo = () => { addDemoResults(learners, DEMO_LESSONS); setVersion(v => v + 1); };
+  // Seeded, so the example is the same every time (one learner in "Needs support").
+  const addDemo = () => { let seed = 7; addDemoResults(learners, DEMO_LESSONS, () => (seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296); setVersion(v => v + 1); };
   const clearDemo = () => { clearDemoResults(); setLessonFilter(''); setVersion(v => v + 1); };
   const download = () => {
     const url = URL.createObjectURL(new Blob([toCsv(shown)], { type: 'text/csv' }));
